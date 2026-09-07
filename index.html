@@ -559,8 +559,11 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       {title:'What is NOT known', text:'The bands on this drawing are a <b>distance model</b>, not a survey. They show the order of exposure, not decibels. <b>No noise reading, no traffic count, no vehicle mix and nothing about the bridge structure’s reflection</b> has been obtained, and none of it is in the DWG. <b>Therefore</b> treat the acoustic strategy as directionally right but unquantified. A single sound-level reading taken at the south edge on the site visit would be worth more than everything modelled here.', source:null}
     ],
     views: [
-      {title:'What can actually be seen from the plot', text:'Measured from the plot centroid against the surveyed footprints. <b>Blocked 275–340°</b> by the 2,794 m² shed 2.9 m away. <b>Open 20–95°</b> over the living fabric toward the ~3,200 m² canopy 94 m off. <b>130–215°</b> is the highway at ground level, but opens onto the Ashrafieh hillside and the Beirut skyline above roughly the fourth floor. <b>Therefore</b> the only free view is north-east — the same direction people arrive from, so the view and the entrance want the same face. Everything else is a view that has to be earned with height.', source:{label:'My own measurement against the professor’s survey — ground level unless stated, VERIFY on site', url:'#'}},
-      {title:'The lecture asks us to FRAME, not just to look', text:'The professor’s translation for this condition is <b>VIEWS → FRAME</b> (p.12). <b>Therefore</b> the move is not "glaze the good side": it is to take the distant view by going up, keep the low levels turned away from the corridor, and make the north-east opening deliberate enough to read as a single framed view rather than a curtain wall.', source:null}
+      {title:'How far you can see, measured degree by degree', text:'A ray was cast every degree from the plot centroid to the first surveyed building, out to 400 m. <b>76° (21%)</b> is blocked within 60 m, <b>154° (43%)</b> within 150 m, and <b>78° (22%)</b> is clear all the way past 400 m. The median first obstruction is <b>184 m</b>. <b>Therefore</b> this is not an enclosed site. For a district where three quarters of the parcels carry building, the plot is unusually open — and that openness, not the fabric, is what there is to work with.', source:{label:'Ray cast every degree from the plot centroid against STRUC$$FOOTPRINT', url:'#'}},
+      {title:'Both sectors this map used to claim were wrong', text:'This map used to claim <b>blocked 275–340°</b> and <b>open 20–95°</b>. Both are wrong. The measured closed sector is <b>322–36°</b> — 75° wide, built ground as close as <b>28 m</b>, which is the shed. Of the old “blocked” arc only <b>19 of 66°</b> is actually blocked within 60 m; and <b>18°</b> of the old “open” arc is the most closed part of the whole horizon. <b>Therefore</b> the sectors are replaced, and the drawing is now the profile itself rather than wedges drawn by eye — 360 rays, one per degree.', source:{label:'Ray cast every degree from the plot centroid against STRUC$$FOOTPRINT', url:'#'}},
+      {title:'Four readings land on the same side of the plot', text:'The widest open sector is <b>86–147°</b>, 62° with nothing built within 150 m, and it holds the <b>tree canopy at 65 m</b>, the <b>pedestrian bridge</b>, and the <b>corridor</b> beyond. The plot’s east face looks at <b>103°</b> — inside it. <b>Therefore</b> four independent readings land on the same side of this plot: Edges calls the east the only real frontage, Streets finds the only walkable public edge there, Access puts the arrival on it, and Views finds the only thing worth framing. When four measurements taken for different reasons agree, that is the design decision making itself.', source:{label:'Ray cast every degree from the plot centroid against STRUC$$FOOTPRINT', url:'#'}},
+      {title:'What the storey counts still decide', text:'Everything above is <b>planimetric</b>. A direction counts as blocked when a building footprint stands in it <i>at ground level</i>. From an upper floor you may see straight over a single-storey shed 28 m away — and given the district’s large buildings are sheds, that is very likely what it is. <b>Therefore</b> the horizontal profile on this map is settled and the skyline is not: the storey counts decide whether the 75° closed sector is closed at 3 m or at 12 m, and whether the river at 232 m is visible from the second floor or only the fifth. That is item 1 on the field brief.', source:null},
+      {title:'The lecture asks us to FRAME, not just to look', text:'The professor’s translation for this condition is <b>VIEWS → FRAME</b> (p.12). <b>Therefore</b> the move is not “glaze the good side”. It is to take the distant view by going up, keep the low levels turned away from the corridor, and make the opening on the <b>east</b> deliberate enough to read as one framed view rather than a curtain wall.', source:null}
     ],
   };
 
@@ -1109,7 +1112,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     wind:         true,    // wind arrows  <- MAP 7, in review
     green:        true,    // green + water  <- MAP 11, in review
     sun:          true,    // sun path + face exposure  <- MAP 12, in review
-    views:        false,   // view arcs
+    views:        true,    // view profile + sectors  <- MAP 13, in review
     fieldsurvey:  false    // per-structure tag colouring
   };
 
@@ -1454,8 +1457,11 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       return [o[0] + (Math.cos(a) * metres) / M_LAT, o[1] + (Math.sin(a) * metres) / M_LNG];
     }
     function arcPts(b0, b1, r, step){
-      var out = [], st = step || 3;
-      for (var b = b0; b <= b1; b += st) out.push(ll(b, r));
+      /* A sector that wraps through north (322 -> 36) used to produce nothing at all,
+         because the loop ran from 322 up to 36 and never started. The closed view sector is
+         exactly such a sector, so it was drawn as a degenerate sliver on the wrong side. */
+      var out = [], st = step || 3, end = b1 < b0 ? b1 + 360 : b1;
+      for (var b = b0; b <= end; b += st) out.push(ll(b % 360, r));
       out.push(ll(b1, r));
       return out;
     }
@@ -1859,19 +1865,49 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         g.addLayer(L.polyline(st.ring, {color:cssVar('--ink'), weight:1.2,
           opacity:.85, interactive:false}));
       });
+      /* The four wedges that used to be here were drawn by eye and two of them were wrong:
+         the "open 20-95" arc pointed a third of its width straight at the shed, and half the
+         "blocked 275-340" arc is open. They are replaced by the measurement itself -- a ray
+         cast every degree from the plot centroid to the first surveyed building, out to
+         400 m and drawn capped at 300. The shape IS the view study. */
+      var VIEW_CONE = [[33.896883,35.540082],[33.896884,35.540088],[33.896866,35.540094],[33.896866,35.5401],[33.896865,35.540106],[33.896865,35.540111],[33.896865,35.540117],[33.896865,35.540123],[33.896864,35.540128],[33.896864,35.540134],[33.896863,35.54014],[33.896862,35.540145],[33.896861,35.540151],[33.896861,35.540156],[33.89686,35.540162],[33.896859,35.540167],[33.896858,35.540173],[33.896856,35.540178],[33.896855,35.540184],[33.896854,35.540189],[33.896852,35.540195],[33.896834,35.540193],[33.896832,35.540198],[33.896831,35.540203],[33.896829,35.540208],[33.896828,35.540213],[33.896842,35.540226],[33.89684,35.540232],[33.896838,35.540237],[33.896836,35.540242],[33.896834,35.540247],[33.896879,35.540283],[33.896876,35.540289],[33.896889,35.540306],[33.896886,35.540312],[33.896882,35.540318],[33.896879,35.540324],[33.897319,35.540702],[33.89731,35.540717],[33.897301,35.540732],[33.897121,35.540587],[33.897114,35.540598],[33.898667,35.542178],[33.898637,35.542221],[33.898605,35.542263],[33.898389,35.542099],[33.898359,35.542136],[33.897998,35.541775],[33.897948,35.541773],[33.897924,35.541801],[33.897911,35.541845],[33.897897,35.541889],[33.897882,35.541932],[33.897276,35.541102],[33.89785,35.542019],[33.89729,35.541199],[33.897814,35.542105],[33.897795,35.542148],[33.898108,35.542782],[33.898069,35.542813],[33.896863,35.540608],[33.897515,35.541929],[33.897488,35.541948],[33.897478,35.542004],[33.897239,35.541545],[33.897209,35.541539],[33.897196,35.541571],[33.897739,35.543033],[33.897696,35.543056],[33.897653,35.543079],[33.897609,35.543101],[33.897481,35.542859],[33.897422,35.542816],[33.8974,35.542894],[33.89737,35.542952],[33.897329,35.542968],[33.897297,35.543024],[33.897268,35.543101],[33.897237,35.543178],[33.8972,35.543233],[33.89676,35.541025],[33.89675,35.541049],[33.896733,35.541031],[33.89672,35.541034],[33.896706,35.541036],[33.896692,35.541039],[33.896879,35.543319],[33.896832,35.543325],[33.896725,35.542316],[33.896685,35.542145],[33.896653,35.542061],[33.896623,35.541975],[33.896596,35.54191],[33.896569,35.54191],[33.896543,35.541909],[33.896516,35.541908],[33.89649,35.541906],[33.89647,35.541817],[33.896445,35.541815],[33.89642,35.541811],[33.896392,35.541829],[33.896266,35.542593],[33.89623,35.542586],[33.896197,35.542556],[33.896165,35.542526],[33.89613,35.542517],[33.896099,35.542486],[33.896064,35.542475],[33.896034,35.542443],[33.896,35.542431],[33.895933,35.542541],[33.895839,35.542732],[33.895677,35.543122],[33.895627,35.543122],[33.895583,35.543101],[33.895539,35.54308],[33.895496,35.543057],[33.895453,35.543034],[33.895411,35.543009],[33.895368,35.542984],[33.895326,35.542958],[33.895285,35.542931],[33.895244,35.542903],[33.895203,35.542875],[33.895163,35.542845],[33.895123,35.542815],[33.895084,35.542783],[33.895045,35.542751],[33.895006,35.542719],[33.894969,35.542685],[33.894931,35.54265],[33.894894,35.542615],[33.894858,35.542579],[33.894822,35.542543],[33.894786,35.542505],[33.894752,35.542467],[33.894717,35.542428],[33.894684,35.542388],[33.894651,35.542348],[33.894618,35.542307],[33.895591,35.54118],[33.895575,35.541159],[33.895546,35.541151],[33.894494,35.542136],[33.894465,35.542092],[33.895458,35.541123],[33.894408,35.542001],[33.895399,35.541099],[33.895758,35.540772],[33.895431,35.541002],[33.894302,35.541814],[33.894278,35.541766],[33.894254,35.541717],[33.894231,35.541668],[33.894208,35.541618],[33.894186,35.541568],[33.894165,35.541517],[33.894145,35.541466],[33.894125,35.541415],[33.894339,35.541244],[33.894356,35.541181],[33.894071,35.541258],[33.894054,35.541205],[33.894362,35.541018],[33.894024,35.541098],[33.894009,35.541044],[33.895694,35.540405],[33.895429,35.54047],[33.895423,35.540446],[33.895594,35.540372],[33.895449,35.540387],[33.895728,35.540297],[33.895743,35.540275],[33.895741,35.540257],[33.895756,35.540236],[33.895736,35.540221],[33.895717,35.540206],[33.893901,35.540378],[33.893898,35.540322],[33.894201,35.540246],[33.894974,35.540163],[33.893891,35.540152],[33.894774,35.540095],[33.894793,35.540058],[33.894811,35.540021],[33.894777,35.539981],[33.894635,35.539931],[33.894907,35.539918],[33.89491,35.539883],[33.894931,35.53985],[33.894935,35.539816],[33.893924,35.539589],[33.893932,35.539533],[33.89394,35.539477],[33.89395,35.539422],[33.89396,35.539366],[33.895388,35.539734],[33.895411,35.539715],[33.895417,35.53969],[33.895423,35.539665],[33.895429,35.539641],[33.895436,35.539617],[33.895443,35.539592],[33.895451,35.539568],[33.895458,35.539544],[33.895467,35.539521],[33.895475,35.539497],[33.895484,35.539474],[33.895477,35.539441],[33.895503,35.539428],[33.895513,35.539405],[33.895507,35.539372],[33.895518,35.539349],[33.895529,35.539327],[33.89554,35.539305],[33.895552,35.539283],[33.895623,35.539309],[33.895635,35.539289],[33.895647,35.539269],[33.895659,35.539249],[33.895586,35.53915],[33.895586,35.539116],[33.895601,35.539095],[33.895615,35.539074],[33.89563,35.539054],[33.895632,35.539019],[33.895648,35.538999],[33.895651,35.538964],[33.895656,35.538929],[33.895673,35.538909],[33.895678,35.538874],[33.89566,35.538806],[33.895668,35.53877],[33.895551,35.53855],[33.895551,35.538494],[33.895564,35.538455],[33.895577,35.538416],[33.895581,35.53836],[33.895597,35.538321],[33.895603,35.538264],[33.89562,35.538225],[33.895629,35.538168],[33.895242,35.537287],[33.895283,35.537259],[33.89557,35.537786],[33.895367,35.537206],[33.89563,35.537725],[33.895673,35.537724],[33.895707,35.537706],[33.895721,35.537628],[33.89575,35.53759],[33.895625,35.537068],[33.895891,35.537779],[33.895914,35.537724],[33.895926,35.537628],[33.895819,35.537056],[33.895849,35.536978],[33.895894,35.536963],[33.89594,35.536949],[33.895986,35.536935],[33.896032,35.536923],[33.89625,35.537973],[33.896294,35.538051],[33.896321,35.538024],[33.896346,35.537975],[33.896265,35.536876],[33.89641,35.537988],[33.896358,35.536865],[33.896405,35.53686],[33.896453,35.536857],[33.896505,35.537027],[33.896551,35.537112],[33.896594,35.536852],[33.896641,35.536853],[33.896688,35.536854],[33.896736,35.536856],[33.896783,35.53686],[33.89683,35.536864],[33.896877,35.53687],[33.896924,35.536876],[33.89697,35.536883],[33.896764,35.538813],[33.896779,35.538839],[33.896798,35.538843],[33.896816,35.538847],[33.896834,35.538852],[33.896852,35.538857],[33.896814,35.539113],[33.897339,35.536977],[33.897385,35.536993],[33.89743,35.53701],[33.897475,35.537028],[33.897519,35.537047],[33.897563,35.537067],[33.897607,35.537088],[33.897651,35.537109],[33.897694,35.537132],[33.897417,35.537978],[33.897424,35.538054],[33.897421,35.538149],[33.897441,35.538186],[33.897469,35.538204],[33.897946,35.537286],[33.897987,35.537315],[33.898027,35.537344],[33.898067,35.537374],[33.89731,35.538822],[33.898145,35.537438],[33.89722,35.539063],[33.897213,35.53911],[33.897216,35.53914],[33.898296,35.537574],[33.897093,35.539382],[33.89708,35.539425],[33.897065,35.539468],[33.897062,35.539494],[33.897046,35.539535],[33.897041,35.539559],[33.897036,35.539584],[33.897017,35.539623],[33.89701,35.539646],[33.897003,35.539669],[33.896996,35.539691],[33.896987,35.539714],[33.896993,35.539722],[33.896984,35.539743],[33.896974,35.539764],[33.896964,35.539784],[33.896969,35.539792],[33.896958,35.539812],[33.896962,35.53982],[33.89695,35.539838],[33.896954,35.539846],[33.896942,35.539864],[33.896945,35.539871],[33.896932,35.539888],[33.896935,35.539895],[33.896938,35.539903],[33.896924,35.539919],[33.896927,35.539926],[33.896929,35.539932],[33.896915,35.539947],[33.896917,35.539954],[33.896919,35.539961],[33.896904,35.539974],[33.896905,35.539981],[33.896907,35.539987],[33.896909,35.539994],[33.89691,35.54],[33.896894,35.540012],[33.896895,35.540018],[33.896896,35.540024],[33.896897,35.540031],[33.896898,35.540037],[33.896881,35.540046],[33.896881,35.540052],[33.896882,35.540058],[33.896882,35.540064],[33.896883,35.54007],[33.896883,35.540076],[33.896883,35.540082]];
+      g.addLayer(L.polygon(VIEW_CONE, {color:cssVar('--layer-greenery'), weight:1.1, opacity:.8,
+        fillColor:cssVar('--layer-greenery'), fillOpacity:.16})
+        .bindPopup('<h4>How far you can see, degree by degree</h4>A ray cast every degree from the plot ' +
+          'centroid to the first surveyed building, out to 400 m and drawn capped at 300.<br><br>' +
+          'Blocked within 60 m: <b>76\u00b0</b> (21%). Within 150 m: <b>154\u00b0</b> (43%). Clear past ' +
+          '400 m: <b>78\u00b0</b> (22%). Median first obstruction <b>184 m</b>.<br><br>' +
+          'This is <b>planimetric</b>: a direction counts as blocked when a footprint stands in it at ' +
+          'ground level. From an upper floor you may see straight over a single-storey shed \u2014 which ' +
+          'is what the one at 28 m probably is. The horizontal profile is settled; the skyline needs the ' +
+          'storey counts.' +
+          '<span class="src">Measured against STRUC$$FOOTPRINT and the layer-0 plot.</span>'));
+
       var V = [
-        {b0:275, b1:340, r:150, kind:'blocked', t:'Blocked — the 2,794 m² shed',
-         d:'A surveyed structure stands <b>2.9 m</b> off this edge and fills the whole arc. From the lower floors there is nothing to see in this direction at all.',
-         then:'Do not spend facade here. This is where the service core and the solid back belong.'},
-        {b0:20, b1:95, r:230, kind:'open', t:'Open — the neighbourhood and the canopy',
-         d:'The only low-level outward view: over the living fabric toward the <b>~3,200 m² tree canopy</b> 94 m away, and past it to the bridge landing.',
-         then:'This is the view worth framing from the public floors. It is also the direction people arrive from — the view and the entrance want the same face.'},
-        {b0:130, b1:215, r:260, kind:'mixed', t:'The highway, and the hills beyond it',
-         d:'At ground level this is the corridor and its traffic. <b>Above about the fourth floor</b> the same arc opens onto Ashrafieh’s hillside and the Beirut skyline.',
-         then:'A view that has to be earned with height. Put the things that benefit from a distant view high, and keep the low levels turned away.'},
-        {b0:215, b1:275, r:200, kind:'mixed', t:'West — river plain and sunset',
-         d:'Low industrial fabric toward the Beirut River 232 m away. Long, flat and open — and the direction of the hardest evening sun.',
-         then:'A view and a problem at once. Frame it selectively, shade it heavily.'}
+        {b0:322, b1:36, r:135, kind:'blocked', t:'Closed \u2014 75\u00b0 of shed',
+         d:'The measured closed sector is <b>322\u201336\u00b0</b>, 75\u00b0 wide, with built ground as ' +
+           'close as <b>28 m</b>: the 2,794 m\u00b2 shed. The map used to put this arc at 275\u2013340\u00b0 ' +
+           'and call 20\u201395\u00b0 open \u2014 a third of that "open" arc is in fact the most closed part ' +
+           'of the horizon.',
+         then:'Do not spend facade here. This is where the service core and the solid back belong \u2014 the same ' +
+              'conclusion the edge drawing reaches from the party wall, for a different reason.'},
+        {b0:86, b1:147, r:235, kind:'open', t:'Open \u2014 the widest view, 62\u00b0',
+         d:'Nothing built within 150 m across the whole arc. It holds the <b>tree canopy at 65 m</b> ' +
+           '(93\u2013127\u00b0), the <b>pedestrian bridge</b> (108\u2013140\u00b0) and the <b>corridor</b> ' +
+           'beyond it from 119\u00b0. The plot\u2019s east face looks at <b>103\u00b0</b> \u2014 inside this arc.',
+         then:'Frame this one. The east side is already the frontage, the only walkable public edge and the ' +
+              'arrival; it is also the only view worth having. Four readings, one side of the plot.'},
+        {b0:228, b1:280, r:250, kind:'open', t:'Open \u2014 over the corridor to the river, 53\u00b0',
+         d:'Nothing built within 150 m. The line of sight runs over the corridor to the <b>Beirut River at ' +
+           '232 m</b>. It is also the direction of the hardest low evening sun, and of the summer intake wind.',
+         then:'A view and two problems in the same arc. Frame it selectively and shade it vertically \u2014 a ' +
+              'horizontal overhang does nothing against sun this low.'},
+        {b0:147, b1:228, r:200, kind:'mixed', t:'South \u2014 the corridor at ground level',
+         d:'Open in places (177\u2013195\u00b0 is clear past 180 m) but it is the corridor you are looking at, ' +
+           'and 98% of the plot lies within 50 m of it. Whether anything worth seeing sits beyond depends ' +
+           'entirely on height, which this survey does not record.',
+         then:'A view that has to be earned with height. Keep the low levels turned away and test it once the ' +
+              'storey counts are in.'}
       ];
       V.forEach(function(v){
         var col = v.kind === 'blocked' ? cssVar('--ink')
@@ -1880,7 +1916,10 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
           fillColor:col, fillOpacity: v.kind === 'blocked' ? .22 : .13, dashArray: v.kind === 'blocked' ? '5 4' : null})
           .bindPopup('<h4>' + v.t + '</h4>' + v.d + '<br><br><b>Therefore:</b> ' + v.then +
             '<span class="src">Arcs measured from the plot centroid against the surveyed footprints. Ground-level only unless stated — VERIFY on site.</span>'));
-        g.addLayer(L.marker(ll((v.b0 + v.b1) / 2, v.r * 0.72), {interactive:false,
+        /* Same wraparound as the arc: the midpoint of 322 -> 36 is 359, not 179, and the
+           label was landing on the opposite side of the plot from its own wedge. */
+        var mid = v.b1 < v.b0 ? ((v.b0 + v.b1 + 360) / 2) % 360 : (v.b0 + v.b1) / 2;
+        g.addLayer(L.marker(ll(mid, v.r * 0.72), {interactive:false,
           icon:L.divIcon({className:'view-label', html:v.t.split(' — ')[0], iconSize:[90, 18], iconAnchor:[45, 9]})}));
       });
       g.addLayer(L.polygon(SITE_PLOT, {color:cssVar('--layer-traffic'), weight:2.5,
@@ -2000,7 +2039,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     if (key === 'sun') rows = [{sw:'line', literal:'#D9A324', label:'21 June — noon 79.5°'},{sw:'line', literal:'#C9931B', label:'Equinox — noon 56.1°'},{sw:'line', literal:'#B0810E', label:'21 December — noon 32.6°'},{sw:'line', color:'--layer-greenery', label:'Plot face: workable sun'},{sw:'line', color:'--layer-environmental', label:'Plot face: hardest to shade'},{sw:'line', color:'--muted', label:'Plot face: least direct sun — midsummer only'}];
     if (key === 'noise') rows = [{sw:'block', color:'--layer-environmental', label:'The corridor — 32,853 m², up to 54.5 m wide'},{sw:'block', color:'--layer-environmental', label:'Distance band (model, not measured)'},{sw:'line', color:'--layer-environmental', label:'The exposed 22.07 m south side — 100% of it'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.6 m²'}];
     if (key === 'wind') rows = [{sw:'line', literal:'#2A6FC4', label:'Dec–Apr  ·  SW ~210–225°'},{sw:'line', literal:'#3987e5', label:'May–Oct  ·  WSW→W ~245–270°'},{sw:'line', literal:'#8AB6EE', label:'Oct reversal  ·  NNW ~337°'},{sw:'line', color:'--layer-greenery', label:'Cross-ventilation line'}];
-    if (key === 'views') rows = [{sw:'block', color:'--ink', label:'Blocked arc — the adjacent shed'},{sw:'block', color:'--layer-greenery', label:'Open arc — fabric and canopy'},{sw:'block', color:'--layer-landuse', label:'View earned with height'},{sw:'block', color:'--ink', label:'Surveyed structure'}];
+    if (key === 'views') rows = [{sw:'block', color:'--layer-greenery', label:'How far you can see — 360 rays, capped at 300 m'},{sw:'block', color:'--ink', label:'Closed 322–36° — the shed at 28 m'},{sw:'block', color:'--layer-greenery', label:'Open arcs — nothing built within 150 m'},{sw:'block', color:'--layer-landuse', label:'South — a view that needs height'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.6 m²'}];
     if (key === 'green') rows = [{sw:'block', color:'--layer-greenery', label:'Mapped green — 341 m² + 361 m², 702 m² in all'},{sw:'block', color:'--layer-greenery', label:'Unbuilt parcels under the canopy — surveyed, 4,571 m²'},{sw:'outline', color:'--layer-greenery', label:'Canopy extent read from imagery — not surveyed'},{sw:'block', color:'--muted', label:'Tagged greenfield — land awaiting development, not green'},{sw:'line', color:'--layer-movement', label:'Beirut River — nearest segment 232 m'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.6 m², 2.12× all the mapped green'}];
     /* While a section's overlay is switched off it is an empty survey map, so the key describes
        the base rather than a layer that is not on the sheet. */
@@ -2054,7 +2093,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       sun:      'noon sun <b>79.5°</b> June / <b>32.6°</b> December &middot; principal axis <b>198.1° / 18.1°</b> &middot; nothing within 250 m could shade the plot under <b>8 storeys</b>',
       noise:    'exposed face <b>22.07 m</b>, 100% of it &middot; <b>98%</b> of the plot lies within <b>50 m</b> of the corridor &middot; furthest corner <b>52.6 m</b> &middot; there is no sheltered end',
       wind:     'summer <b>WSW 257°</b> hits the <b>west</b> face <b>28°</b> off square &middot; nothing built within <b>300 m</b> upwind &middot; but <b>55%</b> of that intake sector is the corridor',
-      views:    'blocked arc <b>275–340°</b> &middot; open arc <b>20–95°</b> &middot; skyline only above ~4th floor',
+      views:    'closed <b>322–36°</b> (75°, shed at 28 m) &middot; widest open <b>86–147°</b> (62°) &middot; only <b>21%</b> of the horizon is blocked within 60 m &middot; median first obstruction <b>184 m</b>',
       green:    'mapped green within 600 m <b>702 m²</b> &middot; the plot is <b>2.12×</b> that &middot; nearest canopy <b>94.2 m</b>, private and walled &middot; nearest public park <b>1.5–2 km</b>'
     };
     if (STRIP[key]){
