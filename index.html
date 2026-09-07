@@ -502,9 +502,10 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       {title:'What is NOT measured', text:'Every wind figure on this map is <b>regional</b>. Directions and the ~3.5 m/s at 10 m come from Beirut station normals; <b>nothing about wind, air quality or particulates was measured on this site</b>, and none of it is in the DWG. The geometry — axis, facade angles, upwind obstruction, corridor overlap — is measured and reliable. The air is not. <b>Therefore</b> the one thing worth bringing back from the site visit for this map is a note of which way the air was actually moving, and whether the corridor was smellable at the south edge.', source:{label:'Beirut station climate normals — regional, not a site measurement. VERIFY on site', url:'#'}}
     ],
     green: [
-      {title:'Access, not absence', text:'There is <b>~3,200 m² of mature canopy 94 m away</b> — larger than Karantina Park and 16× closer — but it is walled and private, on the Cedrus Bank property. Mature trees and palms clearly thrive here, so the ground supports substantial canopy. <b>Therefore</b> the constraint is public <i>access</i> to green, not the ability to grow it. That reframes the ecological programme: the project could be the first publicly accessible green space in this fabric.', source:{label:'My own visual analysis of satellite + Street View — extent approximate, verify on site', url:'#'}},
-      {title:'The nearest public park is 1.5–2 km away', text:'Karantina Park, ~2,980 m², rehabilitated 2020–21. OpenStreetMap lists only three green areas within 600 m of the plot, the nearest 73 m. <b>Therefore</b> this neighbourhood has effectively no public green within walking distance.', source:{label:'CatalyticAction', url:'https://www.catalyticaction.org/'}},
-      {title:'Flood risk is documented, not theoretical', text:'The Beirut River here is a concrete flood channel (~32 m wide, 1974 design capacity 800 m³/s) built to protect Bourj Hammoud — and it has still overflowed. December 2023 saw the worst storm in a decade inundate the area. The plot sits ~5 m above sea level on a flat coastal river plain, <b>232 m</b> from the channel. <b>Therefore</b> stormwater and ground-floor levels are a real constraint, not a formality.', source:{label:'Press reporting, December 2023', url:'#'}},
+      {title:'Two of the three green spaces are green — 702 m² in total', text:'Three areas within 600 m are tagged green in OpenStreetMap, and one of them is not green. The <b>13,145 m²</b> area <b>72 m</b> from the plot is tagged <b>landuse=greenfield</b> — which means land awaiting development, not vegetation — and Figure-Ground independently shows that same ground as vacant cadastral parcels. Counting it overstated this neighbourhood’s green provision by a factor of nineteen. The real figure is a <b>341 m²</b> garden at 288 m and a <b>361 m²</b> patch of grass at 203 m: <b>702 m² of mapped green within 600 m</b>, and whether either is even public is unverified. <b>Therefore</b> the project plot, at <b>1,488.6 m²</b>, is <b>2.12×</b> all the mapped green space within 600 m of it. Whatever ground this building gives back is not a gesture here — it is the largest green space in walking distance.', source:{label:'Parcel faces rebuilt from PARCEL$BOUNDARY; green outlines and tags from OpenStreetMap', url:'#'}},
+      {title:'The canopy is real, walled, and in no dataset', text:'The one real canopy nearby is in no dataset. Reading satellite imagery and April 2023 Street View found dense mature trees and a row of palms behind a graffitied wall with a clipped hedge — <b>private and walled</b> — about <b>3,170 m²</b>, <b>94.2 m</b> from the plot edge. That outline is drawn by eye, so it is dashed thin and nothing is measured from it. What the survey <i>can</i> say: the box crosses <b>7 cadastral parcels</b> totalling <b>12,582 m²</b>, of which <b>5</b> carry no structure linework at all — <b>4,571 m²</b> of surveyed open ground, the largest 2,361 m² at 95.0 m. <b>Therefore</b> mature trees demonstrably thrive on this ground and on this water table. The constraint here is public <i>access</i> to green, not the ability to grow it — which is a far more answerable problem for a building to take on.', source:{label:'Parcel faces rebuilt from PARCEL$BOUNDARY; green outlines and tags from OpenStreetMap', url:'#'}},
+      {title:'The river, and why nothing rests on it', text:'The river is the other water on this drawing, and it is not in the survey either: three OpenStreetMap segments, the nearest <b>232 m</b> from the plot. Nothing in the DWG records it, nothing records whether it is open channel or culverted at this point, and nothing records its flood behaviour. <b>Therefore</b> it is drawn as context and no argument in this project rests on it.', source:null},
+      {title:'The two questions only the visit can answer', text:'Two things settle this map and neither is on a screen. <b>Does the gate in that wall open?</b> If the canopy is accessible at all, the argument changes from “the neighbourhood has almost no green” to “it has some and cannot reach it”. And <b>are the 341 m² garden and the 361 m² grass public?</b> If they are not, mapped public green within 600 m is <b>zero</b>. <b>Therefore</b> both are on the field brief, and the greenery form has an <i>access</i> field for exactly this.', source:null}
     ],
     siteplot: [
       {title:'Where this plot comes from', text:'Layer <b>0</b> of BOURJ HAMMOUD.dwg holds exactly <b>4 objects</b> out of 45,264 in the drawing: this closed 7-vertex polygon and the three lines of the X drawn across it. Everything else in the file sits on named survey layers (PARCEL$BOUNDARY, STRUC$FOOTPRINT, EASEMENT$BOUNDA$…). Layer 0 is where someone draws by hand — so this is the professor marking the plot for us, not survey data. <span class="fs">Source: Layer analysis of the professor’s cadastral survey</span>', source:null},
@@ -659,7 +660,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
 
     {key:'sun', label:'Sun & Shadow', short:'Sun', group:'ANALYSIS', color:'var(--layer-landuse)', blurb:'Solar geometry computed for this site\u2019s latitude (33.90\u00b0 N) and drawn against the plot\u2019s own surveyed bearings. Nothing here comes from another map \u2014 it is the sun and the plot.'},
     {key:'wind', label:'Wind & Air', short:'Wind', group:'ANALYSIS', color:'var(--layer-movement)', blurb:'Prevailing wind by season, plotted against the plot\u2019s own surveyed axis to find the cross-ventilation line. The directions are station data for Beirut, not a site measurement \u2014 the geometry they are drawn against is the survey.'},
-    {key:'green', label:'Green & Water', short:'Green', group:'ANALYSIS', color:'var(--layer-greenery)', blurb:'Every green area and water edge within 600 m, over the survey. The distinction that matters is public access: the nearest sizeable canopy is 94 m away and <b>walled</b>; the nearest public park is 1.5\u20132 km.'},
+    {key:'green', label:'Green & Water', short:'Green', group:'ANALYSIS', color:'var(--layer-greenery)', blurb:'Every green area and water edge within 600 m, over the survey. Two numbers carry it. Of the three areas OpenStreetMap tags as green here, one is <b>landuse=greenfield</b> — development land, not vegetation — so the real mapped green within 600 m is <b>702 m²</b>, and the plot alone is <b>2.12×</b> that. The one real canopy is <b>94.2 m</b> away and <b>walled</b>; the nearest public park is 1.5–2 km. The constraint is access, not growth.'},
     {key:'views', label:'Views & Skyline', short:'Views', group:'ANALYSIS', color:'var(--layer-greenery)', blurb:'What can be seen from the plot, measured from its centroid against the surveyed structure lines around it. Blocked arcs, open arcs, and the distant views the lecture asks us to frame.'}
   ];
   var TAG_OPTIONS_NOTES = ['General','Traffic','Greenery','Land use','Movement','Environmental'];
@@ -1104,7 +1105,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     landuse:      true,    // large structures  <- MAP 9, in review
     access:       true,    // arrival points + walk lines  <- MAP 10, in review
     wind:         true,    // wind arrows  <- MAP 7, in review
-    green:        false,   // greenery, canopy, river
+    green:        true,    // green + water  <- MAP 11, in review
     sun:          false,   // sun paths
     views:        false,   // view arcs
     fieldsurvey:  false    // per-structure tag colouring
@@ -1720,20 +1721,56 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       var g = groups.green;
       if (!g) return;
       ((SITE_FEATURES && SITE_FEATURES.green) || []).forEach(function(gr){
-        g.addLayer(L.polygon(gr.g, {color:cssVar('--layer-greenery'), weight:1.5,
-          fillColor:cssVar('--layer-greenery'), fillOpacity:.4})
-          .bindPopup('<h4>Green space (' + gr.kind + ')</h4><b>' + gr.dist + ' m</b> from the plot edge — ' +
-            'one of only three mapped green areas within 600 m.<span class="src">Outline from OpenStreetMap — annotation over the survey.</span>'));
+        /* landuse=greenfield means land awaiting development, not vegetation. Calling it a
+           green space inflated this neighbourhood's green provision nineteenfold, and
+           Figure-Ground independently shows that ground as vacant cadastral parcels. */
+        var isGreen = gr.kind !== 'greenfield';
+        g.addLayer(L.polygon(gr.g, {
+          color: isGreen ? cssVar('--layer-greenery') : cssVar('--muted'),
+          weight:1.5, dashArray: isGreen ? null : '5 4',
+          fillColor: isGreen ? cssVar('--layer-greenery') : cssVar('--muted'),
+          fillOpacity: isGreen ? .4 : .10})
+          .bindPopup('<h4>' + (isGreen ? 'Green space (' + gr.kind + ')' : 'Not green \u2014 tagged ' + gr.kind) +
+            '</h4><b>' + gr.dist + ' m</b> from the plot edge.' +
+            (isGreen
+              ? ' One of only <b>two</b> mapped areas within 600 m that are actually vegetation \u2014 341 m\u00b2 ' +
+                'and 361 m\u00b2, <b>702 m\u00b2 together</b>. Whether either is public is unverified.'
+              : ' <b>landuse=greenfield</b> means land awaiting development, not vegetation. It is drawn here only ' +
+                'so it is not mistaken for green: counting its 13,145 m\u00b2 as green space overstates what this ' +
+                'neighbourhood has by a factor of nineteen. Figure-Ground shows the same ground as vacant parcels.') +
+            '<span class="src">Outline and tag from OpenStreetMap \u2014 annotation over the survey.</span>'));
+      });
+      /* The trees are in no dataset, so the canopy cannot be replaced with surveyed geometry.
+         It can be BOUNDED by it: the imagery box straddles seven cadastral parcels, five of
+         which carry no structure linework at all. Those five are drawn from the survey; the
+         box stays thinner and dashed, so what was measured and what was read off a picture
+         stay visibly different things. */
+      var CANOPY_PARCELS = [{"g":[[33.896275,35.542212],[33.896271,35.542232],[33.896251,35.542175],[33.8962,35.542093],[33.896166,35.542041],[33.896141,35.542001],[33.896136,35.541946],[33.896136,35.54192],[33.896137,35.541898],[33.896191,35.541816],[33.896185,35.541689],[33.896105,35.541518],[33.896095,35.541507],[33.896082,35.541493],[33.896079,35.541479],[33.896074,35.541471],[33.896017,35.541404],[33.896011,35.541397],[33.896023,35.541346],[33.896043,35.541267],[33.896062,35.541193],[33.896072,35.541152],[33.896472,35.541433],[33.896275,35.542212]],"b":0,"a":2361,"d":95.0},{"g":[[33.896122,35.540957],[33.896149,35.54085],[33.896577,35.541018],[33.896495,35.541342],[33.896483,35.541389],[33.896084,35.541107],[33.89609,35.541084],[33.8961,35.541042],[33.896111,35.540999],[33.896122,35.540957]],"b":0,"a":1516,"d":64.9},{"g":[[33.896112,35.541663],[33.896073,35.54158],[33.896085,35.54154],[33.896157,35.541699],[33.896163,35.541793],[33.896116,35.541901],[33.896107,35.54198],[33.896122,35.54201],[33.896234,35.542196],[33.896283,35.542339],[33.896265,35.542359],[33.896257,35.542336],[33.89623,35.542256],[33.896221,35.542232],[33.896214,35.542215],[33.89621,35.542206],[33.896203,35.542197],[33.896167,35.542148],[33.896142,35.542115],[33.896126,35.542094],[33.896116,35.542077],[33.89611,35.542065],[33.896106,35.542054],[33.896093,35.542016],[33.89608,35.541983],[33.896078,35.541974],[33.896077,35.541966],[33.896078,35.541959],[33.896094,35.541902],[33.896112,35.541837],[33.896123,35.541795],[33.896132,35.541763],[33.896135,35.541749],[33.896135,35.541738],[33.896134,35.541726],[33.896132,35.541714],[33.896129,35.541699],[33.896112,35.541663]],"b":0,"a":250,"d":127.8},{"g":[[33.896271,35.542232],[33.896302,35.542322],[33.896283,35.542339],[33.896234,35.542196],[33.896122,35.54201],[33.896107,35.54198],[33.896116,35.541901],[33.896163,35.541793],[33.896157,35.541699],[33.896085,35.54154],[33.896093,35.541514],[33.896095,35.541507],[33.896105,35.541518],[33.896185,35.541689],[33.896191,35.541816],[33.896137,35.541898],[33.896136,35.54192],[33.896136,35.541946],[33.896141,35.542001],[33.896166,35.542041],[33.8962,35.542093],[33.896251,35.542175],[33.896271,35.542232]],"b":0,"a":230,"d":124.6},{"g":[[33.896084,35.541107],[33.896483,35.541389],[33.896472,35.541433],[33.896072,35.541152],[33.896084,35.541107]],"b":0,"a":214,"d":90.6}];
+      CANOPY_PARCELS.forEach(function(f){
+        g.addLayer(L.polygon(f.g, {color:cssVar('--layer-greenery'), weight:1.2, opacity:.9,
+          fillColor:cssVar('--layer-greenery'), fillOpacity:.34})
+          .bindPopup('<h4>Unbuilt parcel under the canopy \u2014 ' + f.a.toLocaleString() + ' m\u00b2</h4>' +
+            '<b>' + f.d + ' m</b> from the plot edge. Surveyed boundary, and the survey records <b>no structure ' +
+            'linework inside it</b> \u2014 so whatever grows here grows on open ground.<br><br>Five such parcels sit ' +
+            'under the canopy, <b>4,571 m\u00b2</b> between them, out of seven parcels totalling 12,582 m\u00b2 that ' +
+            'the imagery box crosses.' +
+            '<span class="src">Parcel faces rebuilt from PARCEL$BOUNDARY. The canopy itself is read from imagery ' +
+            'and is not surveyed.</span>'));
       });
       g.addLayer(L.polygon([[33.896584,35.541311],[33.896584,35.541953],[33.896103,35.541953],[33.896103,35.541311]],
-        {color:cssVar('--layer-greenery'), weight:2, dashArray:'5 3',
-         fillColor:cssVar('--layer-greenery'), fillOpacity:.3})
-        .bindPopup('<h4>Mature tree canopy — ~3,200 m², 94 m away</h4>Dense mature trees and a row of ' +
-          'palms on an enclosed parcel. <b>In no dataset at all</b> — found by reading satellite imagery and ' +
-          'confirmed in April 2023 Street View: behind a graffitied wall with a clipped hedge, so <b>private and ' +
-          'walled</b>.<br><br><b>Therefore</b> it is larger than Karantina Park and 16× closer, and it proves ' +
-          'mature trees thrive on this ground. The constraint is public <i>access</i> to green, not the ability to ' +
-          'grow it.<span class="src">My own visual analysis — extent approximate, verify on site.</span>'));
+        {color:cssVar('--layer-greenery'), weight:1, dashArray:'3 5', opacity:.75, fill:false})
+        .bindPopup('<h4>Mature tree canopy \u2014 extent read from imagery</h4>The box measures ' +
+          '<b>3,170 m\u00b2</b> and sits <b>94.2 m</b> from the plot edge. Dense mature trees and a row of palms ' +
+          'on enclosed ground. <b>In no dataset at all</b> \u2014 found by reading satellite imagery and confirmed ' +
+          'in April 2023 Street View: behind a graffitied wall with a clipped hedge, so <b>private and walled</b>.' +
+          '<br><br>This outline is drawn by eye, on a survey accurate to 14 cm, so it is dashed thin and nothing is ' +
+          'measured from it. What the survey can say: the box crosses <b>7 cadastral parcels</b> totalling ' +
+          '<b>12,582 m\u00b2</b>, and <b>5</b> of them carry no structure linework at all \u2014 <b>4,571 m\u00b2</b> ' +
+          'of open ground, drawn in solid green here.' +
+          '<br><br><b>Therefore</b> mature trees demonstrably thrive on this ground, and the constraint is public ' +
+          '<i>access</i> to green rather than the ability to grow it.' +
+          '<span class="src">My own visual analysis \u2014 extent approximate. The parcels under it are surveyed. ' +
+          'Verify the wall and the gate on site.</span>'));
       ((SITE_FEATURES && SITE_FEATURES.river) || []).forEach(function(r){
         g.addLayer(L.polyline(r.g, {color:cssVar('--layer-movement'), weight:5, opacity:.8})
           .bindPopup('<h4>Beirut River</h4>Closest mapped channel edge <b>232 m</b> from the plot. A concrete ' +
@@ -1962,7 +1999,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     if (key === 'noise') rows = [{sw:'block', color:'--layer-environmental', label:'The corridor — 32,853 m², up to 54.5 m wide'},{sw:'block', color:'--layer-environmental', label:'Distance band (model, not measured)'},{sw:'line', color:'--layer-environmental', label:'The exposed 22.07 m south side — 100% of it'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.6 m²'}];
     if (key === 'wind') rows = [{sw:'line', literal:'#2A6FC4', label:'Dec–Apr  ·  SW ~210–225°'},{sw:'line', literal:'#3987e5', label:'May–Oct  ·  WSW→W ~245–270°'},{sw:'line', literal:'#8AB6EE', label:'Oct reversal  ·  NNW ~337°'},{sw:'line', color:'--layer-greenery', label:'Cross-ventilation line'}];
     if (key === 'views') rows = [{sw:'block', color:'--ink', label:'Blocked arc — the adjacent shed'},{sw:'block', color:'--layer-greenery', label:'Open arc — fabric and canopy'},{sw:'block', color:'--layer-landuse', label:'View earned with height'},{sw:'block', color:'--ink', label:'Surveyed structure'}];
-    if (key === 'green') rows = [{sw:'block', color:'--layer-greenery', label:'Mapped green area (OSM)'},{sw:'outline', color:'--layer-greenery', label:'Mature canopy I found — private, walled'},{sw:'line', color:'--layer-movement', label:'Beirut River — flood channel'},{sw:'block', color:'--layer-greenery', label:'Karantina Park — nearest public park'}];
+    if (key === 'green') rows = [{sw:'block', color:'--layer-greenery', label:'Mapped green — 341 m² + 361 m², 702 m² in all'},{sw:'block', color:'--layer-greenery', label:'Unbuilt parcels under the canopy — surveyed, 4,571 m²'},{sw:'outline', color:'--layer-greenery', label:'Canopy extent read from imagery — not surveyed'},{sw:'block', color:'--muted', label:'Tagged greenfield — land awaiting development, not green'},{sw:'line', color:'--layer-movement', label:'Beirut River — nearest segment 232 m'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.6 m², 2.12× all the mapped green'}];
     /* While a section's overlay is switched off it is an empty survey map, so the key describes
        the base rather than a layer that is not on the sheet. */
     var OVERLAY_OF = {figureground:'figureground', grain:'grain', edges:'edges', siteplot:'siteplot',
@@ -2016,7 +2053,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       noise:    'exposed face <b>22.07 m</b>, 100% of it &middot; <b>98%</b> of the plot lies within <b>50 m</b> of the corridor &middot; furthest corner <b>52.6 m</b> &middot; there is no sheltered end',
       wind:     'summer <b>WSW 257°</b> hits the <b>west</b> face <b>28°</b> off square &middot; nothing built within <b>300 m</b> upwind &middot; but <b>55%</b> of that intake sector is the corridor',
       views:    'blocked arc <b>275–340°</b> &middot; open arc <b>20–95°</b> &middot; skyline only above ~4th floor',
-      green:    'nearest canopy <b>94 m</b> (private, walled) &middot; nearest PUBLIC park <b>1.5–2 km</b> &middot; river <b>232 m</b>'
+      green:    'mapped green within 600 m <b>702 m²</b> &middot; the plot is <b>2.12×</b> that &middot; nearest canopy <b>94.2 m</b>, private and walled &middot; nearest public park <b>1.5–2 km</b>'
     };
     if (STRIP[key]){
       var sp = document.createElement('div');
