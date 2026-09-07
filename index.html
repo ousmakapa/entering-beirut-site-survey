@@ -270,6 +270,21 @@
   .fb-count b{color:var(--ink); font-size:.82rem;}
   .fb-count i{font-style:normal; opacity:.5;}
   .field-pin{filter:drop-shadow(0 1px 2px rgba(0,0,0,.25));}
+  .locate-ctrl a{display:flex; align-items:center; justify-content:center; color:var(--ink);
+    width:30px; height:30px; background:var(--surface-2);}
+  .locate-ctrl a:hover{background:var(--surface); color:var(--accent);}
+  .locate-ctrl.busy a{color:var(--accent); animation:locpulse 1s ease-in-out infinite;}
+  @keyframes locpulse{50%{opacity:.35}}
+  @media (prefers-reduced-motion:reduce){ .locate-ctrl.busy a{animation:none;} }
+  .locate-toast{position:absolute; left:50%; bottom:1rem; z-index:1300;
+    transform:translateX(-50%) translateY(-6px);
+    max-width:min(30rem, calc(100% - 2rem)); background:var(--ink); color:var(--surface);
+    font-size:.8rem; line-height:1.45; padding:.55rem .8rem; border-radius:6px;
+    box-shadow:0 3px 14px rgba(0,0,0,.22); opacity:0; pointer-events:none;
+    transition:opacity .18s, transform .18s;}
+  .locate-toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  .locate-toast.err{background:var(--layer-environmental);}
+  .locate-toast b{color:#fff;}
 
   /* ---------- phone ---------- */
   @media (max-width:760px){
@@ -2052,12 +2067,32 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
 
   function locate(){
     var st = document.getElementById('field-gps');
-    if (!navigator.geolocation){ st.textContent = 'this browser has no GPS'; return; }
+    /* The message has to land somewhere the user is actually looking. In Field mode that is the
+       field bar; otherwise it is a toast over the map, because the bar is hidden. */
+    function say(msg, isErr){
+      if (st) st.innerHTML = msg;
+      var c = document.querySelector('.locate-ctrl');
+      if (c) c.classList.remove('busy');
+      if (!field.on){
+        var t = document.getElementById('locate-toast');
+        if (!t){
+          t = document.createElement('div');
+          t.id = 'locate-toast'; t.className = 'locate-toast';
+          document.querySelector('.map-shell').appendChild(t);
+        }
+        t.innerHTML = msg;
+        t.classList.toggle('err', !!isErr);
+        t.classList.add('show');
+        clearTimeout(t._h);
+        t._h = setTimeout(function(){ t.classList.remove('show'); }, isErr ? 9000 : 5000);
+      }
+    }
+    if (!navigator.geolocation){ say('This browser has no location service.', true); return; }
     if (!window.isSecureContext){
-      st.innerHTML = 'GPS needs <b>https</b> \u2014 open the published link, or tap the map to place';
+      say('Location needs <b>https</b>. Open the published link rather than the local file.', true);
       return;
     }
-    st.textContent = 'finding you\u2026';
+    say('Finding you\u2026');
     if (field.watch !== null) navigator.geolocation.clearWatch(field.watch);
     field.watch = navigator.geolocation.watchPosition(function(p){
       var ll = [p.coords.latitude, p.coords.longitude];
@@ -2070,10 +2105,20 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       } else {
         field.here.setLatLng(ll); field.acc.setLatLng(ll).setRadius(p.coords.accuracy);
       }
-      st.textContent = 'you are here \u00b1' + Math.round(p.coords.accuracy) + ' m';
-      if (!field.centred){ map.setView(ll, Math.max(map.getZoom(), 18)); field.centred = true; }
+      var far = map.distance(ll, [SITE.lat, SITE.lng]);
+      say('You are here \u00b1' + Math.round(p.coords.accuracy) + ' m' +
+        (p.coords.accuracy > 200
+          ? ' \u2014 that is a network estimate, not GPS. On a phone outdoors it is a few metres.'
+          : '') +
+        (far > 3000 ? '<br>You are ' + (far/1000).toFixed(1) + ' km from the plot.' : ''));
+      if (!field.centred){
+        map.setView(ll, far > 3000 ? map.getZoom() : Math.max(map.getZoom(), 18));
+        field.centred = true;
+      }
     }, function(err){
-      st.textContent = 'GPS unavailable \u2014 ' + err.message + '. Tap the map instead.';
+      say('Location unavailable \u2014 ' + err.message +
+          '. Allow it from the icon in the address bar, or use Field mode and tap the map to place ' +
+          'records by hand.', true);
     }, {enableHighAccuracy:true, maximumAge:4000, timeout:15000});
   }
 
@@ -2095,6 +2140,30 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     else if (field.watch !== null){ navigator.geolocation.clearWatch(field.watch); field.watch = null; }
     updateFieldBar();
   }
+
+  /* Finding yourself is a map function, not a mode — this sits under the zoom buttons where
+     every map puts it, and works whether or not Field mode is on. */
+  var LocateControl = L.Control.extend({
+    options:{position:'topleft'},
+    onAdd:function(){
+      var c = L.DomUtil.create('div', 'leaflet-bar locate-ctrl');
+      var a = L.DomUtil.create('a', '', c);
+      a.href = '#'; a.title = 'Show my location'; a.setAttribute('role', 'button');
+      a.innerHTML = '<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">' +
+        '<circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/>' +
+        '<circle cx="12" cy="12" r="1.7" fill="currentColor"/>' +
+        '<path d="M12 1.6v3.1M12 19.3v3.1M1.6 12h3.1M19.3 12h3.1" stroke="currentColor" ' +
+        'stroke-width="2" stroke-linecap="round"/></svg>';
+      L.DomEvent.on(a, 'click', function(e){
+        L.DomEvent.stop(e);
+        c.classList.add('busy');
+        field.centred = false;
+        locate();
+      });
+      return c;
+    }
+  });
+  map.addControl(new LocateControl());
 
   map.on('click', function(e){ if (field.on) openFieldForm(e.latlng); });
   document.getElementById('field-toggle').addEventListener('click', function(){ setFieldMode(!field.on); });
