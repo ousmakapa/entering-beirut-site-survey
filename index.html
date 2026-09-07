@@ -264,6 +264,43 @@
     border:1px solid var(--layer-traffic); border-radius:8px; padding:.5rem .6rem;
     box-shadow:0 3px 16px rgba(0,0,0,.12); align-items:center; gap:.5rem; flex-wrap:wrap;}
   body.field-on .field-bar{display:flex;}
+  /* Pictures: a bar that only appears on that section, and a chooser sheet over the map. */
+  .pic-bar{display:none; position:absolute; left:.6rem; right:.6rem; z-index:1200;
+    bottom:calc(.6rem + env(safe-area-inset-bottom));
+    background:color-mix(in srgb, var(--surface) 95%, transparent); backdrop-filter:blur(10px);
+    border:1px solid var(--accent); border-radius:8px; padding:.5rem .6rem;
+    box-shadow:0 3px 16px rgba(0,0,0,.12); align-items:center; gap:.5rem; flex-wrap:wrap;}
+  body.pictures-on .pic-bar{display:flex;}
+  .pic-fix{font-family:var(--font-mono); font-size:.7rem; color:var(--ink-soft);
+    display:flex; align-items:center; gap:.35rem; margin-right:auto;}
+  .pf-dot{width:9px; height:9px; border-radius:50%; background:var(--muted); flex:none;}
+  .pic-sheet{display:none; position:absolute; left:.6rem; right:.6rem; z-index:1300;
+    bottom:calc(4rem + env(safe-area-inset-bottom)); max-height:62vh; overflow-y:auto;
+    background:var(--surface); border:1px solid var(--accent); border-radius:10px;
+    padding:.6rem; box-shadow:0 8px 30px rgba(0,0,0,.2);}
+  body.sheet-on .pic-sheet{display:block;}
+  .ps-head{display:flex; align-items:center; gap:.5rem; margin-bottom:.35rem;}
+  .ps-head b{font-size:.85rem;} .ps-head span{font-family:var(--font-mono); font-size:.68rem;
+    color:var(--muted); margin-right:auto;}
+  .ps-fix{font-family:var(--font-mono); font-size:.68rem; color:var(--muted);
+    display:flex; align-items:center; gap:.35rem; padding:.25rem 0 .45rem;}
+  .ps-none{font-size:.76rem; color:var(--muted); padding:.4rem 0;}
+  .ps-row{display:block; width:100%; text-align:left; cursor:pointer; background:var(--surface-2);
+    border:1px solid var(--line-strong); border-radius:7px; padding:.5rem .6rem; margin-bottom:.35rem;
+    min-height:46px; font-family:var(--font-body);}
+  .ps-row b{display:block; font-size:.8rem; color:var(--ink);}
+  .ps-row i{display:block; font-style:normal; font-size:.72rem; color:var(--muted); margin-top:.1rem;}
+  .ps-alt{background:none; border-style:dashed;}
+  .pic-pin{display:flex; align-items:center; justify-content:center;
+    background:var(--accent); color:#fff; border:2px solid #fff; border-radius:50%;
+    font-family:var(--font-mono); font-size:.72rem; font-weight:700;
+    box-shadow:0 1px 5px rgba(0,0,0,.3);}
+  .pic-gal{display:grid; grid-template-columns:1fr 1fr; gap:.3rem; margin:.35rem 0;}
+  .pic-cell img{width:100%; border-radius:3px; display:block;}
+  .pic-cell span{display:block; font-family:var(--font-mono); font-size:.6rem; color:var(--muted);}
+  .pic-cell button{font-size:.62rem; color:var(--layer-environmental); background:none;
+    border:0; cursor:pointer; padding:.1rem 0;}
+  @media (max-width:760px){ .pic-gal{grid-template-columns:1fr;} }
   /* The brief you carry in one hand. Only in Field mode, and only when asked for, so it
      never sits between you and the map. */
   .field-jobs{display:none; position:absolute; z-index:1250; left:.6rem; right:.6rem;
@@ -415,6 +452,16 @@
       <button class="fb-btn fb-quiet" id="field-clear">Clear</button>
     </div>
     <div class="field-jobs" id="field-jobs"></div>
+    <div class="pic-bar" id="pic-bar">
+      <span class="pic-fix" id="pic-fix"><span class="pf-dot"></span><b>GPS</b> tap Enable</span>
+      <button class="fb-btn fb-primary" id="pic-shoot">Take photo</button>
+      <button class="fb-btn" id="pic-pick">Add existing</button>
+      <button class="fb-btn" id="pic-enable">Enable</button>
+      <span class="fb-count"><b id="pic-count">0</b> <span id="pic-word">photos</span></span>
+    </div>
+    <div class="pic-sheet" id="pic-sheet"></div>
+    <input type="file" accept="image/*" capture="environment" id="pic-input" hidden>
+    <input type="file" accept="image/*" multiple id="pic-input-lib" hidden>
     <div class="layer-panel" id="layer-panel">
       <button class="lp-toggle" id="lp-toggle" aria-expanded="true">SURVEY LAYERS <span>−</span></button>
       <div class="lp-body" id="lp-body"></div>
@@ -510,6 +557,12 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       {title:'The canopy is real, walled, and in no dataset', text:'The one real canopy nearby is in no dataset. Reading satellite imagery and April 2023 Street View found dense mature trees and a row of palms behind a graffitied wall with a clipped hedge — <b>private and walled</b> — about <b>3,170 m²</b>, <b>94.2 m</b> from the plot edge. That outline is drawn by eye, so it is dashed thin and nothing is measured from it. What the survey <i>can</i> say: the box crosses <b>7 cadastral parcels</b> totalling <b>12,582 m²</b>, of which <b>5</b> carry no structure linework at all — <b>4,571 m²</b> of surveyed open ground, the largest 2,361 m² at 95.0 m. <b>Therefore</b> mature trees demonstrably thrive on this ground and on this water table. The constraint here is public <i>access</i> to green, not the ability to grow it — which is a far more answerable problem for a building to take on.', source:{label:'Parcel faces rebuilt from PARCEL$BOUNDARY; green outlines and tags from OpenStreetMap', url:'#'}},
       {title:'The river, and why nothing rests on it', text:'The river is the other water on this drawing, and it is not in the survey either: three OpenStreetMap segments, the nearest <b>232 m</b> from the plot. Nothing in the DWG records it, nothing records whether it is open channel or culverted at this point, and nothing records its flood behaviour. <b>Therefore</b> it is drawn as context and no argument in this project rests on it.', source:null},
       {title:'The two questions only the visit can answer', text:'Two things settle this map and neither is on a screen. <b>Does the gate in that wall open?</b> If the canopy is accessible at all, the argument changes from “the neighbourhood has almost no green” to “it has some and cannot reach it”. And <b>are the 341 m² garden and the 361 m² grass public?</b> If they are not, mapped public green within 600 m is <b>zero</b>. <b>Therefore</b> both are on the field brief, and the greenery form has an <i>access</i> field for exactly this.', source:null}
+    ],
+    pictures: [
+      {title:'How to use it', text:'Tap <b>Take photo</b>, shoot, and choose which plot it shows from a shortlist. As many photos per plot as you like — they collect into one gallery on that parcel, and the map shows a count. <b>Add existing</b> takes several at once from the camera roll if you photographed first and assigned later. <b>Therefore</b> the fastest way to work is to walk, shoot freely, and assign in batches whenever you stop.', source:null},
+      {title:'Facing a plot, not standing in it', text:'You will be <b>facing</b> a plot, not standing in it, so position alone cannot pick the right parcel and nothing is auto-assigned. Tap <b>Enable GPS + compass</b> once — iOS only releases the compass from inside a real tap — and every plot within <b>140 m</b> is offered, with the ones <b>in front of you</b> ranked above the ones merely near you. Each row says how far away it is, which way it lies, and whether it is straight ahead or behind your shoulder. <b>Therefore</b> you pick from a short, ordered list instead of correcting a guess.', source:{label:'Photographs and positions recorded on site; parcels from PARCEL$BOUNDARY', url:'#'}},
+      {title:'Why the GPS here is better than the usual browser fix', text:'The reason browser geolocation usually feels worse than Google Maps is that the <b>first</b> fix a browser hands over is normally a network estimate — wifi and cell towers — and can be hundreds of metres out. This holds the <b>best</b> fix it has seen rather than the first, replaces it once it goes stale, and shows the accuracy in metres with a colour: <b>green under 12 m</b>, amber to 35 m, red beyond. <b>Therefore</b> open this tab, wait for green, then shoot — two seconds of patience is the whole difference. Every photo stores the accuracy it was taken at, so a bad fix is visible later rather than silently wrong.', source:null},
+      {title:'Where the photographs actually go', text:'A phone photograph is 3–5 MB and localStorage holds about <b>5 MB in total</b> — roughly thirty pictures before it breaks. Images are resized to 1000 px and kept in <b>IndexedDB</b>, which is measured in tens of megabytes; only the small record (parcel, position, accuracy, heading, time) goes to localStorage beside the field notes. <b>Therefore</b> shoot as much as you want. It still works with no signal, and <b>Export</b> from Field mode before clearing anything.', source:null}
     ],
     cadastral: [
       {title:'What the base is — 2,704 entities, 35,183 m of line', text:'Everything in this file is drawn on one thing: <b>2,704 entities</b> and <b>35,183 m</b> of line, extracted from <b>BOURJ HAMMOUD.dwg</b> inside a <b>580 × 496 m</b> crop centred on the plot. The bulk of it is <b>1,241 parcel boundaries</b> (19,873 m) and <b>366 structure lines</b> (8,759 m); the rest is what the survey adds to explain itself — 249 parcel numbers, 207 structure marks, 61 dividing lines, 60 easements, 47 easement codes, 25 encroached walls, 6 street names. <b>Therefore</b> when any drawing in this file says a distance, it is this geometry it was measured against — not a road database, not satellite imagery, and not a guess.', source:{label:'Professor\'s cadastral survey, BOURJ HAMMOUD.dwg — extracted by _extract-survey.py, EPSG:22780 → WGS84', url:'#'}},
@@ -670,6 +723,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
 
     {key:'age', label:'Field Survey', short:'Field Survey', group:'FABRIC', color:'var(--layer-movement)', blurb:'A blank recording sheet on the survey base. No age or function data for Bourj Hammoud exists in this DWG or in any free dataset \u2014 click a structure to record what you see on site. Your tags are saved in this browser.'},
 
+    {key:'pictures', label:'Pictures', short:'Pictures', group:'FABRIC', color:'var(--accent)', blurb:'Photograph a plot and assign the picture to the surveyed parcel it shows — several per plot. The GPS holds the <b>best</b> fix it has seen rather than the first one offered, and shows you its accuracy, because the first reading a browser gives is usually a network estimate. Where the phone has a compass, the plots <b>in front of you</b> are listed first — you will be facing a plot, not standing in it. Photos are kept in IndexedDB, so the 5 MB localStorage limit does not apply.'},
     {key:'streets', label:'Streets & Public Space', short:'Streets', group:'MOVEMENT', color:'var(--layer-movement)', blurb:'The public realm drawn as a network rather than a set of blobs: the void between the parcel blocks skeletonised to <b>111 centreline segments, 5,322 m</b>, each carrying its <b>own</b> measured width instead of the widest point of the shape it came from. Half of everything walkable here is under <b>9 m</b>. There are no traffic colours — no count exists for this site, and two ways of predicting it from the network both ranked the survey’s own named streets near the bottom.'},
     {key:'access', label:'Access & Arrival', short:'Access', group:'MOVEMENT', color:'var(--layer-movement)', blurb:'How anyone actually reaches the plot. Every distance is measured on the survey to the layer-0 plot edge, and every walk is routed through the derived public space rather than drawn straight. The finding: the <b>nearest</b> arrival on paper — the bridge’s north landing at 75.4 m — sits <b>29.2 m</b> from any public space, so there is no walking route to it at all. The bus stop, at 74.3 m straight and <b>83.7 m</b> on foot, is the closest real approach.'},
     {key:'noise', label:'The Corridor', short:'Corridor', group:'MOVEMENT', color:'var(--layer-environmental)', blurb:'The widest continuous public space in the survey — one connected 32,853 m² piece, up to 54.5 m across. The plot’s south side lies along 100% of its length. The survey gives it no name; that it is the Charles Helou axis comes from the brief, not from this drawing. Distance bands are a geometric model from the surveyed edge, not a measured noise reading.'},
@@ -1166,6 +1220,8 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     addBase('noise');
     addBase('views');
     addBase('siteplot',     {loudStructures:true});
+    addBase('pictures',     {quietParcels:true});   // the parcels are what you assign photos to
+    if (typeof drawPictures === 'function') drawPictures();
 
     /* Figure-ground from BUILT vs VACANT parcels.
        A true footprint poché is not available: the survey gives wall lines, not closed outlines
@@ -1319,7 +1375,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     if (groups.noise) groups.noise.addLayer(L.polyline([SITE_PLOT[0], SITE_PLOT[1]], {color:cssVar('--layer-environmental'), weight:5, opacity:.95})
       .bindPopup('<h4>The exposed end — 22.07 m</h4>The shortest side of the plot, facing 197° SSW toward the corridor — the smallest face the geometry offers it.'));
     ['cadastral','figureground','age','streets','siteplot','edges','grain','sun','noise','views',
-     'landuse','access','wind','green'].forEach(function(k){
+     'landuse','access','wind','green','pictures'].forEach(function(k){
       if (!groups[k]) return;
       /* A white halo under a heavy ink line, so the plot is legible over any thematic fill.
          EXCEPT on the two sections whose whole subject IS the plot's own edges — there a
@@ -2048,6 +2104,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
        top half empty -- the map was fitting a box it no longer had. */
     fitFor(key);
     lastTab = key;
+    setPicturesMode(key === 'pictures');
 
     // swap map layer groups
     Object.keys(groups).forEach(function(k){ map.removeLayer(groups[k]); });
@@ -2072,6 +2129,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     if (key === 'sun') rows = [{sw:'line', literal:'#D9A324', label:'21 June — noon 79.5°'},{sw:'line', literal:'#C9931B', label:'Equinox — noon 56.1°'},{sw:'line', literal:'#B0810E', label:'21 December — noon 32.6°'},{sw:'line', color:'--layer-greenery', label:'Plot face: workable sun'},{sw:'line', color:'--layer-environmental', label:'Plot face: hardest to shade'},{sw:'line', color:'--muted', label:'Plot face: least direct sun — midsummer only'}];
     if (key === 'noise') rows = [{sw:'block', color:'--layer-environmental', label:'The corridor — 32,853 m², up to 54.5 m wide'},{sw:'block', color:'--layer-environmental', label:'Distance band (model, not measured)'},{sw:'line', color:'--layer-environmental', label:'The exposed 22.07 m south side — 100% of it'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.6 m²'}];
     if (key === 'wind') rows = [{sw:'line', literal:'#2A6FC4', label:'Dec–Apr  ·  SW ~210–225°'},{sw:'line', literal:'#3987e5', label:'May–Oct  ·  WSW→W ~245–270°'},{sw:'line', literal:'#8AB6EE', label:'Oct reversal  ·  NNW ~337°'},{sw:'line', color:'--layer-greenery', label:'Cross-ventilation line'}];
+    if (key === 'pictures') rows = [{sw:'block', color:'--accent', label:'Parcel with photographs — tap for the gallery'},{sw:'line', color:'--accent', label:'Where you stood, and what you pointed at'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.6 m²'}];
     if (key === 'views') rows = [{sw:'block', color:'--layer-greenery', label:'How far you can see — 360 rays, capped at 300 m'},{sw:'block', color:'--ink', label:'Closed 322–36° — the shed at 28 m'},{sw:'block', color:'--layer-greenery', label:'Open arcs — nothing built within 150 m'},{sw:'block', color:'--layer-landuse', label:'South — a view that needs height'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.6 m²'}];
     if (key === 'green') rows = [{sw:'block', color:'--layer-greenery', label:'Mapped green — 341 m² + 361 m², 702 m² in all'},{sw:'block', color:'--layer-greenery', label:'Unbuilt parcels under the canopy — surveyed, 4,571 m²'},{sw:'outline', color:'--layer-greenery', label:'Canopy extent read from imagery — not surveyed'},{sw:'block', color:'--muted', label:'Tagged greenfield — land awaiting development, not green'},{sw:'line', color:'--layer-movement', label:'Beirut River — nearest segment 232 m'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.6 m², 2.12× all the mapped green'}];
     /* While a section's overlay is switched off it is an empty survey map, so the key describes
@@ -2184,6 +2242,334 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
      https it follows you; opened as a local file it cannot, so tapping the
      map to place a record is always available and is the primary method.
      ====================================================================== */
+
+  /* ============================ PICTURES ============================
+     Photograph a plot and assign the photo to a surveyed cadastral parcel.
+
+     Three things this has to get right, because they are the three that make
+     the difference between usable on site and not:
+
+     1. GPS. The browser's first fix is almost always a network estimate, often
+        hundreds of metres out, and using it is what makes web geolocation feel
+        like rubbish next to Google Maps. So this keeps a running watch, holds
+        the BEST fix it has seen, and shows you its accuracy in metres with a
+        colour, so you can wait two seconds for it to settle before shooting.
+     2. You will be FACING a plot, not standing in it. So position alone cannot
+        pick the right parcel. Where the phone gives a compass heading, parcels
+        in front of you are ranked above parcels merely close to you -- and you
+        always choose from a shortlist rather than having one guessed for you.
+     3. Photographs are large. A phone picture is 3-5 MB and localStorage holds
+        about 5 MB in total, so images go to IndexedDB (tens of MB) and only the
+        small metadata record stays in localStorage.
+     ================================================================= */
+  var PIC_META_KEY = 'studio7PhotoMeta';
+  var picMeta = [];
+  try { picMeta = JSON.parse(localStorage.getItem(PIC_META_KEY) || '[]'); } catch (e) { picMeta = []; }
+  function savePicMeta(){
+    try { localStorage.setItem(PIC_META_KEY, JSON.stringify(picMeta)); return true; }
+    catch (e) { alert('Out of storage for photo records. Export, then Clear.'); return false; }
+  }
+
+  /* ---- image store: IndexedDB, because localStorage cannot hold photographs ---- */
+  var PIC_DB = null, PIC_DB_TRIED = false;
+  function picDB(cb){
+    if (PIC_DB) return cb(PIC_DB);
+    if (PIC_DB_TRIED && !PIC_DB) return cb(null);
+    try {
+      var r = indexedDB.open('studio7pics', 1);
+      r.onupgradeneeded = function(){ r.result.createObjectStore('pics'); };
+      r.onsuccess = function(){ PIC_DB = r.result; PIC_DB_TRIED = true; cb(PIC_DB); };
+      r.onerror = function(){ PIC_DB_TRIED = true; cb(null); };
+    } catch (e) { PIC_DB_TRIED = true; cb(null); }
+  }
+  function picPut(id, data, cb){
+    picDB(function(db){
+      if (!db) return cb(false);
+      try {
+        var t = db.transaction('pics', 'readwrite');
+        t.objectStore('pics').put(data, id);
+        t.oncomplete = function(){ cb(true); };
+        t.onerror = function(){ cb(false); };
+      } catch (e) { cb(false); }
+    });
+  }
+  function picGet(id, cb){
+    picDB(function(db){
+      if (!db) return cb(null);
+      try {
+        var q = db.transaction('pics').objectStore('pics').get(id);
+        q.onsuccess = function(){ cb(q.result || null); };
+        q.onerror = function(){ cb(null); };
+      } catch (e) { cb(null); }
+    });
+  }
+  function picDel(id){
+    picDB(function(db){
+      if (!db) return;
+      try { db.transaction('pics', 'readwrite').objectStore('pics').delete(id); } catch (e) {}
+    });
+  }
+
+  /* ---- the best fix we have, not the first one we were given ---- */
+  var fix = {best:null, at:0, watch:null, heading:null, headOK:false};
+  function fixAge(){ return fix.best ? (Date.now() - fix.at) / 1000 : null; }
+  function fixQuality(){
+    if (!fix.best) return {t:'waiting', c:'--muted', s:'finding you\u2026'};
+    var a = fix.best.coords.accuracy;
+    if (a <= 12) return {t:'good',    c:'--layer-greenery',     s:'\u00b1' + Math.round(a) + ' m \u2014 good'};
+    if (a <= 35) return {t:'ok',      c:'--layer-landuse',      s:'\u00b1' + Math.round(a) + ' m \u2014 usable, wait a moment for better'};
+    return          {t:'poor',    c:'--layer-environmental','s':'\u00b1' + Math.round(a) + ' m \u2014 too coarse, this is a network estimate not GPS'};
+  }
+  function startFix(){
+    if (!navigator.geolocation || fix.watch !== null) return;
+    fix.watch = navigator.geolocation.watchPosition(function(p){
+      /* Take it if it is better than what we have, or if what we have has gone
+         stale. Never let one early coarse reading stick for the whole session. */
+      var better = !fix.best || p.coords.accuracy <= fix.best.coords.accuracy || (Date.now() - fix.at) > 20000;
+      if (better){ fix.best = p; fix.at = Date.now(); }
+      paintFixBar();
+    }, function(){ paintFixBar(); },
+       {enableHighAccuracy:true, maximumAge:0, timeout:20000});
+  }
+  function startHeading(){
+    function on(e){
+      var h = (typeof e.webkitCompassHeading === 'number') ? e.webkitCompassHeading
+            : (e.absolute && typeof e.alpha === 'number') ? (360 - e.alpha) % 360 : null;
+      if (h !== null && !isNaN(h)){ fix.heading = h; fix.headOK = true; }
+    }
+    try {
+      if (typeof DeviceOrientationEvent !== 'undefined' &&
+          typeof DeviceOrientationEvent.requestPermission === 'function'){
+        DeviceOrientationEvent.requestPermission().then(function(r){
+          if (r === 'granted') window.addEventListener('deviceorientation', on, true);
+        }).catch(function(){});
+      } else {
+        window.addEventListener('deviceorientationabsolute', on, true);
+        window.addEventListener('deviceorientation', on, true);
+      }
+    } catch (e) {}
+  }
+
+  /* ---- geometry against the surveyed parcels ---- */
+  var M_LAT2 = 111320, M_LNG2 = 111320 * Math.cos(33.8966 * Math.PI / 180);
+  function segDist(px, py, ax, ay, bx, by){
+    var dx = bx - ax, dy = by - ay, L2 = dx * dx + dy * dy;
+    if (L2 === 0) return Math.sqrt((px - ax) * (px - ax) + (py - ay) * (py - ay));
+    var t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / L2));
+    var qx = ax + t * dx, qy = ay + t * dy;
+    return Math.sqrt((px - qx) * (px - qx) + (py - qy) * (py - qy));
+  }
+  function ringXY(ring){
+    return ring.map(function(p){ return [p[1] * M_LNG2, p[0] * M_LAT2]; });
+  }
+  function inRing(px, py, r){
+    var hit = false;
+    for (var i = 0, j = r.length - 1; i < r.length; j = i++){
+      if ((r[i][1] > py) !== (r[j][1] > py) &&
+          px < (r[j][0] - r[i][0]) * (py - r[i][1]) / (r[j][1] - r[i][1]) + r[i][0]) hit = !hit;
+    }
+    return hit;
+  }
+  var PARCEL_XY = null, PARCEL_C = null;
+  function parcelGeom(){
+    if (PARCEL_XY) return;
+    PARCEL_XY = []; PARCEL_C = [];
+    (PARCEL_FACES || []).forEach(function(f){
+      var r = ringXY(f.g);
+      PARCEL_XY.push(r);
+      var sx = 0, sy = 0;
+      r.forEach(function(p){ sx += p[0]; sy += p[1]; });
+      PARCEL_C.push([sx / r.length, sy / r.length]);
+    });
+  }
+  function angDiff(a, b){ var d = Math.abs(a - b) % 360; return d > 180 ? 360 - d : d; }
+  function nearbyParcels(lat, lng, heading, limit){
+    parcelGeom();
+    var px = lng * M_LNG2, py = lat * M_LAT2, out = [];
+    for (var i = 0; i < PARCEL_XY.length; i++){
+      var r = PARCEL_XY[i], d = Infinity;
+      for (var k = 0, j = r.length - 1; k < r.length; j = k++){
+        var s = segDist(px, py, r[j][0], r[j][1], r[k][0], r[k][1]);
+        if (s < d) d = s;
+      }
+      var inside = inRing(px, py, r);
+      if (inside) d = 0;
+      if (d > 140) continue;
+      var c = PARCEL_C[i];
+      var brg = (Math.atan2(c[0] - px, c[1] - py) * 180 / Math.PI + 360) % 360;
+      var off = (heading === null || heading === undefined) ? null : angDiff(brg, heading);
+      /* What you are looking at beats what you are standing next to. Anything more
+         than 70 deg off your heading is behind your shoulder and is pushed down. */
+      var score = d + (off === null ? 0 : (off > 70 ? 250 : off * 1.6));
+      out.push({i:i, d:Math.round(d), brg:Math.round(brg), off:(off === null ? null : Math.round(off)),
+                score:score, a:(PARCEL_FACES[i] || {}).a || 0, inside:inside});
+    }
+    out.sort(function(x, y){ return x.score - y.score; });
+    return out.slice(0, limit || 6);
+  }
+  var COMPASS16 = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+  function compass(b){ return COMPASS16[Math.round((b % 360) / 22.5) % 16]; }
+
+  /* ---- the bar that tells you whether the fix is worth trusting ---- */
+  function paintFixBar(){
+    var el = document.getElementById('pic-fix');
+    if (!el) return;
+    var q = fixQuality();
+    el.innerHTML = '<span class="pf-dot" style="background:' + cssVar(q.c) + '"></span>' +
+      '<b>GPS</b> ' + q.s +
+      (fix.headOK ? ' &middot; facing <b>' + Math.round(fix.heading) + '\u00b0 ' + compass(fix.heading) + '</b>'
+                  : ' &middot; <i>no compass</i>');
+    var b = document.getElementById('pic-shoot');
+    if (b) b.disabled = false;
+  }
+
+  /* ---- capture -> shrink -> choose a parcel -> store ---- */
+  function handlePicFiles(files){
+    var list = Array.prototype.slice.call(files || []);
+    if (!list.length) return;
+    var done = 0, ids = [];
+    list.forEach(function(f){
+      shrink(f, function(dataUrl){
+        var id = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+        picPut(id, dataUrl, function(ok){
+          if (ok) ids.push(id);
+          if (++done === list.length) askParcel(ids);
+        });
+      });
+    });
+  }
+  function askParcel(ids){
+    if (!ids.length){ alert('Could not store the photo. The browser may be out of space.'); return; }
+    var lat = fix.best ? fix.best.coords.latitude : SITE.lat;
+    var lng = fix.best ? fix.best.coords.longitude : SITE.lng;
+    var acc = fix.best ? Math.round(fix.best.coords.accuracy) : null;
+    var head = fix.headOK ? fix.heading : null;
+    var cands = nearbyParcels(lat, lng, head, 7);
+    var q = fixQuality();
+    var sheet = document.getElementById('pic-sheet');
+    var html = '<div class="ps-head"><b>Which plot is this?</b>' +
+      '<span>' + ids.length + ' photo' + (ids.length > 1 ? 's' : '') + '</span>' +
+      '<button class="fb-btn fb-quiet" id="ps-cancel">cancel</button></div>' +
+      '<div class="ps-fix"><span class="pf-dot" style="background:' + cssVar(q.c) + '"></span>' +
+        (acc === null ? 'no fix \u2014 pick from the map instead' : 'fix \u00b1' + acc + ' m') +
+        (head !== null ? ' &middot; facing ' + Math.round(head) + '\u00b0 ' + compass(head) +
+                         ' \u2014 plots in front of you are listed first'
+                       : ' &middot; no compass, so these are simply the nearest') + '</div>';
+    if (!cands.length){
+      html += '<div class="ps-none">No surveyed parcel within 140 m of that fix.</div>';
+    }
+    html += cands.map(function(c){
+      return '<button class="ps-row" data-i="' + c.i + '">' +
+        '<b>' + (c.inside ? 'You are standing in this one' : 'Parcel ' + c.a.toLocaleString() + ' m\u00b2') + '</b>' +
+        '<i>' + (c.inside ? c.a.toLocaleString() + ' m\u00b2' : c.d + ' m away, ' + compass(c.brg) + ' of you') +
+        (c.off === null ? '' : (c.off <= 25 ? ' \u00b7 straight ahead' :
+                                c.off <= 70 ? ' \u00b7 ' + c.off + '\u00b0 off your heading' :
+                                              ' \u00b7 behind you')) + '</i></button>';
+    }).join('');
+    html += '<button class="ps-row ps-alt" data-i="-1"><b>None of these</b>' +
+            '<i>tap the map instead \u2014 the next tap on Pictures places them</i></button>';
+    sheet.innerHTML = html;
+    /* The bar wraps to two rows on a phone, so a fixed offset buries the Take photo button
+       underneath the sheet. Measure the bar and sit above whatever height it actually is. */
+    var bar = document.getElementById('pic-bar');
+    if (bar) sheet.style.bottom = 'calc(' + (bar.offsetHeight + 16) + 'px + env(safe-area-inset-bottom))';
+    document.body.classList.add('sheet-on');
+    sheet.querySelectorAll('.ps-row').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var i = parseInt(btn.getAttribute('data-i'), 10);
+        document.body.classList.remove('sheet-on');
+        if (i === -1){ pendingPics = ids; return; }
+        commitPics(ids, i, lat, lng, acc, head);
+      });
+    });
+    var c = document.getElementById('ps-cancel');
+    if (c) c.addEventListener('click', function(){
+      document.body.classList.remove('sheet-on');
+      ids.forEach(picDel);
+    });
+  }
+  var pendingPics = null;
+  function commitPics(ids, parcel, lat, lng, acc, head){
+    var when = new Date().toISOString().slice(0, 16).replace('T', ' ');
+    ids.forEach(function(id){
+      picMeta.push({id:id, parcel:parcel, lat:lat, lng:lng, acc:acc, head:head, when:when});
+    });
+    savePicMeta();
+    rebuildAll();
+    var q = document.getElementById('pic-count');
+    if (q) q.textContent = picMeta.length;
+    var w = document.getElementById('pic-word');
+    if (w) w.textContent = picMeta.length === 1 ? 'photo' : 'photos';
+  }
+  window.deletePhoto = function(id){
+    if (!confirm('Delete this photo?')) return;
+    picMeta = picMeta.filter(function(m){ return m.id !== id; });
+    savePicMeta(); picDel(id); map.closePopup(); rebuildAll();
+  };
+
+  /* ---- draw: one marker per parcel that has photographs ---- */
+  function drawPictures(){
+    var g = groups.pictures;
+    if (!g) return;
+    parcelGeom();
+    var byParcel = {};
+    picMeta.forEach(function(m){ (byParcel[m.parcel] = byParcel[m.parcel] || []).push(m); });
+    Object.keys(byParcel).forEach(function(k){
+      var i = parseInt(k, 10), shots = byParcel[k];
+      var f = PARCEL_FACES[i];
+      if (!f) return;
+      g.addLayer(L.polygon(f.g, {color:cssVar('--accent'), weight:2, opacity:.95,
+        fillColor:cssVar('--accent'), fillOpacity:.30}).bindPopup(picPopupShell(i, shots)));
+      var c = PARCEL_C[i];
+      g.addLayer(L.marker([c[1] / M_LAT2, c[0] / M_LNG2], {icon:L.divIcon({className:'pic-pin',
+        html:'<b>' + shots.length + '</b>', iconSize:[30, 30], iconAnchor:[15, 15]})})
+        .bindPopup(picPopupShell(i, shots)));
+      shots.forEach(function(m){
+        if (m.lat === undefined) return;
+        g.addLayer(L.polyline([[m.lat, m.lng], [c[1] / M_LAT2, c[0] / M_LNG2]],
+          {color:cssVar('--accent'), weight:1, opacity:.5, dashArray:'3 4', interactive:false}));
+        g.addLayer(L.circleMarker([m.lat, m.lng], {radius:3.5, color:cssVar('--accent'),
+          weight:1.5, fillColor:'#fff', fillOpacity:1})
+          .bindPopup('<h4>Where this was taken from</h4>' +
+            (m.acc === null ? 'No fix recorded.' : 'GPS \u00b1<b>' + m.acc + ' m</b>') +
+            (m.head === null || m.head === undefined ? '' :
+              '<br>Facing <b>' + Math.round(m.head) + '\u00b0 ' + compass(m.head) + '</b>') +
+            '<span class="src">' + m.when + '</span>'));
+      });
+    });
+  }
+  function picPopupShell(i, shots){
+    var f = PARCEL_FACES[i] || {};
+    var html = '<h4>' + shots.length + ' photo' + (shots.length > 1 ? 's' : '') +
+      ' \u00b7 parcel ' + (f.a || 0).toLocaleString() + ' m\u00b2</h4>' +
+      '<div class="pic-gal" id="gal-' + i + '">loading\u2026</div>' +
+      '<span class="src">Assigned on site. The dashed line runs back to where you stood.</span>';
+    setTimeout(function(){
+      var box = document.getElementById('gal-' + i);
+      if (!box) return;
+      box.innerHTML = '';
+      shots.forEach(function(m){
+        picGet(m.id, function(src){
+          if (!src || !document.getElementById('gal-' + i)) return;
+          var d = document.createElement('div');
+          d.className = 'pic-cell';
+          /* built with DOM calls, not innerHTML, so the photo id never has to survive
+             two layers of string escaping to reach the click handler */
+          var im = document.createElement('img'); im.src = src; im.alt = '';
+          var cap = document.createElement('span');
+          cap.textContent = m.when + (m.head === null || m.head === undefined ? ''
+                            : ' · ' + compass(m.head));
+          var del = document.createElement('button');
+          del.textContent = 'delete';
+          del.addEventListener('click', function(){ deletePhoto(m.id); });
+          d.appendChild(im); d.appendChild(cap); d.appendChild(del);
+          box.appendChild(d);
+        });
+      });
+    }, 40);
+    return html;
+  }
+
   var FIELD_KEY = 'studio7FieldRecords';
 
   /* What to collect, ranked by how much it unblocks. Every item names the map it releases,
@@ -2526,6 +2912,46 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     clearTimeout(refitT);
     refitT = setTimeout(function(){ if (lastTab) fitFor(lastTab); }, 180);
   });
+
+  /* The bar belongs to the Pictures section only, and the fix starts the moment you open it
+     so it has time to settle before you shoot rather than after. */
+  function setPicturesMode(on){
+    document.body.classList.toggle('pictures-on', on);
+    if (!on) document.body.classList.remove('sheet-on');
+    if (on){
+      startFix(); paintFixBar();
+      var q = document.getElementById('pic-count');
+      if (q) q.textContent = picMeta.length;
+      var w = document.getElementById('pic-word');
+      if (w) w.textContent = picMeta.length === 1 ? 'photo' : 'photos';
+    }
+  }
+  (function wirePictures(){
+    var shoot = document.getElementById('pic-shoot'),
+        pick  = document.getElementById('pic-pick'),
+        en    = document.getElementById('pic-enable'),
+        inp   = document.getElementById('pic-input'),
+        lib   = document.getElementById('pic-input-lib');
+    if (!shoot) return;
+    /* iOS will only hand over the compass, and will only ask for location, from inside a
+       real tap. That is what this button is for. */
+    en.addEventListener('click', function(){ startFix(); startHeading(); paintFixBar(); });
+    shoot.addEventListener('click', function(){ startFix(); inp.click(); });
+    pick.addEventListener('click', function(){ startFix(); lib.click(); });
+    inp.addEventListener('change', function(){ handlePicFiles(inp.files); inp.value = ''; });
+    lib.addEventListener('change', function(){ handlePicFiles(lib.files); lib.value = ''; });
+    map.on('click', function(e){
+      if (!pendingPics || currentTab !== 'pictures') return;
+      var c = nearbyParcels(e.latlng.lat, e.latlng.lng, null, 1);
+      if (!c.length){ alert('No surveyed parcel there \u2014 tap on one.'); return; }
+      commitPics(pendingPics, c[0].i,
+                 fix.best ? fix.best.coords.latitude : e.latlng.lat,
+                 fix.best ? fix.best.coords.longitude : e.latlng.lng,
+                 fix.best ? Math.round(fix.best.coords.accuracy) : null,
+                 fix.headOK ? fix.heading : null);
+      pendingPics = null;
+    });
+  })();
 
   document.getElementById('field-toggle').addEventListener('click', function(){ setFieldMode(!field.on); });
   document.getElementById('field-jobs-btn').addEventListener('click', function(){
