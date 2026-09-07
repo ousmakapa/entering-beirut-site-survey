@@ -516,9 +516,10 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       {title:'Climate normals', text:'Mean annual ~19–21 °C (Jan ~11–14.5 °C, Aug ~26 °C). Annual rainfall ~715–730 mm, sharply winter-concentrated (Feb wettest ~148 mm; Jul ~1 mm). Relative humidity 57–72%, highest in winter. Long dry summer + short intense wet season — drives both greenhouse water strategy and stormwater sizing.', source:{label:'NASA POWER + station climate normals', url:'https://en.climate-data.org/asia/lebanon/beirut/beirut-3572/'}}
     ],
     noise: [
-      {title:'Noise exposure', text:'Site sits directly on a primary vehicular corridor with industrial/port activity across the river — a major likely noise source for facade/envelope design.', source:null},
-      {title:'The geometry already helps — use it', text:'The corridor passes the <b>south</b> end of the plot, and that end is its <b>shortest</b> side at <b>22.07 m</b>. The east frontage, <b>33.66 m</b>, is on the far side and is shielded by the plot’s own depth. <b>Therefore</b> put the depth of the building between the corridor and everything quiet: service, stair, plant and circulation stacked on the south end make an inhabited acoustic wall, so the programme does the work a barrier would otherwise have to do.', source:{label:'Professor\'s cadastral survey — BOURJ HAMMOUD.dwg', url:'#'}},
-      {title:'What is NOT known', text:'The bands on this drawing are a <b>distance model</b>, not a measured survey — they show the order of exposure, not decibels. No noise reading, no traffic count and no information on the bridge structure’s reflection has been obtained. <b>Therefore</b> treat the acoustic strategy as directionally right but unquantified until a site reading is taken.', source:null}
+      {title:'What the corridor is — and what the survey will not tell us', text:'One connected space of <b>32,853 m²</b>, <b>54.5 m</b> across at its widest, running <b>543 m</b> through the frame — <b>45% of all the public space</b> in this drawing. The plot’s south side lies directly along it: <b>22.1 m of 22.07 m, 100%</b>. The south-east side adds 1.4 m (8%); the east and north sides touch it nowhere. <b>But the survey gives this space no name.</b> No STREET$TEXT label falls inside it, the nearest is <b>106.7 m</b> away, and VERS BEYROUTH and TRIPOLI sit <b>175 m</b> and <b>178 m</b> off, on other spaces entirely. <b>Therefore</b> this drawing can state the corridor’s width and position exactly and cannot state what runs in it. That it is the Charles Helou axis comes from the brief and from where the site is, not from this survey.', source:{label:'Corridor geometry from _extract-street-space.py; distances measured against the layer-0 plot', url:'#'}},
+      {title:'There is no far side of this plot', text:'The usual move is to put the quiet uses at the far end. Measured, there is no far end. <b>98%</b> of the plot lies within <b>50 m</b> of the corridor; <b>58%</b> within 30 m; <b>38%</b> within 20 m. Only <b>318 m²</b> — <b>21%</b> — is beyond 40 m, and the furthest corner of the plot is <b>52.6 m</b> from it. <b>Therefore</b> distance is not a strategy available on a plot of 1,488.6 m² here. Whatever protection the quiet rooms get has to be built — depth, mass, section and orientation — because it cannot be walked away from. This corrects an earlier note on this map, which claimed the east frontage was “on the far side and shielded by the plot’s own depth”.', source:{label:'Corridor geometry from _extract-street-space.py; distances measured against the layer-0 plot', url:'#'}},
+      {title:'What the geometry does offer', text:'What the geometry does offer is a narrow face. The plot turns <b>22.07 m</b> to the corridor against <b>52.37 m</b> and <b>33.66 m</b> on its two long sides, which run away from it at 195° and 13°. <b>Therefore</b> build deep rather than broad against it: bank service, stair, plant and circulation on the south end so the programme itself becomes an inhabited acoustic wall, and let the long axis carry the rooms that need quiet as far back as 52.6 m allows. It is not far. It is what there is.', source:{label:'Corridor geometry from _extract-street-space.py; distances measured against the layer-0 plot', url:'#'}},
+      {title:'What is NOT known', text:'The bands on this drawing are a <b>distance model</b>, not a survey. They show the order of exposure, not decibels. <b>No noise reading, no traffic count, no vehicle mix and nothing about the bridge structure’s reflection</b> has been obtained, and none of it is in the DWG. <b>Therefore</b> treat the acoustic strategy as directionally right but unquantified. A single sound-level reading taken at the south edge on the site visit would be worth more than everything modelled here.', source:null}
     ],
     views: [
       {title:'What can actually be seen from the plot', text:'Measured from the plot centroid against the surveyed footprints. <b>Blocked 275–340°</b> by the 2,794 m² shed 2.9 m away. <b>Open 20–95°</b> over the living fabric toward the ~3,200 m² canopy 94 m off. <b>130–215°</b> is the highway at ground level, but opens onto the Ashrafieh hillside and the Beirut skyline above roughly the fourth floor. <b>Therefore</b> the only free view is north-east — the same direction people arrive from, so the view and the entrance want the same face. Everything else is a view that has to be earned with height.', source:{label:'My own measurement against the professor’s survey — ground level unless stated, VERIFY on site', url:'#'}},
@@ -694,7 +695,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
 
     {key:'streets', label:'Streets & Public Space', short:'Streets', group:'MOVEMENT', color:'var(--layer-movement)', blurb:'The public realm as the survey itself defines it: the void left between parcel blocks, classified by <b>its own measured width</b> \u2014 not by any road database. 72,548 m\u00b2 in this frame, <b>26%</b> of the ground. Unbuilt and unparcelled is not the same as public: which of these you can actually walk into is a question for the site visit. The street names are the survey\u2019s own STREET$TEXT labels.'},
     {key:'access', label:'Access & Arrival', short:'Access', group:'MOVEMENT', color:'var(--layer-movement)', blurb:'How anyone actually reaches the plot. Every arrival point with its distance measured to the plot edge on the survey. Nothing lands on the site: the bridge deposits people 75 m away and the bus stop is 74 m off, both across other people\u2019s land.'},
-    {key:'noise', label:'The Corridor', short:'Corridor', group:'MOVEMENT', color:'var(--layer-environmental)', blurb:'The widest continuous public space in the survey \u2014 over 26 m between plots, 31,048 m\u00b2 \u2014 is the highway corridor the survey names VERS BEYROUTH / VERS TRIPOLI. Distance bands are a geometric model from its surveyed edge, not a measured noise reading.'},
+    {key:'noise', label:'The Corridor', short:'Corridor', group:'MOVEMENT', color:'var(--layer-environmental)', blurb:'The widest continuous public space in the survey — one connected 32,853 m² piece, up to 54.5 m across. The plot’s south side lies along 100% of its length. The survey gives it no name; that it is the Charles Helou axis comes from the brief, not from this drawing. Distance bands are a geometric model from the surveyed edge, not a measured noise reading.'},
 
     {key:'sun', label:'Sun & Shadow', short:'Sun', group:'ANALYSIS', color:'var(--layer-landuse)', blurb:'Solar geometry computed for this site\u2019s latitude (33.90\u00b0 N) and drawn against the plot\u2019s own surveyed bearings. Nothing here comes from another map \u2014 it is the sun and the plot.'},
     {key:'wind', label:'Wind & Air', short:'Wind', group:'ANALYSIS', color:'var(--layer-movement)', blurb:'Prevailing wind by season, plotted against the plot\u2019s own surveyed axis to find the cross-ventilation line. The directions are station data for Beirut, not a site measurement \u2014 the geometry they are drawn against is the survey.'},
@@ -1139,7 +1140,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     edges:        true,    // per-edge colouring + labels  <- MAP 2, in review
     siteplot:     true,    // side dimensions  <- MAP 1, in review
     streets:      true,    // street void shading  <- MAP 5, in review
-    corridor:     false,   // corridor + distance bands
+    corridor:     true,    // corridor + distance bands  <- MAP 6, in review
     landuse:      false,   // brownfield outline
     access:       false,   // arrival points + walk lines
     wind:         false,   // wind arrows
@@ -1266,28 +1267,32 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     (function drawCorridor(){
       if (!SHOW.corridor) return;
       var g = groups.noise;
-      if (!g || !STREET_CAD) return;
+      if (!g || !STREET_CAD || !STREET_CAD.primary || !STREET_CAD.primary.length) return;
+
+      /* Only ONE of the five pieces 26 m and wider is the corridor: a single connected
+         32,853 m2 space, up to 54.5 m across, running 543 m through the frame and touching
+         the plot's south side. The other four are 634-1,875 m2 fragments lying 34-243 m
+         away, and banding those as highway was the error this drawing used to make. */
+      var cor = STREET_CAD.primary.reduce(function(a, b){ return b.a > a.a ? b : a; });
+
       [[58, .05], [36, .075], [18, .11]].forEach(function(pair){
-        (STREET_CAD.primary || []).forEach(function(p){
-          g.addLayer(L.polygon([p.o].concat(p.h || []), {color:cssVar('--layer-environmental'),
-            weight:pair[0], opacity:pair[1], fill:false, interactive:false,
-            lineJoin:'round', lineCap:'round'}));
-        });
+        g.addLayer(L.polygon([cor.o].concat(cor.h || []), {color:cssVar('--layer-environmental'),
+          weight:pair[0], opacity:pair[1], fill:false, interactive:false,
+          lineJoin:'round', lineCap:'round'}));
       });
-      (STREET_CAD.primary || []).forEach(function(p){
-        g.addLayer(L.polygon([p.o].concat(p.h || []), {color:cssVar('--layer-environmental'),
-          weight:1.2, fillColor:cssVar('--layer-environmental'), fillOpacity:.45})
-          .bindPopup('<h4>The corridor \u2014 over 26 m wide</h4>The widest continuous public space in ' +
-            'the survey, <b>31,048 m\u00b2</b> in this frame. The survey names it <b>VERS BEYROUTH</b> ' +
-            'and <b>VERS TRIPOLI</b>. It passes the <b>south</b> end of the plot \u2014 which is the ' +
-            'plot\u2019s <b>shortest</b> side at 22.07 m, the smallest face the geometry offers it.' +
-            '<br><br><b>Therefore</b> put the depth of the building between the corridor and everything ' +
-            'quiet: service, stair, plant and circulation on the south end make an inhabited acoustic ' +
-            'wall, so the programme does the work a barrier would otherwise have to do.' +
-            '<span class="src">Width and name both from the professor\u2019s survey. The bands are a ' +
-            'geometric model from the surveyed edge, not a measured noise reading.</span>'));
-      });
-    })();
+      g.addLayer(L.polygon([cor.o].concat(cor.h || []), {color:cssVar('--layer-environmental'),
+        weight:1.2, fillColor:cssVar('--layer-environmental'), fillOpacity:.45})
+        .bindPopup('<h4>The corridor</h4>One connected space of <b>' + cor.a.toLocaleString() +
+          ' m\u00b2</b>, <b>' + cor.w + ' m</b> across at its widest, running <b>543 m</b> through this ' +
+          'frame \u2014 <b>45%</b> of all the public space here. The plot\u2019s south side lies along it: ' +
+          '<b>22.1 m of 22.07 m, 100%</b>.' +
+          '<br><br>The survey gives it no name. No STREET$TEXT label falls inside it; the nearest is ' +
+          '<b>106.7 m</b> away, and VERS BEYROUTH and TRIPOLI sit 175 m and 178 m off, on other spaces. ' +
+          'That it is the Charles Helou axis comes from the brief and from where the site is \u2014 not ' +
+          'from this drawing.' +
+          '<span class="src">Width and position from the professor\u2019s survey. The bands are a geometric ' +
+          'model from the surveyed edge, not a measured noise reading.</span>'));
+})();
 
     /* ---------- THE PROJECT PLOT — professor's own marking, layer 0 of the DWG ---------- */
     SITE_PLOT       = [[33.8964055,35.5398699],[33.8963473,35.540098],[33.8964428,35.5402268],[33.8967382,35.5403097],[33.8967474,35.5403065],[33.8967708,35.5402983],[33.8968607,35.5400197],[33.8964055,35.5398699]];
@@ -1360,6 +1365,20 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       }
       var tag = L.marker(lead, {icon:L.divIcon({className:'plot-tag',
         html:'THE PLOT<i>1,488.6 m\u00b2</i>', iconSize:[76,28], iconAnchor:anchorTo})}).bindPopup(PLOT_POPUP);
+      /* The Corridor legend names the exposed south side, so that drawing has to show it.
+         100% of the 22.07 m side lies within 1 m of the corridor -- the plot's entire contact
+         with it. Drawn here rather than in drawCorridor because SITE_PLOT is assigned after it. */
+      if (k === 'noise'){
+        var expo = L.polyline([SITE_PLOT[0], SITE_PLOT[1]], {color:cssVar('--layer-environmental'),
+          weight:5, opacity:.95})
+          .bindPopup('<h4>The exposed side — 22.07 m</h4><b>100%</b> of this side lies within 1 m of ' +
+            'the corridor. It is the plot’s entire contact with it: the south-east side adds 1.4 m ' +
+            '(8%), and the east and north sides touch it nowhere.<br><br>But <b>98%</b> of the plot lies ' +
+            'within <b>50 m</b> of the corridor and the furthest corner is <b>52.6 m</b>, so turning a ' +
+            'narrow face to it buys orientation, not distance.' +
+            '<span class="src">Measured against the layer-0 plot and the derived corridor geometry.</span>');
+        groups[k].addLayer(expo); kept.push(expo);
+      }
       if (leader){ groups[k].addLayer(leader); kept.push(leader); }
       groups[k].addLayer(tag);
       kept.push(tag);
@@ -1895,7 +1914,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     if (key === 'edges') rows = [{sw:'line', color:'--layer-traffic', label:'Side on the legal cadastral boundary'},{sw:'line', color:'--layer-landuse', label:'Side approximate (2.35 m off)'},{sw:'line', color:'--layer-environmental', label:'The professor’s own cut line'},{sw:'line', color:'--ink', label:'The shed 2.9 m off the north edge'},{sw:'line', color:'--ink-soft', label:'Other surveyed structure'},{sw:'outline', color:'--line-strong', label:'Neighbouring parcel'}];
     if (key === 'access') rows = [{sw:'line', color:'--ink', label:'Motorway / trunk corridor'},{sw:'line', color:'--layer-movement', label:'Primary / secondary'},{sw:'line', color:'--line-strong', label:'Local street'},{sw:'block', color:'--layer-movement', label:'Arrival point (bridge / bus)'},{sw:'line', color:'--layer-traffic', label:'Walk to the plot'},{sw:'outline', color:'--muted', label:'50 / 100 / 200 m rings'}];
     if (key === 'sun') rows = [{sw:'line', literal:'#D9A324', label:'21 June — noon 79.5°'},{sw:'line', literal:'#C9931B', label:'Equinox — noon 56.1°'},{sw:'line', literal:'#B0810E', label:'21 December — noon 32.6°'},{sw:'line', color:'--layer-greenery', label:'Plot face: workable sun'},{sw:'line', color:'--layer-environmental', label:'Plot face: hardest to shade'},{sw:'line', color:'--muted', label:'Plot face: no direct sun'}];
-    if (key === 'noise') rows = [{sw:'line', color:'--layer-environmental', label:'Highway corridor — dominant source'},{sw:'block', color:'--layer-environmental', label:'Distance band (model, not measured)'},{sw:'line', color:'--layer-environmental', label:'The exposed 22.07 m south end'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.6 m²'}];
+    if (key === 'noise') rows = [{sw:'block', color:'--layer-environmental', label:'The corridor — 32,853 m², up to 54.5 m wide'},{sw:'block', color:'--layer-environmental', label:'Distance band (model, not measured)'},{sw:'line', color:'--layer-environmental', label:'The exposed 22.07 m south side — 100% of it'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.6 m²'}];
     if (key === 'wind') rows = [{sw:'line', literal:'#2A6FC4', label:'Dec–Apr  ·  SW ~210–225°'},{sw:'line', literal:'#3987e5', label:'May–Oct  ·  WSW→W ~245–270°'},{sw:'line', literal:'#8AB6EE', label:'Oct reversal  ·  NNW ~337°'},{sw:'line', color:'--layer-greenery', label:'Cross-ventilation line'}];
     if (key === 'views') rows = [{sw:'block', color:'--ink', label:'Blocked arc — the adjacent shed'},{sw:'block', color:'--layer-greenery', label:'Open arc — fabric and canopy'},{sw:'block', color:'--layer-landuse', label:'View earned with height'},{sw:'block', color:'--ink', label:'Surveyed structure'}];
     if (key === 'green') rows = [{sw:'block', color:'--layer-greenery', label:'Mapped green area (OSM)'},{sw:'outline', color:'--layer-greenery', label:'Mature canopy I found — private, walled'},{sw:'line', color:'--layer-movement', label:'Beirut River — flood channel'},{sw:'block', color:'--layer-greenery', label:'Karantina Park — nearest public park'}];
@@ -1949,7 +1968,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       edges:    '<b>6 of 7</b> sides are legal boundary (0.00–0.72 m) &middot; the <b>52.37 m west side</b> is <b>14.6 m</b> from any cadastral line',
       access:   'bridge north landing <b>75 m</b> &middot; bus stop <b>74 m</b> &middot; bridge south landing <b>86 m</b> &middot; nothing lands on the plot',
       sun:      'latitude <b>33.90° N</b> &middot; noon sun <b>79.5°</b> in June, <b>32.6°</b> in December &middot; long axis runs <b>195° / 15°</b>',
-      noise:    'exposed face <b>22.07 m</b> (the shortest side) &middot; sheltered frontage <b>33.66 m</b> &middot; no acoustic barrier exists',
+      noise:    'exposed face <b>22.07 m</b>, 100% of it &middot; <b>98%</b> of the plot lies within <b>50 m</b> of the corridor &middot; furthest corner <b>52.6 m</b> &middot; there is no sheltered end',
       wind:     'prevailing <b>SW 218°</b> &middot; plot long axis <b>195°</b> &middot; <b>23°</b> apart — the breeze runs along the plot',
       views:    'blocked arc <b>275–340°</b> &middot; open arc <b>20–95°</b> &middot; skyline only above ~4th floor',
       green:    'nearest canopy <b>94 m</b> (private, walled) &middot; nearest PUBLIC park <b>1.5–2 km</b> &middot; river <b>232 m</b>'
