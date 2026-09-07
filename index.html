@@ -222,6 +222,9 @@
     border:1px solid var(--line); border-radius:6px; box-shadow:0 2px 12px rgba(0,0,0,.08);
     font-size:.72rem; max-height:calc(100% - 1.2rem); display:flex; flex-direction:column;}
   .layer-panel.collapsed{width:auto;}
+  /* On a phone the panel was opening over half the screen. It starts collapsed there --
+     one tap opens it, and the map is the thing you came for. */
+  @media (max-width: 760px){ .layer-panel{max-height:46vh;} }
   .lp-toggle{width:100%; text-align:left; background:none; border:0; cursor:pointer;
     font-family:var(--font-mono); font-size:.58rem; letter-spacing:.12em; color:var(--muted);
     padding:.5rem .65rem .35rem; display:flex; justify-content:space-between; align-items:center;
@@ -261,6 +264,26 @@
     border:1px solid var(--layer-traffic); border-radius:8px; padding:.5rem .6rem;
     box-shadow:0 3px 16px rgba(0,0,0,.12); align-items:center; gap:.5rem; flex-wrap:wrap;}
   body.field-on .field-bar{display:flex;}
+  /* The brief you carry in one hand. Only in Field mode, and only when asked for, so it
+     never sits between you and the map. */
+  .field-jobs{display:none; position:absolute; z-index:1250; left:.6rem; right:.6rem;
+    bottom:calc(4rem + env(safe-area-inset-bottom)); max-height:58vh; overflow-y:auto;
+    background:color-mix(in srgb, var(--surface) 97%, transparent); backdrop-filter:blur(10px);
+    border:1px solid var(--layer-traffic); border-radius:8px; padding:.55rem .65rem;
+    box-shadow:0 6px 26px rgba(0,0,0,.16);}
+  body.field-on.jobs-on .field-jobs{display:block;}
+  .fj-head{display:flex; align-items:center; gap:.5rem; margin-bottom:.4rem;}
+  .fj-head b{font-size:.82rem;}
+  .fj-head span{font-family:var(--font-mono); font-size:.68rem; color:var(--muted); margin-right:auto;}
+  .fj-row{display:flex; gap:.5rem; align-items:flex-start; padding:.42rem 0;
+    border-top:1px solid var(--line);}
+  .fj-row input{margin-top:.15rem; width:17px; height:17px; flex:none;}
+  .fj-row b{display:block; font-size:.79rem; line-height:1.3;}
+  .fj-row i{display:block; font-style:normal; font-size:.72rem; color:var(--muted); margin-top:.12rem;}
+  .fj-row u{display:block; text-decoration:none; font-size:.72rem; color:var(--ink-soft); margin-top:.18rem;}
+  .fj-row em{display:block; font-style:normal; font-family:var(--font-mono); font-size:.64rem;
+    letter-spacing:.04em; color:var(--layer-traffic); margin-top:.18rem;}
+  .fj-done b{text-decoration:line-through; color:var(--muted);}
   .fb-btn{font-family:var(--font-body); font-size:.78rem; font-weight:500; cursor:pointer;
     background:var(--surface-2); color:var(--ink); border:1px solid var(--line-strong);
     border-radius:999px; padding:.42rem .85rem; min-height:34px;}
@@ -387,9 +410,11 @@
       <button class="fb-btn fb-primary" id="field-locate">Find me</button>
       <span class="fb-gps" id="field-gps">tap the map to place a record</span>
       <span class="fb-count"><b id="field-here">0</b> here <i>/</i> <b id="field-count">0</b> total</span>
+      <button class="fb-btn" id="field-jobs-btn">To do</button>
       <button class="fb-btn" id="field-export">Export</button>
       <button class="fb-btn fb-quiet" id="field-clear">Clear</button>
     </div>
+    <div class="field-jobs" id="field-jobs"></div>
     <div class="layer-panel" id="layer-panel">
       <button class="lp-toggle" id="lp-toggle" aria-expanded="true">SURVEY LAYERS <span>−</span></button>
       <div class="lp-body" id="lp-body"></div>
@@ -498,6 +523,12 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       {title:'The plot’s frontages, side by side', text:'Measured along each side, the share that actually abuts public space. <b>South 22.07 m: 100%</b>, onto the corridor. <b>East 33.66 m: 76%</b> — 25.4 m of it — onto a lane <b>7.8 m</b> wide. <b>North 27.64 m: 100%</b>, onto a gap <b>3.0 m</b> wide, which is the shed, not a street. South-east: <b>20%</b>, 3.3 m onto a 4.8 m lane. West: <b>4%</b> — it is interior to parcel 2478 and faces nothing. <b>Therefore</b> the plot has exactly one wide public frontage and it is the one it cannot use for arrival: 54.5 m of fast, loud road. The only frontage onto anything walkable is <b>25.4 m of a 7.8 m lane</b>.', source:{label:'Derived from PARCEL$BOUNDARY and STRUC$$FOOTPRINT by _extract-street-space.py — no road database used', url:'#'}},
       {title:'Where the give-back belongs — and it is not the west edge', text:'A <b>7.8 m</b> lane cannot carry the arrival of a 1,500 m² mixed-use building — that is a width for a back street, and the survey’s own classes call anything under 9 m a lane. Setting the building back <b>2 m</b> along the 33.66 m east side costs <b>67 m²</b>, <b>4.5%</b> of the plot, and takes the public width there from 7.8 m to <b>9.8 m</b> — out of the lane class and into the 9–16 m one. <b>Therefore</b> the give-back belongs on the east side, not the west. This corrects the edge drawing: the <b>west</b> edge is where we are <i>free</i> to move a boundary, because it has no legal existence; the <b>east</b> is where the public space is actually <i>short</i>. Those are different things, and only the second one is a reason to give ground away.', source:{label:'Derived from PARCEL$BOUNDARY and STRUC$$FOOTPRINT by _extract-street-space.py — no road database used', url:'#'}},
       {title:'What this drawing cannot settle — for the site visit', text:'A cadastral survey records ownership and structure. It does not record whether a space is <b>public</b>. Everything on this drawing is unbuilt and unparcelled — which is not the same thing. Several of the widest pieces sit <b>inside</b> the block fabric and are far more likely to be industrial yards than street: the survey gives no way to tell them apart, so this map does not pretend to. <b>Therefore</b> the first job on site is to walk the pieces this drawing marks and record which are open, which are gated and which are private — particularly the <b>7.8 m lane on the east side</b>, because the whole arrival argument rests on it. That goes on the Field Survey.', source:{label:'Derived from PARCEL$BOUNDARY and STRUC$$FOOTPRINT by _extract-street-space.py — no road database used', url:'#'}},
+    ],
+    age: [
+      {title:'What to bring back — ranked', text:'Ten things, ranked by how much each one releases. Open <b>Field</b> and the list is there; tick as you go and it is kept on the phone. Two items are worth more than the rest combined. <b>Storey counts</b>: the DWG is planimetric — <b>no height anywhere in 45,264 entities</b> — and that single number blocks Sun &amp; Shadow, Views <i>and</i> the massing study. <b>The 7.8 m east lane</b>: 25.4 m of the plot’s only walkable frontage is on it, and the whole arrival argument assumes you can use it. <b>Therefore</b> if the visit is cut short, get those two and come back.', source:{label:'Open questions carried forward from Maps 1–7', url:'#'}},
+      {title:'Every record type feeds a specific map', text:'Each record type is pinned to the map it feeds, so nothing you write down lands nowhere. Building → Sun, Views, massing. Ground-floor use → Functions. Greenery, with an <i>access</i> field → Green &amp; Water. Street → Streets. Arrival point → Access. View → Views. Noise, in dB → Corridor. Sun/shadow, with a time → Sun. <b>Therefore</b> tag from whichever section you are reading and the record goes to the right argument by itself.', source:{label:'Open questions carried forward from Maps 1–7', url:'#'}},
+      {title:'It works offline — but export before you clear anything', text:'It works with no signal. The page, the survey and your records are all held on the phone; photographs are resized before they are stored because a phone picture is 3–5 MB and the browser holds about 5 MB in total. Location needs <b>https</b>, which the published link is. <b>Therefore</b> open the live link before you leave, and <b>Export</b> at the end of the walk — clearing the browser’s site data would take the records with it.', source:null},
+      {title:'This map is empty on purpose', text:'What this map claims today is <b>nothing</b>. It is empty until you fill it, and that is the honest state: every other section in this file says which of its claims rest on a survey and which rest on guesswork, and this is where the guesswork gets replaced. <b>Therefore</b> the value of the visit is measured by how many of the ten are ticked when you get back — not by how many photographs.', source:null}
     ],
     grain: [
       {title:'The plot is the big one here — measured', text:'Every cadastral parcel in the drawn frame was rebuilt from the survey and measured: <b>216 parcels</b>, median <b>285 m²</b> — a <b>16.9 m square</b>. At <b>1,488.6 m²</b> the project plot is <b>5.2× that</b>, larger than <b>85%</b> of them, and as a square it would be <b>38.6 m</b> a side. <b>Therefore</b> this is not an ordinary plot for the neighbourhood. A single mass built across it would be the largest object on its street, so the volume has to be broken into bays of roughly a neighbour’s width — it should read as several buildings that agree, not one that dominates.', source:{label:'Parcel faces rebuilt from PARCEL$BOUNDARY by _extract-parcel-faces.py', url:'#'}},
@@ -1882,6 +1913,47 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   }
 
   var lastTab = null;
+  /* The fit, on its own, so a rotation or a window resize can re-run just this rather
+     than rebuilding every layer on the map. */
+  function fitFor(key){
+    map.invalidateSize({animate:false});
+    /* Padding has to scale with the frame. The desktop numbers are a large share of a 430 px
+       phone, which pushed the drawing off the bottom on their own. */
+    var mw = map.getSize().x, mh = map.getSize().y;
+    function cap(v, span){ return Math.min(v, Math.round(span * 0.14)); }
+    var CLOSE = SITE_PLOT ? {siteplot:[[165,105],[105,195]], edges:[[150,150],[95,195]]} : {};
+    Object.keys(CLOSE).forEach(function(k){
+      CLOSE[k] = [[cap(CLOSE[k][0][0], mw), cap(CLOSE[k][0][1], mh)],
+                  [cap(CLOSE[k][1][0], mw), cap(CLOSE[k][1][1], mh)]];
+    });
+    if (CLOSE[key] !== undefined){
+      map.fitBounds(L.polygon(SITE_PLOT).getBounds(), {paddingTopLeft:CLOSE[key][0],
+        paddingBottomRight:CLOSE[key][1], animate:false});
+    } else if (CAD_DATA && CAD_DATA.bounds){
+      /* Fit the drawing that is really there. The nominal 580 x 496 m crop has empty corners, so
+         fitting the rectangle wastes the frame; DRAWN_BOUNDS is the extent of the linework itself.
+         The right-hand layer panel floats over the map, so the drawing is inset past it. */
+      var pad = window.innerWidth > 1100 ? [10, 150] : [10, 10];   // the panel is translucent, so the drawing may run a little under its edge
+      pad = [cap(pad[0], mw), cap(pad[1], mw)];
+      /* A portrait phone is 1:1.9; the drawing is 1.17:1. Fitting the whole 580 m crop into
+         that leaves the drawing small between two empty bands, and on site scale is the
+         thing you need. Narrow screens frame +/-190 m around the plot instead -- still 380 m
+         of context, at roughly twice the size. The rule is the same for every section, so
+         the drawings stay comparable to each other. */
+      if (mw < 560 && SITE_PLOT){
+        var HALF = 190 / 111320;
+        map.fitBounds([[SITE.lat - HALF, SITE.lng - HALF / Math.cos(SITE.lat * Math.PI / 180)],
+                       [SITE.lat + HALF, SITE.lng + HALF / Math.cos(SITE.lat * Math.PI / 180)]],
+                      {padding:[6, 6], animate:false});
+        return;
+      }
+      map.fitBounds(DRAWN_BOUNDS || CAD_DATA.bounds, {paddingTopLeft:[pad[0], pad[0]],
+        paddingBottomRight:[pad[1], pad[0]], animate:false});
+    } else {
+      map.setView([SITE.lat, SITE.lng], 17, {animate:false});
+    }
+  }
+
   function renderTab(key){
     var t = TABS.filter(function(x){ return x.key === key; })[0];
 
@@ -1893,20 +1965,10 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
        itself zoom to the plot instead. */
     /* Bias the fit away from the legend card in the bottom-left corner, so the drawing
        sits in clear space rather than half under it. */
-    var CLOSE = SITE_PLOT ? {siteplot:[[165,105],[105,195]], edges:[[150,150],[95,195]]} : {};
-    if (CLOSE[key] !== undefined){
-      map.fitBounds(L.polygon(SITE_PLOT).getBounds(), {paddingTopLeft:CLOSE[key][0],
-        paddingBottomRight:CLOSE[key][1], animate:false});
-    } else if (CAD_DATA && CAD_DATA.bounds){
-      /* Fit the drawing that is really there. The nominal 580 x 496 m crop has empty corners, so
-         fitting the rectangle wastes the frame; DRAWN_BOUNDS is the extent of the linework itself.
-         The right-hand layer panel floats over the map, so the drawing is inset past it. */
-      var pad = window.innerWidth > 1100 ? [10, 150] : [10, 10];   // the panel is translucent, so the drawing may run a little under its edge
-      map.fitBounds(DRAWN_BOUNDS || CAD_DATA.bounds, {paddingTopLeft:[pad[0], pad[0]],
-        paddingBottomRight:[pad[1], pad[0]], animate:false});
-    } else {
-      map.setView([SITE.lat, SITE.lng], 17, {animate:false});
-    }
+    /* Measure the container before fitting. On a phone the first fit ran against a stale
+       size, so the drawing came out small and pushed to the bottom of the screen with the
+       top half empty -- the map was fitting a box it no longer had. */
+    fitFor(key);
     lastTab = key;
 
     // swap map layer groups
@@ -2044,6 +2106,71 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
      map to place a record is always available and is the primary method.
      ====================================================================== */
   var FIELD_KEY = 'studio7FieldRecords';
+
+  /* What to collect, ranked by how much it unblocks. Every item names the map it releases,
+     because an item with no consequence does not belong on a list you carry in one hand. */
+  var FIELD_JOBS = [
+    {id:'storeys', p:1, t:'Storey counts, every building you pass',
+     w:'The DWG is planimetric \u2014 no height anywhere in 45,264 entities. This one number blocks Sun &amp; Shadow, Views AND the massing study.',
+     m:'Sun \u00b7 Views \u00b7 Massing', how:'Tap a building, use the Building form, count floors. The 2,794 m\u00b2 shed on the north edge first.'},
+    {id:'eastlane', p:1, t:'The 7.8 m lane on the east side \u2014 public, gated or private?',
+     w:'25.4 m of the plot\u2019s only walkable frontage is on it, and the entire arrival argument rests on it being usable.',
+     m:'Streets \u00b7 Access', how:'Walk it end to end. Photograph both ends. Note gates, bollards, parked cars, whether anyone else walks it.'},
+    {id:'sound', p:2, t:'A sound reading at the south edge',
+     w:'Map 6\u2019s bands are a distance model, not decibels. Four readings turn the whole acoustic argument into a measurement.',
+     m:'Corridor', how:'Any phone dB meter. Take one at the south edge, one at the north, and note the time.'},
+    {id:'westedge', p:2, t:'Is there anything physical on the west edge?',
+     w:'It is the professor\u2019s own cut, 14.6 m from any cadastral line. If a wall or fence stands there, it stops being an invention.',
+     m:'The Plot \u00b7 Edges', how:'Walk the west side of the plot. Wall, fence, kerb, nothing? Photograph it either way.'},
+    {id:'voids', p:2, t:'Which of the wide open spaces can you actually enter?',
+     w:'Streets classifies the public realm by width because the survey records width. It cannot record access \u2014 several wide pieces are probably industrial yards.',
+     m:'Streets', how:'Switch to Streets, look at the dark blue and mid blue pieces, and try to walk into them.'},
+    {id:'uses', p:3, t:'Ground-floor uses along the east lane and the streets you cross',
+     w:'Building Functions currently rests on OpenStreetMap, which this project already showed is unusable on this site.',
+     m:'Functions', how:'Ground-floor use form. Name on the sign, category. Quantity beats detail.'},
+    {id:'views', p:3, t:'A photo out from each plot corner',
+     w:'The open sectors are 86\u2013147\u00b0 and 228\u2013280\u00b0; the blocked one is 0\u201336\u00b0. Photographs are what turn that into a view study.',
+     m:'Views', how:'Stand at each corner, shoot outward, note the compass bearing if your phone shows it.'},
+    {id:'canopy', p:3, t:'The walled tree canopy, 94 m away \u2014 is the gate open?',
+     w:'Green &amp; Water argues the constraint is access to green, not the ability to grow it. That stands or falls on this gate.',
+     m:'Green', how:'Greenery form, access field. Photograph the wall and the gate.'},
+    {id:'empty', p:4, t:'Is the plot actually empty on the ground?',
+     w:'Figure-Ground says zero structure line falls inside it. Worth confirming with your own eyes \u2014 rubble, parking, a shack.',
+     m:'Figure-Ground', how:'Stand in it if you can. One photo across it.'},
+    {id:'number', p:4, t:'Any parcel number posted on or near the plot?',
+     w:'Whether the plot is a numbered parcel or a carve-out of 2478 decides whether the west edge is ours to move. Design driver 04.',
+     m:'The Plot', how:'Look for painted or plaqued numbers on walls at the corners.'}
+  ];
+  var JOBS_KEY = 'eb-field-jobs-v1';
+  var jobsDone = {};
+  try { jobsDone = JSON.parse(localStorage.getItem(JOBS_KEY) || '{}'); } catch(e){ jobsDone = {}; }
+  function saveJobs(){ try { localStorage.setItem(JOBS_KEY, JSON.stringify(jobsDone)); } catch(e){} }
+  function jobsLeft(){ return FIELD_JOBS.filter(function(j){ return !jobsDone[j.id]; }).length; }
+
+  function renderJobs(){
+    var box = document.getElementById('field-jobs');
+    if (!box) return;
+    box.innerHTML = '<div class="fj-head"><b>What to bring back</b>' +
+      '<span id="fj-left">' + jobsLeft() + ' of ' + FIELD_JOBS.length + ' left</span>' +
+      '<button class="fb-btn fb-quiet" id="fj-close">hide</button></div>' +
+      FIELD_JOBS.map(function(j){
+        return '<label class="fj-row' + (jobsDone[j.id] ? ' fj-done' : '') + '">' +
+          '<input type="checkbox" data-job="' + j.id + '"' + (jobsDone[j.id] ? ' checked' : '') + '>' +
+          '<span><b>' + j.t + '</b>' +
+          '<i>' + j.w + '</i>' +
+          '<u>' + j.how + '</u>' +
+          '<em>releases: ' + j.m + '</em></span></label>';
+      }).join('');
+    box.querySelectorAll('input[data-job]').forEach(function(cb){
+      cb.addEventListener('change', function(){
+        jobsDone[cb.getAttribute('data-job')] = cb.checked;
+        saveJobs(); renderJobs();
+      });
+    });
+    var c = document.getElementById('fj-close');
+    if (c) c.addEventListener('click', function(){ document.body.classList.remove('jobs-on'); });
+  }
+
   var field = {on:false, records:[], watch:null, here:null, acc:null, lastAcc:null, centred:false};
   try { field.records = JSON.parse(localStorage.getItem(FIELD_KEY) || '[]'); } catch(e){ field.records = []; }
 
@@ -2265,10 +2392,20 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     document.body.classList.toggle('field-on', on);
     var b = document.getElementById('field-toggle');
     if (b) b.classList.toggle('on', on);
-    if (on) locate();
-    else if (field.watch !== null){ navigator.geolocation.clearWatch(field.watch); field.watch = null; }
+    if (on){
+      locate();
+      renderJobs();
+      /* Open the brief the first time Field mode is used. After that it remembers -- if
+         there is still something on the list, it opens; once it is all ticked, it stays out
+         of the way. */
+      if (jobsLeft() > 0 && !jobsShown){ document.body.classList.add('jobs-on'); jobsShown = true; }
+    } else {
+      document.body.classList.remove('jobs-on');
+      if (field.watch !== null){ navigator.geolocation.clearWatch(field.watch); field.watch = null; }
+    }
     updateFieldBar();
   }
+  var jobsShown = false;
 
   /* Finding yourself is a map function, not a mode — this sits under the zoom buttons where
      every map puts it, and works whether or not Field mode is on. */
@@ -2295,7 +2432,19 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   map.addControl(new LocateControl());
 
   map.on('click', function(e){ if (field.on) openFieldForm(e.latlng); });
+  /* A phone rotates, and a desktop window resizes. Either changes the frame the drawing was
+     fitted to, so fit it again -- debounced, because resize fires continuously. */
+  var refitT = null;
+  window.addEventListener('resize', function(){
+    clearTimeout(refitT);
+    refitT = setTimeout(function(){ if (lastTab) fitFor(lastTab); }, 180);
+  });
+
   document.getElementById('field-toggle').addEventListener('click', function(){ setFieldMode(!field.on); });
+  document.getElementById('field-jobs-btn').addEventListener('click', function(){
+    renderJobs();
+    document.body.classList.toggle('jobs-on');
+  });
   document.getElementById('field-locate').addEventListener('click', locate);
   document.getElementById('field-export').addEventListener('click', exportField);
   document.getElementById('field-clear').addEventListener('click', function(){
@@ -2308,6 +2457,15 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
 
   loadFromSnapshot();
   buildLayerPanel();
+  /* Start the layer panel collapsed on a phone: it was covering roughly half the screen,
+     and on site the map is what you are there for. One tap opens it. */
+  if (window.innerWidth <= 760){
+    var lp0 = document.getElementById('layer-panel');
+    var lt0 = document.getElementById('lp-toggle');
+    if (lp0) lp0.classList.add('collapsed');
+    if (lt0){ lt0.setAttribute('aria-expanded', 'false');
+              if (lt0.querySelector('span')) lt0.querySelector('span').textContent = '+'; }
+  }
 
   /* the tab rail is one or two rows depending on window width — measure it rather than guess,
      so the map always fills exactly what is left */
