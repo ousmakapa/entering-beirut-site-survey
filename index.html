@@ -490,9 +490,10 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       {title:'The easiest map in the file to fill', text:'This is the emptiest map in the file and it is the easiest one to fill. One walk down the east lane and the streets you cross, tagging ground-floor use, replaces the whole of the note above with something positioned to a metre. <b>Therefore</b> ground-floor uses are item <b>6</b> on the field brief — and unlike storey counts, every single record is usable on its own.', source:null}
     ],
     access: [
-      {title:'Nothing lands on the plot — measured', text:'Pedestrian bridge north landing <b>75 m</b> from the plot edge, south landing <b>86 m</b>, bus stop (routes B1 / B2 / B3) <b>74 m</b>. All three are across other people’s land. <b>Therefore</b> footfall here has to be earned, not assumed: the ground floor must be a through-route people use on the way somewhere, and a public route has to be extended from the north-east edge toward the bridge landing.', source:{label:'Positions from OpenStreetMap; distances measured on the survey to the layer-0 plot boundary', url:'#'}},
-      {title:'The corridor is a barrier as well as an address', text:'Everyone arriving from Karantina has to use the bridge, and the bridge does not touch us. <b>Therefore</b> the project’s catchment on foot is effectively the Bourj Hammoud side only, unless the building gives people a reason to make the crossing.', source:{label:'area-arch.it', url:'https://www.area-arch.it/en/bourj-hammoud-district/'}},
-      {title:'Still unsurveyed', text:'Exact landing points, ramp geometry and headroom under the bridge are not in the DWG and not in any dataset. They need a site visit before the ground-floor route can be designed.', source:null},
+      {title:'The distances are right — the walks are not the same thing', text:'The three distances this map has always quoted are right. Measured against the layer-0 plot edge: bridge north landing <b>75.4 m</b>, bridge south <b>86.0 m</b>, bus stop <b>74.3 m</b>. But a straight line is not a walk. Routed through public space only, from the plot boundary on a 2 m grid: the bus stop is <b>83.7 m</b> (&times;1.13), the south landing <b>90.2 m</b> (&times;1.05) — and the north landing is <b>not reachable at all</b>. <b>Therefore</b> the nearest arrival point on paper is the one you cannot actually walk to, and the bus stop, not the bridge, is the closest real approach.', source:{label:'Distances measured on the survey against the layer-0 plot; walks routed through the derived public space on a 2 m grid', url:'#'}},
+      {title:'The nearest arrival point does not land anywhere public', text:'Why the north landing fails is measurable: it sits <b>29.2 m</b> from the nearest public space the survey records. The south landing and the bus stop both sit at <b>0.0 m</b> — inside it. So either OpenStreetMap has that endpoint in the wrong place, or the bridge genuinely lands on private ground. <b>Therefore</b> the earlier note here — that the route “crosses two other properties or goes round by the street” — was right, and is now measured rather than guessed. It is also the one thing on this map that a two-minute look on site settles for good.', source:{label:'Distances measured on the survey against the layer-0 plot; walks routed through the derived public space on a 2 m grid', url:'#'}},
+      {title:'What corroborates: the span, not the endpoints', text:'What does check out is the bridge itself. Its span, <b>57.7 m</b> on a bearing of <b>17°</b>, is consistent with the corridor measured independently off the survey at up to <b>54.5 m</b> wide — two unrelated sources agreeing. <b>Therefore</b> treat the bridge as good evidence that a crossing exists and runs roughly north–south, and as poor evidence of where you step onto it. Every point on this map is OpenStreetMap-positioned, and this project already measured OSM here at <b>11.0 m</b> median building mismatch; 29.2 m is well past even that.', source:{label:'Distances measured on the survey against the layer-0 plot; walks routed through the derived public space on a 2 m grid', url:'#'}},
+      {title:'Where the door goes is settled elsewhere', text:'None of this decides where the door goes, because the plot’s own contact with the public realm does. Measured on Streets: the south side abuts the corridor along <b>100%</b> of its 22.07 m, the east side abuts a <b>7.8 m</b> lane along <b>76%</b> (25.4 m), the north abuts a 3.0 m gap, and the west abuts essentially nothing. <b>Therefore</b> the arrival comes off the east lane whatever the bridge turns out to be — and the bridge and bus questions are really about how people reach <i>that lane</i>, not how they reach the plot.', source:{label:'Distances measured on the survey against the layer-0 plot; walks routed through the derived public space on a 2 m grid', url:'#'}}
     ],
     wind: [
       {title:'Which face the wind actually hits', text:'Measured area-weighted off the survey, the plot’s principal axis is <b>198.1° / 18.1°</b>, elongation <b>1.70:1</b>. (The <b>195°</b> quoted elsewhere is the longest <i>side</i>, not the axis — close, but they are different things.) Taking each face’s outward normal against each prevailing direction: the winter wind (<b>SW 218°</b>) arrives <b>21°</b> off square to the <b>south</b> face, the summer wind (<b>WSW 257°</b>) <b>28°</b> off square to the <b>west</b> face, and the autumn reversal (<b>NNW 337°</b>) <b>44°</b> off the <b>north</b>. <b>Therefore</b> the summer breeze crosses the plot’s <b>short</b> dimension, entering the 52.37 m west facade and leaving through the east — a short flow path across a wide intake, which is exactly the geometry cross-ventilation wants. This corrects an earlier note here, which recommended running the section along the plot’s <i>length</i>: 52 m is the long way round.', source:{label:'Geometry measured off the professor\'s survey and the derived corridor', url:'#'}},
@@ -653,7 +654,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     {key:'age', label:'Field Survey', short:'Field Survey', group:'FABRIC', color:'var(--layer-movement)', blurb:'A blank recording sheet on the survey base. No age or function data for Bourj Hammoud exists in this DWG or in any free dataset \u2014 click a structure to record what you see on site. Your tags are saved in this browser.'},
 
     {key:'streets', label:'Streets & Public Space', short:'Streets', group:'MOVEMENT', color:'var(--layer-movement)', blurb:'The public realm as the survey itself defines it: the void left between parcel blocks, classified by <b>its own measured width</b> \u2014 not by any road database. 72,548 m\u00b2 in this frame, <b>26%</b> of the ground. Unbuilt and unparcelled is not the same as public: which of these you can actually walk into is a question for the site visit. The street names are the survey\u2019s own STREET$TEXT labels.'},
-    {key:'access', label:'Access & Arrival', short:'Access', group:'MOVEMENT', color:'var(--layer-movement)', blurb:'How anyone actually reaches the plot. Every arrival point with its distance measured to the plot edge on the survey. Nothing lands on the site: the bridge deposits people 75 m away and the bus stop is 74 m off, both across other people\u2019s land.'},
+    {key:'access', label:'Access & Arrival', short:'Access', group:'MOVEMENT', color:'var(--layer-movement)', blurb:'How anyone actually reaches the plot. Every distance is measured on the survey to the layer-0 plot edge, and every walk is routed through the derived public space rather than drawn straight. The finding: the <b>nearest</b> arrival on paper — the bridge’s north landing at 75.4 m — sits <b>29.2 m</b> from any public space, so there is no walking route to it at all. The bus stop, at 74.3 m straight and <b>83.7 m</b> on foot, is the closest real approach.'},
     {key:'noise', label:'The Corridor', short:'Corridor', group:'MOVEMENT', color:'var(--layer-environmental)', blurb:'The widest continuous public space in the survey — one connected 32,853 m² piece, up to 54.5 m across. The plot’s south side lies along 100% of its length. The survey gives it no name; that it is the Charles Helou axis comes from the brief, not from this drawing. Distance bands are a geometric model from the surveyed edge, not a measured noise reading.'},
 
     {key:'sun', label:'Sun & Shadow', short:'Sun', group:'ANALYSIS', color:'var(--layer-landuse)', blurb:'Solar geometry computed for this site\u2019s latitude (33.90\u00b0 N) and drawn against the plot\u2019s own surveyed bearings. Nothing here comes from another map \u2014 it is the sun and the plot.'},
@@ -1101,7 +1102,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     streets:      true,    // street void shading  <- MAP 5, in review
     corridor:     true,    // corridor + distance bands  <- MAP 6, in review
     landuse:      true,    // large structures  <- MAP 9, in review
-    access:       false,   // arrival points + walk lines
+    access:       true,    // arrival points + walk lines  <- MAP 10, in review
     wind:         true,    // wind arrows  <- MAP 7, in review
     green:        false,   // greenery, canopy, river
     sun:          false,   // sun paths
@@ -1626,24 +1627,45 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       if (SITE_FEATURES && SITE_FEATURES.bridge){
         g.addLayer(L.polyline(SITE_FEATURES.bridge.g, {color:cssVar('--layer-movement'),
           weight:5, opacity:.95, dashArray:'8,4'})
-          .bindPopup('<h4>Pedestrian bridge</h4>Span ~57.7 m, bearing ~17°. North landing <b>75 m</b> ' +
-            'from the plot edge, south landing <b>86 m</b>.<span class="src">Geometry from OpenStreetMap ' +
-            '(way 701135687) — annotation over the survey. Ramps and clearances still need a site visit.</span>'));
+          .bindPopup('<h4>Pedestrian bridge</h4>Span <b>57.7 m</b>, bearing <b>17\u00b0</b>. North landing ' +
+            '<b>75.4 m</b> from the plot edge, south landing <b>86.0 m</b>.' +
+            '<br><br>The span is the part that checks out: <b>57.7 m</b> against a corridor measured ' +
+            'independently off the survey at up to <b>54.5 m</b> wide. A crossing exists here and runs ' +
+            'about the right way. Where you step on and off it is another matter \u2014 the north landing ' +
+            'sits <b>29.2 m</b> from any public space the survey records.' +
+            '<span class="src">Geometry from OpenStreetMap (way 701135687) \u2014 annotation over the survey. ' +
+            'OSM measures 11.0 m median building mismatch on this site. Ramps, steps and clearances all ' +
+            'still need the site visit.</span>'));
       }
-      [{p:[33.896375, 35.541045], n:'Pedestrian bridge — north landing', d:75,
-        w:'about a minute’s walk, but it crosses two other properties or goes round by the street.'},
-       {p:[33.895878, 35.540863], n:'Pedestrian bridge — south landing', d:86,
+      /* Each point carries three numbers now: the straight line to the plot edge, the walk
+         routed through public space only on a 2 m grid, and how far the point itself sits from
+         any public space. That last one is what decides whether the first two mean anything. */
+      [{p:[33.896375, 35.541045], n:'Pedestrian bridge — north landing', d:75.4, walk:null, pub:29.2,
+        w:'the nearest arrival point to the plot — and the one that cannot be trusted. Routed through public space it is not reachable at all.'},
+       {p:[33.895878, 35.540863], n:'Pedestrian bridge — south landing', d:86.0, walk:90.2, pub:0.0,
         w:'the far side of the corridor. Anyone from Karantina lands here and still has the bridge to climb.'},
-       {p:[33.896040, 35.540868], n:'Bus stop — routes B1 / B2 / B3', d:74,
+       {p:[33.896040, 35.540868], n:'Bus stop — routes B1 / B2 / B3', d:74.3, walk:83.7, pub:0.0,
         w:'the only scheduled transit within 400 m. Southbound passengers arrive on the wrong side.'}
       ].forEach(function(a){
-        g.addLayer(L.polyline([a.p, [SITE.lat, SITE.lng]], {color:cssVar('--layer-traffic'),
-          weight:2, dashArray:'6 5', opacity:.85})
-          .bindPopup('<h4>' + a.d + ' m to walk</h4>From ' + a.n.toLowerCase() + ' to the middle of the plot.'));
-        g.addLayer(L.circleMarker(a.p, {radius:6, color:cssVar('--layer-movement'), weight:2,
-          fillColor:cssVar('--surface'), fillOpacity:1})
-          .bindPopup('<h4>' + a.n + '</h4><b>' + a.d + ' m</b> from the plot edge — ' + a.w +
-            '<span class="src">Position from OpenStreetMap; distance measured on the survey to the layer-0 plot boundary.</span>'));
+        var bad = a.pub > 5;
+        g.addLayer(L.polyline([a.p, [SITE.lat, SITE.lng]], {
+          color: bad ? cssVar('--layer-environmental') : cssVar('--layer-traffic'),
+          weight:2, dashArray: bad ? '2 6' : '6 5', opacity:.85})
+          .bindPopup('<h4>' + a.d.toFixed(1) + ' m in a straight line</h4>' +
+            (a.walk ? 'Walking, routed through public space only: <b>' + a.walk.toFixed(1) + ' m</b> ' +
+                      '(&times;' + (a.walk / a.d).toFixed(2) + ').'
+                    : '<b>Not reachable</b> through public space at all \u2014 see the point itself.')));
+        g.addLayer(L.circleMarker(a.p, {radius:6, color: bad ? cssVar('--layer-environmental') : cssVar('--layer-movement'),
+          weight:2, fillColor: bad ? cssVar('--layer-environmental') : cssVar('--surface'), fillOpacity:1})
+          .bindPopup('<h4>' + a.n + '</h4><b>' + a.d.toFixed(1) + ' m</b> from the plot edge \u2014 ' + a.w +
+            '<br><br>Walking through public space: ' +
+            (a.walk ? '<b>' + a.walk.toFixed(1) + ' m</b>, a detour of &times;' + (a.walk / a.d).toFixed(2) + '.'
+                    : '<b>no route</b>.') +
+            '<br>This point sits <b>' + a.pub.toFixed(1) + ' m</b> from the nearest public space the survey records' +
+            (bad ? ' \u2014 so either OpenStreetMap has it in the wrong place, or it lands on private ground. ' +
+                   'Check it on site.' : '.') +
+            '<span class="src">Position from OpenStreetMap; every distance measured on the survey against the ' +
+            'layer-0 plot and the derived public space.</span>'));
       });
       [50, 100, 200].forEach(function(r){
         g.addLayer(L.circle([SITE.lat, SITE.lng], {radius:r, color:cssVar('--muted'), weight:0.8,
@@ -1935,7 +1957,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     if (key === 'siteplot') rows = [{sw:'line', color:'--ink', label:'THE PLOT — 1,488.6 m²'},{sw:'line', color:'--layer-traffic', label:'Side on the legal cadastral boundary'},{sw:'line', color:'--layer-landuse', label:'Side approximate (no line under it)'},{sw:'line', color:'--layer-environmental', label:'The professor’s own cut line'},{sw:'outline', color:'--layer-traffic', label:'Host parcel 2478 (5,581 m²)'},{sw:'line', color:'--ink', label:'The shed 2.9 m off the north edge'},{sw:'line', color:'--ink-soft', label:'Other surveyed structure'},{sw:'outline', color:'--line-strong', label:'Neighbouring parcel'}];
     if (key === 'grain') rows = [{sw:'block', literal:'#EDE7DC', label:'under 285 m² (the median) — 108 parcels, 7.5% of the land'},{sw:'block', literal:'#DCCFB4', label:'285 – 886 m² — 54 parcels'},{sw:'block', literal:'#C4AE83', label:'886 – 2,329 m² — 32 parcels · THE PLOT is here'},{sw:'block', literal:'#9E844F', label:'over 2,329 m² — 22 parcels, 58% of the land'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.6 m², 33rd of 216'}];
     if (key === 'edges') rows = [{sw:'line', color:'--layer-traffic', label:'Side on the legal cadastral boundary'},{sw:'line', color:'--layer-landuse', label:'Side approximate (2.35 m off)'},{sw:'line', color:'--layer-environmental', label:'The professor’s own cut line'},{sw:'line', color:'--ink', label:'The shed 2.9 m off the north edge'},{sw:'line', color:'--ink-soft', label:'Other surveyed structure'},{sw:'outline', color:'--line-strong', label:'Neighbouring parcel'}];
-    if (key === 'access') rows = [{sw:'line', color:'--ink', label:'Motorway / trunk corridor'},{sw:'line', color:'--layer-movement', label:'Primary / secondary'},{sw:'line', color:'--line-strong', label:'Local street'},{sw:'block', color:'--layer-movement', label:'Arrival point (bridge / bus)'},{sw:'line', color:'--layer-traffic', label:'Walk to the plot'},{sw:'outline', color:'--muted', label:'50 / 100 / 200 m rings'}];
+    if (key === 'access') rows = [{sw:'block', color:'--layer-movement', label:'Arrival point that lands in public space'},{sw:'block', color:'--layer-environmental', label:'Arrival point that does not — 29.2 m from any'},{sw:'line', color:'--layer-traffic', label:'Straight line to the plot'},{sw:'line', color:'--muted', label:'50 / 100 / 200 m from the plot centre'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.6 m²'}];
     if (key === 'sun') rows = [{sw:'line', literal:'#D9A324', label:'21 June — noon 79.5°'},{sw:'line', literal:'#C9931B', label:'Equinox — noon 56.1°'},{sw:'line', literal:'#B0810E', label:'21 December — noon 32.6°'},{sw:'line', color:'--layer-greenery', label:'Plot face: workable sun'},{sw:'line', color:'--layer-environmental', label:'Plot face: hardest to shade'},{sw:'line', color:'--muted', label:'Plot face: no direct sun'}];
     if (key === 'noise') rows = [{sw:'block', color:'--layer-environmental', label:'The corridor — 32,853 m², up to 54.5 m wide'},{sw:'block', color:'--layer-environmental', label:'Distance band (model, not measured)'},{sw:'line', color:'--layer-environmental', label:'The exposed 22.07 m south side — 100% of it'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.6 m²'}];
     if (key === 'wind') rows = [{sw:'line', literal:'#2A6FC4', label:'Dec–Apr  ·  SW ~210–225°'},{sw:'line', literal:'#3987e5', label:'May–Oct  ·  WSW→W ~245–270°'},{sw:'line', literal:'#8AB6EE', label:'Oct reversal  ·  NNW ~337°'},{sw:'line', color:'--layer-greenery', label:'Cross-ventilation line'}];
@@ -1989,7 +2011,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       grain:    '<b>216</b> parcels in frame &middot; median <b>285 m²</b> (a 16.9 m square) &middot; ' +
                 'the plot is <b>5.2\u00d7</b> that, larger than <b>85%</b> &middot; but the largest <b>10%</b> hold <b>58%</b> of the land',
       edges:    '<b>6 of 7</b> sides are legal boundary (0.00–0.72 m) &middot; the <b>52.37 m west side</b> is <b>14.6 m</b> from any cadastral line',
-      access:   'bridge north landing <b>75 m</b> &middot; bus stop <b>74 m</b> &middot; bridge south landing <b>86 m</b> &middot; nothing lands on the plot',
+      access:   'nearest arrival <b>74.3 m</b> (bus stop) &middot; on foot <b>83.7 m</b> &middot; the bridge’s north landing is <b>29.2 m</b> from any public space — no walking route to it',
       sun:      'latitude <b>33.90° N</b> &middot; noon sun <b>79.5°</b> in June, <b>32.6°</b> in December &middot; long axis runs <b>195° / 15°</b>',
       noise:    'exposed face <b>22.07 m</b>, 100% of it &middot; <b>98%</b> of the plot lies within <b>50 m</b> of the corridor &middot; furthest corner <b>52.6 m</b> &middot; there is no sheltered end',
       wind:     'summer <b>WSW 257°</b> hits the <b>west</b> face <b>28°</b> off square &middot; nothing built within <b>300 m</b> upwind &middot; but <b>55%</b> of that intake sector is the corridor',
@@ -2061,6 +2083,9 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     {id:'eastlane', p:1, t:'The 7.8 m lane on the east side \u2014 public, gated or private?',
      w:'25.4 m of the plot\u2019s only walkable frontage is on it, and the entire arrival argument rests on it being usable.',
      m:'Streets \u00b7 Access', how:'Walk it end to end. Photograph both ends. Note gates, bollards, parked cars, whether anyone else walks it.'},
+    {id:'bridge', p:2, t:'The pedestrian bridge \u2014 where does the north end actually land?',
+     w:'It is the nearest arrival point to the plot at 75.4 m, but it sits 29.2 m from any public space the survey records, so routed on foot it is not reachable at all.',
+     m:'Access', how:'Walk to the bridge, go up the north end, photograph what you step onto and whether you can reach the plot from it without crossing private ground.'},
     {id:'sound', p:2, t:'A sound reading at the south edge',
      w:'Map 6\u2019s bands are a distance model, not decibels. Four readings turn the whole acoustic argument into a measurement.',
      m:'Corridor', how:'Any phone dB meter. Take one at the south edge, one at the north, and note the time.'},
