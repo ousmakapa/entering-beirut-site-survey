@@ -325,7 +325,12 @@
   }
 
   .parcel-no{ font-family:var(--font-mono); font-size:7px; text-align:center; line-height:12px;
-    color:var(--ink-soft); white-space:nowrap; }
+    color:var(--ink-soft); white-space:nowrap;
+    text-shadow:0 0 2px var(--surface), 0 0 2px var(--surface); }
+  /* On Figure-Ground a number can land on a solid black parcel. Dark text plus a light halo
+     there reads as a smudge, so those are drawn light with no halo instead. */
+  .parcel-no--onfill{ color:#FFFFFF; opacity:.5; text-shadow:none; }
+  .street-name{ text-shadow:0 0 3px var(--surface), 0 0 3px var(--surface); }
   .parcel-no span{ display:inline-block; transform-origin:center; }
   .street-name span{ display:inline-block; transform-origin:center; }
   .sheet-label{ font-family:var(--font-mono); font-size:7.5px; letter-spacing:.05em; text-align:center;
@@ -478,6 +483,11 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       {title:'Shape, size and orientation', text:'Perimeter <b>155.5 m</b>; bounding box <b>42.0 m east–west × 57.2 m north–south</b>. The long axis runs <b>195° / 15°</b>, roughly north–south, and the south edge faces <b>197° SSW</b>. <b>Therefore</b> the deep frontages are east and west, and the short south end is what meets the highway edge — a narrow face to the noise, long faces to the neighbourhood. <span class="fs">Source: Vertex geometry, EPSG:22780 → WGS84</span>', source:null},
       {title:'A seam in the survey itself', text:'Neighbours: parcel <b>3850</b> 7.4 m away (2,363 m²), <b>2481/3845</b> 11.7 m (4,019 m²), <b>3839</b> 15.4 m (1,163 m²), <b>4870</b> 40 m (1,246 m²). A <b>D.P. dividing line</b> runs within <b>0.95 m</b> of the plot edge and a <b>map-sheet boundary</b> within <b>4.4 m</b>. The plot sits exactly on a join between two survey sheets — which is why the parcel numbering around it reads inconsistently. <span class="fs">Source: Cadastral survey, layers DP$DIVIDING$LINE and MAP$SHEET$BOUND$</span>', source:null},
       {title:'What replaced parcel 4871', text:'An earlier reading of this file put the site on parcel <b>4871</b> (1,516.3 m²), because that area is also close to 1,500 m² and the old working coordinate fell inside it. That was a coincidence: 4871 is <b>96 m south-east</b> of the professor’s marking. The layer-0 polygon supersedes it, and every distance in this file has been recomputed from the new plot edge. <span class="fs">Source: Correction recorded 2026-09-05</span>', source:null}
+    ],
+    figureground: [
+      {title:'The plot is one of the 45% that are empty', text:'Every cadastral parcel inside the crop was rebuilt from the survey and tested for structure linework: <b>753 parcels</b>, of which <b>414</b> carry linework (<b>55%</b>, 261,968 m²) and <b>339</b> carry none (<b>45%</b>, 153,509 m²). <b>Zero</b> falls inside the project plot — <b>0.00 m</b>. <b>Therefore</b> the site is buildable from scratch, nothing has to come down, and the figure-ground confirms the professor’s layer-0 marking by a route that does not depend on it.', source:{label:'Parcel faces rebuilt from PARCEL$BOUNDARY, tested against STRUC$FOOTPRINT linework', url:'#'}},
+      {title:'Empty here normally means small — this one is not', text:'The median vacant parcel in the crop is <b>195 m²</b>, roughly a 14 m square: the empty ground around here is mostly leftover slivers between buildings. At <b>1,488.6 m²</b> the plot is <b>7.6× that median</b> and ranks <b>21st of the 339</b> vacant parcels — the <b>94th percentile</b> of open ground. <b>Therefore</b> this is not a gap in the fabric to be patched. It is one of the few pieces of empty ground at the entrance large enough to carry a building of consequence, which is what makes a 1,500 m² mixed-use programme a reasonable thing to ask of it.', source:{label:'Parcel faces rebuilt from PARCEL$BOUNDARY, tested against STRUC$FOOTPRINT linework', url:'#'}},
+      {title:'The mass sits east and north of the plot, and nothing sits south-east', text:'Built area within 200 m, by direction from the plot centroid: <b>east 8,123 m²</b>, <b>north 7,582 m²</b>, south-west 5,975, west 3,024, north-east 2,874, south 2,801, north-west 1,260 — and <b>south-east 0 m²</b>. The immediate pocket is also emptier than the district: <b>12 of 26</b> parcels within 150 m are built (<b>46%</b>) against 55% across the whole crop. <b>Therefore</b> the building has solid fabric on exactly the two sides the edge drawing already identified — the east frontage it must address and the north side it must back onto — while its south-east opens onto nothing built at all. That is the direction the section should be cut.', source:{label:'Parcel faces rebuilt from PARCEL$BOUNDARY, tested against STRUC$FOOTPRINT linework', url:'#'}},
     ],
     grain: [
       {title:'The plot is the big one here — measured', text:'Every cadastral parcel within 330 m was rebuilt from the survey and measured: <b>278 parcels</b>, median <b>269 m²</b> (roughly a 16 m square), mean 894 m², upper quartile 740 m². At <b>1,488.6 m²</b> the project plot sits in the <b>87th percentile</b> — only <b>35</b> of the 278 are larger. <b>Therefore</b> this is not an ordinary plot for the neighbourhood, and a single mass built across it would be the largest object in the street. Build to the edges, but break the volume into bays of roughly a neighbour’s width so it reads as several buildings that agree.', source:{label:'Professor\'s cadastral survey — BOURJ HAMMOUD.dwg', url:'#'}},
@@ -1049,8 +1059,28 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       if (a < -90 || a > 90) a += 180;
       return 'transform:rotate(' + a.toFixed(1) + 'deg);';
     }
+    /* Figure-Ground fills the built parcels solid, so a number landing on one has to be
+       drawn light or it vanishes. Ray-cast against the built parcels only, and only for
+       that section -- everywhere else the base is line work and this never runs. */
+    var fills = (groupKey === 'figureground') && BUILT_PARCELS
+      ? BUILT_PARCELS.filter(function(p){ return p.b; }) : null;
+    function onFill(pt){
+      if (!fills) return false;
+      for (var f = 0; f < fills.length; f++){
+        var r = fills[f].g, hit = false;
+        for (var i = 0, j = r.length - 1; i < r.length; j = i++){
+          if ((r[i][0] > pt[0]) !== (r[j][0] > pt[0]) &&
+              pt[1] < (r[j][1] - r[i][1]) * (pt[0] - r[i][0]) / (r[j][0] - r[i][0]) + r[i][1]){
+            hit = !hit;
+          }
+        }
+        if (hit) return true;
+      }
+      return false;
+    }
     if (on('numbers')) (CAD_DATA.numbers || []).forEach(function(n){
-      g.addLayer(L.marker(n.p, {icon:L.divIcon({className:'parcel-no',
+      g.addLayer(L.marker(n.p, {icon:L.divIcon({
+        className:'parcel-no' + (onFill(n.p) ? ' parcel-no--onfill' : ''),
         html:'<span style="' + rotStyle(n) + '">' + n.t + '</span>', iconSize:[34,12], iconAnchor:[17,6]})})
         .bindPopup('<h4>Parcel ' + n.t + '</h4>Surveyed parcel number, ~' + n.d + ' m from the plot.' +
           '<span class="src">Professor’s cadastral survey, PARCEL$NUMBER layer.</span>'));
@@ -1094,7 +1124,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
      We turn these on ONE AT A TIME as each map is rebuilt and checked.
      ---------------------------------------------------------------------- */
   var SHOW = {
-    figureground: false,   // built / vacant plot fills
+    figureground: true,    // built / vacant plot fills  <- MAP 3, in review
     grain:        false,   // parcels shaded by area
     edges:        true,    // per-edge colouring + labels  <- MAP 2, in review
     siteplot:     true,    // side dimensions  <- MAP 1, in review
@@ -1276,8 +1306,13 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       var ownEdges = (k === 'edges' && SHOW.edges) || (k === 'siteplot' && SHOW.siteplot);
       var kept = [];
       if (!ownEdges){
+        /* On Figure-Ground the plot must read as one of the VACANT parcels -- that is the
+           whole argument of the drawing -- so it takes the same open fill as the other 338
+           rather than an accent tint, and relies on the heavy outline and label to be found. */
+        var fg = (k === 'figureground');
         var halo = L.polygon(SITE_PLOT, {color:'#FFFFFF', weight:7, opacity:.95,
-          fillColor:cssVar('--layer-traffic'), fillOpacity:.30, interactive:false});
+          fillColor:cssVar(fg ? '--surface' : '--layer-traffic'),
+          fillOpacity: fg ? 1 : .30, interactive:false});
         groups[k].addLayer(halo); kept.push(halo);
       }
       if (!ownEdges){
