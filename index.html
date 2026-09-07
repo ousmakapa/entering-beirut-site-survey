@@ -291,7 +291,7 @@
   .ps-row b{display:block; font-size:.8rem; color:var(--ink);}
   .ps-row i{display:block; font-style:normal; font-size:.72rem; color:var(--muted); margin-top:.1rem;}
   .ps-alt{background:none; border-style:dashed;}
-  .pic-pin{display:flex; align-items:center; justify-content:center;
+  .pic-pin{display:flex; align-items:center; justify-content:center; z-index:1200 !important;
     background:var(--accent); color:#fff; border:2px solid #fff; border-radius:50%;
     font-family:var(--font-mono); font-size:.72rem; font-weight:700;
     box-shadow:0 1px 5px rgba(0,0,0,.3);}
@@ -2518,12 +2518,22 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       var i = parseInt(k, 10), shots = byParcel[k];
       var f = PARCEL_FACES[i];
       if (!f) return;
-      g.addLayer(L.polygon(f.g, {color:cssVar('--accent'), weight:2, opacity:.95,
-        fillColor:cssVar('--accent'), fillOpacity:.30}).bindPopup(picPopupShell(i, shots)));
+      /* The gallery must be filled when the popup OPENS, not when the layer is bound --
+         binding a string ran the fill against a popup that was not in the document yet, so
+         every gallery stayed on "loading" and no photograph ever appeared.
+         zIndexOffset lifts the pin above the survey's own parcel-number labels: one of them
+         sat over the pin and swallowed the tap, opening the parcel popup instead. */
+      function attach(layer){
+        layer.bindPopup(function(){ return picPopupShell(i, shots); });
+        layer.on('popupopen', function(){ fillGallery(i, shots); });
+        g.addLayer(layer);
+      }
+      attach(L.polygon(f.g, {color:cssVar('--accent'), weight:2, opacity:.95,
+        fillColor:cssVar('--accent'), fillOpacity:.30}));
       var c = PARCEL_C[i];
-      g.addLayer(L.marker([c[1] / M_LAT2, c[0] / M_LNG2], {icon:L.divIcon({className:'pic-pin',
-        html:'<b>' + shots.length + '</b>', iconSize:[30, 30], iconAnchor:[15, 15]})})
-        .bindPopup(picPopupShell(i, shots)));
+      attach(L.marker([c[1] / M_LAT2, c[0] / M_LNG2], {zIndexOffset:2000,
+        icon:L.divIcon({className:'pic-pin', html:'<b>' + shots.length + '</b>',
+          iconSize:[30, 30], iconAnchor:[15, 15]})}));
       shots.forEach(function(m){
         if (m.lat === undefined) return;
         g.addLayer(L.polyline([[m.lat, m.lng], [c[1] / M_LAT2, c[0] / M_LNG2]],
@@ -2540,10 +2550,12 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   }
   function picPopupShell(i, shots){
     var f = PARCEL_FACES[i] || {};
-    var html = '<h4>' + shots.length + ' photo' + (shots.length > 1 ? 's' : '') +
+    return '<h4>' + shots.length + ' photo' + (shots.length > 1 ? 's' : '') +
       ' \u00b7 parcel ' + (f.a || 0).toLocaleString() + ' m\u00b2</h4>' +
       '<div class="pic-gal" id="gal-' + i + '">loading\u2026</div>' +
       '<span class="src">Assigned on site. The dashed line runs back to where you stood.</span>';
+  }
+  function fillGallery(i, shots){
     setTimeout(function(){
       var box = document.getElementById('gal-' + i);
       if (!box) return;
@@ -2567,7 +2579,6 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         });
       });
     }, 40);
-    return html;
   }
 
   var FIELD_KEY = 'studio7FieldRecords';
@@ -2851,13 +2862,34 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     }, {enableHighAccuracy:true, maximumAge:4000, timeout:15000});
   }
 
+  /* Export has to carry the photographs too. It used to write only the field records, so a
+     whole day of pictures had no backup path at all -- clear the browser's site data, or move
+     to another phone, and they were gone. The images live in IndexedDB, so this reads them
+     back out and inlines them. */
   function exportField(){
-    var out = {project:'ARC 531-13 \u2014 Entering Beirut', exported:new Date().toISOString(),
-               plot:[SITE.lat, SITE.lng], count:field.records.length, records:field.records};
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([JSON.stringify(out, null, 1)], {type:'application/json'}));
-    a.download = 'field-survey-' + new Date().toISOString().slice(0, 10) + '.json';
-    a.click();
+    var btn = document.getElementById('field-export');
+    var pics = (typeof picMeta !== 'undefined') ? picMeta.slice() : [];
+    if (btn && pics.length) btn.textContent = 'Packing…';
+    var imgs = {}, left = pics.length;
+    function finish(){
+      var out = {project:'ARC 531-13 — Entering Beirut',
+                 exported:new Date().toISOString(),
+                 plot:[SITE.lat, SITE.lng],
+                 count:field.records.length, records:field.records,
+                 photoCount:pics.length, photos:pics, images:imgs};
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([JSON.stringify(out, null, 1)], {type:'application/json'}));
+      a.download = 'field-survey-' + new Date().toISOString().slice(0, 10) + '.json';
+      a.click();
+      if (btn) btn.textContent = 'Export';
+    }
+    if (!left) return finish();
+    pics.forEach(function(m){
+      picGet(m.id, function(src){
+        if (src) imgs[m.id] = src;
+        if (--left === 0) finish();
+      });
+    });
   }
 
   function setFieldMode(on){
@@ -2904,7 +2936,12 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   });
   map.addControl(new LocateControl());
 
-  map.on('click', function(e){ if (field.on) openFieldForm(e.latlng); });
+  /* Field mode must not hijack Pictures. On site you will very likely have Field mode on
+     for the brief and the locator, then switch to Pictures -- and a tap there has to assign a
+     photograph, not open a field record form. */
+  map.on('click', function(e){
+    if (field.on && currentTab !== 'pictures') openFieldForm(e.latlng);
+  });
   /* A phone rotates, and a desktop window resizes. Either changes the frame the drawing was
      fitted to, so fit it again -- debounced, because resize fires continuously. */
   var refitT = null;
@@ -2917,7 +2954,14 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
      so it has time to settle before you shoot rather than after. */
   function setPicturesMode(on){
     document.body.classList.toggle('pictures-on', on);
-    if (!on) document.body.classList.remove('sheet-on');
+    if (!on){
+      document.body.classList.remove('sheet-on');
+      /* Stop the fix when the section closes. A watch left running is a real battery cost
+         over a long walk, and Field mode keeps its own locator anyway. */
+      if (fix.watch !== null && navigator.geolocation){
+        navigator.geolocation.clearWatch(fix.watch); fix.watch = null;
+      }
+    }
     if (on){
       startFix(); paintFixBar();
       var q = document.getElementById('pic-count');
@@ -2962,7 +3006,10 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   document.getElementById('field-export').addEventListener('click', exportField);
   document.getElementById('field-clear').addEventListener('click', function(){
     if (!field.records.length) return;
-    if (confirm('Delete all ' + field.records.length + ' records? Export first if you want to keep them.')){
+    var np = (typeof picMeta !== 'undefined') ? picMeta.length : 0;
+    if (confirm('Delete all ' + field.records.length + ' field records?' +
+        (np ? ' Your ' + np + ' photograph' + (np > 1 ? 's are' : ' is') + ' kept.' : '') +
+        ' Export first if you want to keep them.')){
       field.records = []; saveField(); rebuildAll(); updateFieldBar();
     }
   });
