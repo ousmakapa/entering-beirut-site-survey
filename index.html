@@ -1095,7 +1095,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     figureground: false,   // built / vacant plot fills
     grain:        false,   // parcels shaded by area
     edges:        false,   // per-edge colouring + labels
-    siteplot:     false,   // side dimensions
+    siteplot:     true,    // side dimensions  <- MAP 1, in review
     streets:      false,   // street void shading
     corridor:     false,   // corridor + distance bands
     landuse:      false,   // brownfield outline
@@ -1283,15 +1283,28 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
           fill:false}).bindPopup(PLOT_POPUP);
         groups[k].addLayer(pp); kept.push(pp);
       }
-      // a leader from the label down to the plot's north corner, so it can never read as
-      // labelling the parcel it happens to sit over
-      var anchor = SITE_PLOT[6], lead = [anchor[0] + 0.00022, anchor[1] - 0.00010];
-      var leader = L.polyline([lead, anchor], {color:cssVar('--ink'), weight:1, opacity:.75,
-        interactive:false});
+      /* Where the label goes depends on how much of the frame the plot fills. On the wide
+         sections it sits outside on a leader down to the north corner, so it can never read
+         as labelling the parcel it happens to sit over. On the measured-plot section the plot
+         fills the frame, so the label goes inside it at the centroid and needs no leader --
+         placed outside there, it falls off the edge of the view.  */
+      var lead, leader = null, anchorTo = [38, 32];
+      if (k === 'siteplot'){
+        var cy = 0, cx = 0, nv = SITE_PLOT.length - 1;
+        for (var q = 0; q < nv; q++){ cy += SITE_PLOT[q][0]; cx += SITE_PLOT[q][1]; }
+        lead = [cy / nv, cx / nv];
+        anchorTo = [38, 14];
+      } else {
+        var anchor = SITE_PLOT[6];
+        lead = [anchor[0] + 0.00022, anchor[1] - 0.00010];
+        leader = L.polyline([lead, anchor], {color:cssVar('--ink'), weight:1, opacity:.75,
+          interactive:false});
+      }
       var tag = L.marker(lead, {icon:L.divIcon({className:'plot-tag',
-        html:'THE PLOT<i>1,488.6 m\u00b2</i>', iconSize:[76,28], iconAnchor:[38,32]})}).bindPopup(PLOT_POPUP);
-      groups[k].addLayer(leader); groups[k].addLayer(tag);
-      kept.push(leader, tag);
+        html:'THE PLOT<i>1,488.6 m\u00b2</i>', iconSize:[76,28], iconAnchor:anchorTo})}).bindPopup(PLOT_POPUP);
+      if (leader){ groups[k].addLayer(leader); kept.push(leader); }
+      groups[k].addLayer(tag);
+      kept.push(tag);
       (PLOT_OUTLINES[k] = PLOT_OUTLINES[k] || []).push.apply(PLOT_OUTLINES[k], kept);
       groups[k].addLayer(L.polygon(HOST_PARCEL.ring, {color:cssVar('--layer-traffic'), weight:1.2,
         opacity:.65, dashArray:'6 4', fill:false, interactive:true})
@@ -1330,7 +1343,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       var R = SITE_PLOT;
       [[0,3],[1,5],[2,6]].forEach(function(p){
         g.addLayer(L.polyline([R[p[0]], R[p[1]]], {color:cssVar('--layer-traffic'),
-          weight:1, opacity:.45, dashArray:'3 4', interactive:false}));
+          weight:1.3, opacity:.75, dashArray:'6 4', interactive:false}));
       });
 
       // dimension label on every side
@@ -1356,6 +1369,9 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
           dashArray: cut ? '7 5' : (appr ? '2 3' : null), interactive:false}));
         if (s.len < 2) return;                       // skip the two 1–3 m steps
         var pos = midOffset(a, b, s.len > 25 ? 13 : 10);
+        var mid = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+        g.addLayer(L.polyline([mid, pos], {color:cssVar('--layer-traffic'), weight:0.8,
+          opacity:.5, interactive:false}));
         g.addLayer(L.marker(pos, {interactive:false, icon:L.divIcon({
           className:'dim-label' + (cut ? ' dim-label--cut' : ''),
           html: s.len.toFixed(2) + '&thinsp;m<i>' + Math.round(s.bearing) + '°</i>',
@@ -1763,9 +1779,12 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     /* Every section fits the SAME extent - the cropped survey's own bounds - so the drawings
        are directly comparable and none of them float on white. The two sections about the plot
        itself zoom to the plot instead. */
-    var CLOSE = SITE_PLOT ? {siteplot:150, edges:130} : {};
+    /* Bias the fit away from the legend card in the bottom-left corner, so the drawing
+       sits in clear space rather than half under it. */
+    var CLOSE = SITE_PLOT ? {siteplot:[[165,105],[105,195]], edges:[[150,95],[95,175]]} : {};
     if (CLOSE[key] !== undefined){
-      map.fitBounds(L.polygon(SITE_PLOT).getBounds(), {padding:[CLOSE[key], CLOSE[key]], animate:false});
+      map.fitBounds(L.polygon(SITE_PLOT).getBounds(), {paddingTopLeft:CLOSE[key][0],
+        paddingBottomRight:CLOSE[key][1], animate:false});
     } else if (CAD_DATA && CAD_DATA.bounds){
       /* Fit the drawing that is really there. The nominal 580 x 496 m crop has empty corners, so
          fitting the rectangle wastes the frame; DRAWN_BOUNDS is the extent of the linework itself.
