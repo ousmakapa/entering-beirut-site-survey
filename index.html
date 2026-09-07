@@ -469,9 +469,10 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       {title:'Still unsurveyed', text:'Exact landing points, ramp geometry and headroom under the bridge are not in the DWG and not in any dataset. They need a site visit before the ground-floor route can be designed.', source:null},
     ],
     wind: [
-      {title:'Prevailing wind by season', text:'Annual prevailing direction <b>~230–247° (SW–WSW)</b> at about 3.5 m/s at 10 m. Seasonally: SW (~210–225°) December–April, rotating WSW→W (~245–270°) May–October, with a notable autumn reversal to NNW (~337°) in October.', source:{label:'Station data for Beirut — regional, not a site measurement. VERIFY.', url:'#'}},
-      {title:'The one climate condition the plot is already set up for', text:'The dominant breeze arrives from <b>~218° SW</b>. The plot’s long axis, measured off the survey, runs <b>195°</b> — only <b>23°</b> away. <b>Therefore</b> a section opened south-west to north-east runs <i>with</i> the prevailing wind along the plot’s own length rather than across it. Cross-ventilation here is nearly free, and it is the strongest argument for a naturally ventilated section.', source:{label:'Plot bearings from the professor’s survey', url:'#'}},
-      {title:'The catch', text:'The same south-west quarter that brings the breeze also brings the corridor and its pollution. <b>Therefore</b> the intake side and the noise side are the same side — the section has to draw air in without drawing the corridor in with it. That is a real design problem, not a detail.', source:null},
+      {title:'Which face the wind actually hits', text:'Measured area-weighted off the survey, the plot’s principal axis is <b>198.1° / 18.1°</b>, elongation <b>1.70:1</b>. (The <b>195°</b> quoted elsewhere is the longest <i>side</i>, not the axis — close, but they are different things.) Taking each face’s outward normal against each prevailing direction: the winter wind (<b>SW 218°</b>) arrives <b>21°</b> off square to the <b>south</b> face, the summer wind (<b>WSW 257°</b>) <b>28°</b> off square to the <b>west</b> face, and the autumn reversal (<b>NNW 337°</b>) <b>44°</b> off the <b>north</b>. <b>Therefore</b> the summer breeze crosses the plot’s <b>short</b> dimension, entering the 52.37 m west facade and leaving through the east — a short flow path across a wide intake, which is exactly the geometry cross-ventilation wants. This corrects an earlier note here, which recommended running the section along the plot’s <i>length</i>: 52 m is the long way round.', source:{label:'Geometry measured off the professor\'s survey and the derived corridor', url:'#'}},
+      {title:'Is the breeze available? — upwind ground, measured', text:'Whether a breeze exists on paper and whether it reaches the site are different questions, so the upwind ground was measured. In a ±25° sector out to 100 m: the summer <b>WSW</b> approach is <b>0% built</b>, with <b>nothing built within 300 m</b> on the bearing; the winter <b>SW</b> approach is <b>0% built</b> to 100 m, nearest building <b>130 m</b>. The autumn <b>NNW</b> reversal is <b>48% built</b> within 100 m, nearest building <b>42 m</b>. <b>Therefore</b> both prevailing winds arrive across open ground and are genuinely available — this is not a sheltered site. The one that is blocked is the reversal.', source:{label:'Geometry measured off the professor\'s survey and the derived corridor', url:'#'}},
+      {title:'The catch: the open upwind ground is the highway', text:'The same open ground that lets the wind through is the highway. Measuring the upwind sector against the corridor: the summer <b>WSW</b> intake is <b>55%</b> corridor, first reached <b>52 m</b> out; the winter <b>SW</b> intake is <b>28%</b> corridor, first reached at <b>28 m</b>. The only direction that crosses no corridor at all is the <b>NNW</b> reversal — which is the one blocked by buildings at 42 m. <b>Therefore</b> there is no wind direction here that is both available and clean. Cross-ventilation is geometrically free and pneumatically compromised, and the honest move is to treat the west facade as a designed intake rather than an open window: height above the corridor plume, depth, planting or filtration — decided by a reading, not by this drawing.', source:{label:'Geometry measured off the professor\'s survey and the derived corridor', url:'#'}},
+      {title:'What is NOT measured', text:'Every wind figure on this map is <b>regional</b>. Directions and the ~3.5 m/s at 10 m come from Beirut station normals; <b>nothing about wind, air quality or particulates was measured on this site</b>, and none of it is in the DWG. The geometry — axis, facade angles, upwind obstruction, corridor overlap — is measured and reliable. The air is not. <b>Therefore</b> the one thing worth bringing back from the site visit for this map is a note of which way the air was actually moving, and whether the corridor was smellable at the south edge.', source:{label:'Beirut station climate normals — regional, not a site measurement. VERIFY on site', url:'#'}}
     ],
     green: [
       {title:'Access, not absence', text:'There is <b>~3,200 m² of mature canopy 94 m away</b> — larger than Karantina Park and 16× closer — but it is walled and private, on the Cedrus Bank property. Mature trees and palms clearly thrive here, so the ground supports substantial canopy. <b>Therefore</b> the constraint is public <i>access</i> to green, not the ability to grow it. That reframes the ecological programme: the project could be the first publicly accessible green space in this fabric.', source:{label:'My own visual analysis of satellite + Street View — extent approximate, verify on site', url:'#'}},
@@ -1143,7 +1144,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     corridor:     true,    // corridor + distance bands  <- MAP 6, in review
     landuse:      false,   // brownfield outline
     access:       false,   // arrival points + walk lines
-    wind:         false,   // wind arrows
+    wind:         true,    // wind arrows  <- MAP 7, in review
     green:        false,   // greenery, canopy, river
     sun:          false,   // sun paths
     views:        false,   // view arcs
@@ -1684,20 +1685,35 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       [{b:218, n:'Dec–Apr', d:'SW ~210–225°', col:'#2A6FC4'},
        {b:257, n:'May–Oct', d:'WSW→W ~245–270°', col:'#3987e5'},
        {b:337, n:'Oct reversal', d:'NNW ~337°', col:'#8AB6EE'}].forEach(function(w){
+        /* An arrowhead at the inner end. Without one the label says "from SW" while the line
+           itself says nothing, and which way the air travels is the whole point. */
+        g.addLayer(L.polyline([ll(w.b + 7, 54), ll(w.b, 40), ll(w.b - 7, 54)],
+          {color:w.col, weight:3, opacity:.95, interactive:false}));
         g.addLayer(L.polyline([ll(w.b, 210), ll(w.b, 40)], {color:w.col, weight:3, opacity:.85})
           .bindPopup('<h4>Prevailing wind, ' + w.n + '</h4>From <b>' + w.d + '</b> at roughly 3.5 m/s at 10 m.' +
             '<span class="src">Station data for Beirut — regional, not a site measurement. VERIFY.</span>'));
         g.addLayer(L.marker(ll(w.b, 226), {interactive:false, icon:L.divIcon({className:'wind-label',
           html:'<b>' + w.n + '</b>' + w.d, iconSize:[104, 26], iconAnchor:[52, 13]})}));
       });
-      g.addLayer(L.polyline([ll(218, 46), ll(38, 46)], {color:cssVar('--layer-greenery'),
+      /* The summer wind crosses the plot's SHORT dimension, west facade to east. Drawing the
+         line that way round, because running air along the 52 m length is the worse arrangement
+         and is not what the geometry offers. */
+      g.addLayer(L.polyline([ll(84, 38), ll(77, 46), ll(70, 38)], {color:cssVar('--layer-greenery'),
+        weight:4, opacity:.95, interactive:false}));
+      g.addLayer(L.polyline([ll(257, 46), ll(77, 46)], {color:cssVar('--layer-greenery'),
         weight:4, dashArray:'9 5', opacity:.9})
-        .bindPopup('<h4>The cross-ventilation line</h4>The dominant breeze arrives from <b>218° (SW)</b> ' +
-          'for most of the year. The plot’s long axis, measured off the survey, runs <b>195°</b> — ' +
-          'only <b>23°</b> apart.<br><br><b>Therefore</b> a section opened south-west to north-east runs ' +
-          '<b>with</b> the prevailing wind along the plot’s own length. Cross-ventilation here is nearly ' +
-          'free — the one climate condition the plot geometry is already set up for. The catch: the same ' +
-          'quarter brings the corridor, so the intake side and the noise side are the same side.'));
+        .bindPopup('<h4>The cross-ventilation line</h4>The summer breeze (<b>May–Oct, WSW 257°</b>) ' +
+          'arrives <b>28° off square</b> to the <b>52.37 m west facade</b> and leaves through the east — ' +
+          'across the plot’s <b>short</b> dimension, which is the short flow path cross-ventilation wants. ' +
+          'Upwind of that facade there is <b>nothing built within 300 m</b>.<br><br>' +
+          'The plot’s principal axis, area-weighted off the survey, is <b>198.1° / 18.1°</b> ' +
+          '(elongation 1.70:1); the winter wind at 218° lies <b>19.9°</b> off it. The 195° quoted ' +
+          'elsewhere is the longest <i>side</i>, not the axis.<br><br>' +
+          '<b>But</b> that intake air has crossed the corridor: <b>55%</b> of the upwind sector is highway, ' +
+          'first reached <b>52 m</b> out. Cross-ventilation here is geometrically free and pneumatically ' +
+          'compromised.' +
+          '<span class="src">Geometry measured off the survey; wind directions from Beirut station normals — ' +
+          'regional, not a site measurement. VERIFY.</span>'));
     })();
 
     /* ---------------- GREEN & WATER ---------------- */
@@ -1969,7 +1985,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       access:   'bridge north landing <b>75 m</b> &middot; bus stop <b>74 m</b> &middot; bridge south landing <b>86 m</b> &middot; nothing lands on the plot',
       sun:      'latitude <b>33.90° N</b> &middot; noon sun <b>79.5°</b> in June, <b>32.6°</b> in December &middot; long axis runs <b>195° / 15°</b>',
       noise:    'exposed face <b>22.07 m</b>, 100% of it &middot; <b>98%</b> of the plot lies within <b>50 m</b> of the corridor &middot; furthest corner <b>52.6 m</b> &middot; there is no sheltered end',
-      wind:     'prevailing <b>SW 218°</b> &middot; plot long axis <b>195°</b> &middot; <b>23°</b> apart — the breeze runs along the plot',
+      wind:     'summer <b>WSW 257°</b> hits the <b>west</b> face <b>28°</b> off square &middot; nothing built within <b>300 m</b> upwind &middot; but <b>55%</b> of that intake sector is the corridor',
       views:    'blocked arc <b>275–340°</b> &middot; open arc <b>20–95°</b> &middot; skyline only above ~4th floor',
       green:    'nearest canopy <b>94 m</b> (private, walled) &middot; nearest PUBLIC park <b>1.5–2 km</b> &middot; river <b>232 m</b>'
     };
