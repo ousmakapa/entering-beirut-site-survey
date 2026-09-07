@@ -484,9 +484,10 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
 
   var CONTEXT_FACTS = {
     landuse: [
-      {title:'The function evidence is 77 named businesses', text:'Bright dots (41) read off Google Maps, soft dots (25) from OpenStreetMap tags, squares (11) read off satellite and Street View. They sit on the survey drawing as <b>annotation</b> — the map underneath is the DWG. The survey itself records no use or age for any structure, and no free dataset covers Bourj Hammoud, so this is the only function evidence there is.', source:{label:'My own desk survey, 2026-09-03', url:'#'}},
-      {title:'A steel and auto-repair cluster right at the plot', text:'DEMCO STEEL sits <b>51 m</b> away, with a Suzuki garage beside it. A jewellery cluster further east confirms the Rue d’Arménie trade; Tekeyan school and the Bourj Hammoud municipality building anchor the civic side. <b>Therefore</b> the immediate neighbours are workshops, not homes — the brief’s co-working and creative programme is closer to what is already here than it first looks.', source:{label:'Lebanon Traveler', url:'https://www.lebanontraveler.com/en/magazine/guide-bourj-hammoud/'}},
-      {title:'Three false positives, caught', text:'Demco Towers, Kalco Steel and CBM Lebanon all appeared under Google’s “people also search for” and all three turned out to be 3.5–4 km away. They are excluded. Treat any listing not visible on the survey frame with the same suspicion.', source:null},
+      {title:'What the survey can say about use — six buildings', text:'The survey records <b>no use and no age</b> for any structure in 45,264 entities. What it does record is extent, and extent settles one thing cleanly: a single-span building of several thousand square metres is not housing. Inside the frame, <b>six</b> pieces of enclosed built ground are over <b>1,000 m²</b> and they hold <b>21,924 m² — 75%</b> of all of it: 9,906 m² at 235 m, 4,125 at 208, <b>2,798 at 2.9 m</b>, 2,429 at 141, 1,521 at 108, 1,145 at 183. <b>Therefore</b> this is an industrial district by floor area whatever the small buildings turn out to be — and the single largest thing touching the plot is the shed on its north edge, which Edges, Figure-Ground, Corridor and Views all turn on.', source:{label:'Enclosed area recovered from STRUC$$FOOTPRINT in the professor\'s survey', url:'#'}},
+      {title:'What it cannot say, and why nothing smaller is drawn', text:'Nothing under 1,000 m² is drawn here, and that is deliberate. Footprint size cannot separate a <b>77 m²</b> house from a 77 m² workshop — and the median piece in frame is 84 m². Worse, <b>STRUC$$FOOTPRINT is wall linework, not closed outlines</b>: only a minority of it encloses an area at all (2 of 941 outlines close; median gap 7.6 m). A full building map drawn from it would imply the blank parts are empty. <b>Therefore</b> this map shows the buildings the survey can vouch for and stops.', source:{label:'Enclosed area recovered from STRUC$$FOOTPRINT in the professor\'s survey', url:'#'}},
+      {title:'77 named businesses — a list, not a map', text:'A desk survey found <b>77 named businesses</b> — 41 off Google Maps, 25 from OpenStreetMap tags, 11 read off satellite and Street View — including <b>DEMCO STEEL</b> about 51 m away with a Suzuki garage beside it, a jewellery cluster on the Rue d’Arménie side, and Tekeyan school and the municipality anchoring the civic end. Three further listings (Demco Towers, Kalco Steel, CBM Lebanon) turned out to be 3.5–4 km away and were dropped. <b>None of it is plotted.</b> This project already measured OpenStreetMap here at a <b>11.0 m</b> median building mismatch, and a Google pin is worse; putting those points on a drawing accurate to <b>14 cm</b> would be a lie about precision. <b>Therefore</b> they are a list, not a map — real evidence that the neighbours are workshops rather than homes, which makes the brief’s co-working and making programme closer to what is here than it first looks.', source:{label:'Desk survey, 2026-09-03', url:'#'}},
+      {title:'The easiest map in the file to fill', text:'This is the emptiest map in the file and it is the easiest one to fill. One walk down the east lane and the streets you cross, tagging ground-floor use, replaces the whole of the note above with something positioned to a metre. <b>Therefore</b> ground-floor uses are item <b>6</b> on the field brief — and unlike storey counts, every single record is usable on its own.', source:null}
     ],
     access: [
       {title:'Nothing lands on the plot — measured', text:'Pedestrian bridge north landing <b>75 m</b> from the plot edge, south landing <b>86 m</b>, bus stop (routes B1 / B2 / B3) <b>74 m</b>. All three are across other people’s land. <b>Therefore</b> footfall here has to be earned, not assumed: the ground floor must be a through-route people use on the way somewhere, and a public route has to be extended from the north-east edge toward the bridge landing.', source:{label:'Positions from OpenStreetMap; distances measured on the survey to the layer-0 plot boundary', url:'#'}},
@@ -576,81 +577,17 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
      map view (pixel-to-coordinate projection), not clicked individually — treat as approximate,
      verify exact building on site. Ground-floor use only; Google doesn't list residential units,
      so a business here doesn't rule out residential floors above (likely, given the neighborhood). */
-  var BUSINESS_POIS = [
-    {n:"WISE - Moscanet S.A.L", cat:"commercial", type:"office / company", lat:33.897092, lng:35.539493, dist:55},
-    {n:"Maserati", cat:"commercial", type:"car dealership", lat:33.896901, lng:35.53945, dist:52},
-    {n:"KVA SAL", cat:"commercial", type:"office / company", lat:33.896825, lng:35.539871, dist:12},
-    {n:"Posh Club - Beirut", cat:"commercial", type:"nightlife venue", lat:33.89711, lng:35.541497, dist:117},
-    {n:"Suzuki Garage", cat:"workshop", type:"auto repair", lat:33.897115, lng:35.541785, dist:143},
-    {n:"DEMCO STEEL", cat:"workshop", type:"steel / industrial", lat:33.896574, lng:35.540834, dist:51},
-    {n:"Cedrus Bank - Dora Branch (HQ)", cat:"commercial", type:"bank", lat:33.896298, lng:35.542002, dist:163},
-    {n:"Elmeditors International Lebanon", cat:"commercial", type:"office / company", lat:33.897188, lng:35.539596, dist:53},
-    {n:"We Recycle SAL", cat:"workshop", type:"recycling center", lat:33.896561, lng:35.537907, dist:182},
-    {n:"Azar & Abi Habib SAL", cat:"commercial", type:"locksmith / security", lat:33.896403, lng:35.538862, dist:93},
-    {n:"Sylva Gems", cat:"commercial", type:"jewelry shop", lat:33.896253, lng:35.536856, dist:279},
-    {n:"dipnDip Regional Offices", cat:"commercial", type:"office / company", lat:33.896235, lng:35.539231, dist:62},
-    {n:"A. Chehab Consulting Engineering Office - HQ", cat:"commercial", type:"engineering office", lat:33.896157, lng:35.539313, dist:58},
-    {n:"Tekeyan Intermediate School", cat:"civic", type:"school", lat:33.895986, lng:35.538306, dist:152},
-    {n:"Voice Of Van", cat:"commercial", type:"media / radio office", lat:33.896066, lng:35.538688, dist:116},
-    {n:"Mano solar", cat:"commercial", type:"solar company office", lat:33.895836, lng:35.53824, dist:163},
-    {n:"Societe Boghos - Bourj Hammoud Branch", cat:"commercial", type:"financial / currency exchange", lat:33.895738, lng:35.537506, dist:231},
-    {n:"Probike - Bicycle Shop", cat:"commercial", type:"bicycle retail", lat:33.89561, lng:35.539251, dist:105},
-    {n:"Apo", cat:"commercial", type:"restaurant", lat:33.895532, lng:35.538832, dist:137},
-    {n:"GAP Architects", cat:"commercial", type:"architecture office", lat:33.89546, lng:35.539465, dist:112},
-    {n:"Appliance store (Armenian signage)", cat:"commercial", type:"appliance retail", lat:33.895977, lng:35.54018, dist:42},
-    {n:"Campomatic", cat:"commercial", type:"appliance / electronics retail", lat:33.895793, lng:35.539929, dist:64},
-    {n:"Kevgems S.A.R.L", cat:"commercial", type:"jewelry (gems) wholesale", lat:33.895548, lng:35.539909, dist:91},
-    {n:"Mini Market Lteif & Co", cat:"commercial", type:"grocery retail", lat:33.895072, lng:35.538149, dist:218},
-    {n:"Gary Joe Jewelery", cat:"commercial", type:"jewelry shop", lat:33.894986, lng:35.538513, dist:202},
-    {n:"Baaklini Gems", cat:"commercial", type:"jewelry shop", lat:33.895077, lng:35.53979, dist:144},
-    {n:"Salon Kevo", cat:"commercial", type:"hair salon", lat:33.894735, lng:35.537983, dist:255},
-    {n:"Home", cat:"commercial", type:"cafe / juice bar", lat:33.894742, lng:35.538466, dist:226},
-    {n:"Boghossian Bros. Est", cat:"commercial", type:"hardware / tools retail", lat:33.894742, lng:35.539324, dist:192},
-    {n:"Gloria silver", cat:"commercial", type:"jewelry (silver) shop", lat:33.894662, lng:35.539275, dist:202},
-    {n:"Nigiri Sushi", cat:"commercial", type:"restaurant", lat:33.894534, lng:35.53799, dist:271},
-    {n:"Bachir Housson Jewelers", cat:"commercial", type:"jewelry shop", lat:33.894858, lng:35.539844, dist:167},
-    {n:"Centre Blanco", cat:"commercial", type:"retail", lat:33.894541, lng:35.540668, dist:208},
-    {n:"Bank Liban wal Mahjar - Dora Branch", cat:"commercial", type:"bank", lat:33.894537, lng:35.540161, dist:202},
-    {n:"Mano Burger", cat:"commercial", type:"restaurant", lat:33.894431, lng:35.540101, dist:213},
-    {n:"Falafel Arax", cat:"commercial", type:"restaurant", lat:33.894242, lng:35.538949, dist:255},
-    {n:"Basterma Mano", cat:"commercial", type:"restaurant / deli", lat:33.894217, lng:35.540116, dist:237},
-    {n:"AYAT - Bourj Hammoud", cat:"commercial", type:"gift shop retail", lat:33.894153, lng:35.537728, dist:319},
-    {n:"Magnet Ties (Sarkis Somokian)", cat:"commercial", type:"menswear retail", lat:33.893923, lng:35.537666, dist:343},
-    {n:"Elio Freres co.", cat:"commercial", type:"retail", lat:33.893923, lng:35.538483, dist:305},
-    {n:"Bourj Hammoud Municipality", cat:"civic", type:"municipal government building", lat:33.894044, lng:35.540766, dist:264}
-  ];
+  /* BUSINESS_POIS removed: declared and never read. These were the dots this map used to
+     draw, taken off because their positions could not be trusted on a survey accurate
+     to 14 cm. The evidence survives in the notes as a list, which is what it is. */
 
   /* Independent second source: OpenStreetMap POI nodes (shop/amenity/office tags, live Overpass
      query 2026-09-03, radius 400 m) — exact coordinates, no estimation. A few overlap the Google
      set above (Suzuki Garage, Cedrus Bank, Payless Photo, Basterma Mano, appliance store) and were
      left out here to avoid duplicate pins; those are cross-confirmed by two independent sources. */
-  var OSM_POIS = [
-    {n:"Parking lot", cat:"commercial", type:"parking", lat:33.8958776, lng:35.540003, dist:53},
-    {n:"Bedo", cat:"commercial", type:"fast food", lat:33.8938807, lng:35.5408112, dist:282},
-    {n:"Agha Sarkissian", cat:"commercial", type:"electronics retail", lat:33.8959652, lng:35.5401977, dist:44},
-    {n:"Tire/auto repair shop", cat:"workshop", type:"car repair", lat:33.8953386, lng:35.5450252, dist:460},
-    {n:"Cafe (unnamed)", cat:"commercial", type:"cafe", lat:33.8937238, lng:35.5405836, dist:295},
-    {n:"Vahan Tekeyan Kindergarten", cat:"civic", type:"kindergarten", lat:33.8960165, lng:35.5383235, dist:149},
-    {n:"Chgozian Cultural Center", cat:"civic", type:"arts centre", lat:33.8958561, lng:35.538771, dist:119},
-    {n:"The Grand Factory", cat:"commercial", type:"nightclub", lat:33.8997171, lng:35.5421088, dist:368},
-    {n:"Woodn Bakery", cat:"commercial", type:"bakery", lat:33.8957469, lng:35.5413061, dist:126},
-    {n:"Arax Pharmacy Bourj Hammoud", cat:"commercial", type:"pharmacy", lat:33.8942537, lng:35.5396166, dist:237},
-    {n:"Aloco", cat:"commercial", type:"hardware store", lat:33.8986868, lng:35.5425801, dist:300},
-    {n:"Camera/electronics shop", cat:"commercial", type:"camera shop", lat:33.8985577, lng:35.5424055, dist:278},
-    {n:"Awdeh Bourj Hammoud", cat:"commercial", type:"bank", lat:33.8935546, lng:35.5403974, dist:312},
-    {n:"Bakery (mistagged)", cat:"commercial", type:"bakery", lat:33.8944922, lng:35.5402251, dist:207},
-    {n:"Noy", cat:"commercial", type:"restaurant", lat:33.8947334, lng:35.5396805, dist:184},
-    {n:"Convenience store (unnamed)", cat:"commercial", type:"convenience store", lat:33.8936493, lng:35.5423026, dist:363},
-    {n:"Lebanese Bank for Trade", cat:"commercial", type:"bank", lat:33.8938307, lng:35.5426927, dist:369},
-    {n:"Babylon", cat:"commercial", type:"nightclub", lat:33.8975224, lng:35.542516, dist:221},
-    {n:"Outdoor equipment retail", cat:"commercial", type:"outdoor gear", lat:33.8949365, lng:35.5378685, dist:247},
-    {n:"Porsche", cat:"commercial", type:"car dealership", lat:33.8969359, lng:35.5412422, dist:89},
-    {n:"Souk Hammoudeh", cat:"commercial", type:"department store", lat:33.8942749, lng:35.5395499, dist:236},
-    {n:"Club Soda", cat:"commercial", type:"nightclub", lat:33.8974129, lng:35.5423485, dist:202},
-    {n:"Mano Bakery", cat:"commercial", type:"pastry shop", lat:33.893989, lng:35.5403889, dist:264},
-    {n:"We-2", cat:"commercial", type:"clothing retail", lat:33.8938622, lng:35.5401779, dist:277},
-    {n:"Crepe Station", cat:"commercial", type:"confectionery", lat:33.8938441, lng:35.5402278, dist:279}
-  ];
+  /* OSM_POIS removed: declared and never read. These were the dots this map used to
+     draw, taken off because their positions could not be trusted on a survey accurate
+     to 14 cm. The evidence survives in the notes as a list, which is what it is. */
 
   /* Third pass — my own visual analysis of satellite + Street View imagery (2026-09-03), not a
      ready-made dataset. These are the creative/production cluster immediately NE of the site,
@@ -658,19 +595,9 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
      (gated industrial shells; BCP's own reviews confirm Imagic + Sugar Rush studios are inside it).
      BCP's coordinates are exact (from its Maps listing); the rest are estimated from imagery
      (±~25 m) — verify exact buildings on site. */
-  var ANALYZED_POIS = [
-    {n:"BCP | Business & Creative Park", cat:"commercial", type:"creative/business complex (exact coords)", lat:33.897175, lng:35.542193, dist:181},
-    {n:"KAMELTAN s.a.r.l", cat:"commercial", type:"company / office", lat:33.897975, lng:35.540841, dist:143},
-    {n:"Antranik Baljian and Sons (ABS Metals)", cat:"workshop", type:"metals fabrication", lat:33.897475, lng:35.540556, dist:82},
-    {n:"PLEMICOR HOLDING SA", cat:"commercial", type:"holding company office", lat:33.897437, lng:35.541555, dist:138},
-    {n:"Hyundai Body & Paint Service", cat:"workshop", type:"auto body & paint", lat:33.897350, lng:35.540187, dist:57},
-    {n:"The hole beirut", cat:"commercial", type:"nightclub", lat:33.897627, lng:35.542445, dist:220},
-    {n:"SUGAR RUSH PRODUCTIONS", cat:"commercial", type:"TV/film production studio", lat:33.897435, lng:35.542921, dist:253},
-    {n:"Wonderful Productions", cat:"commercial", type:"production studio", lat:33.897354, lng:35.542756, dist:236},
-    {n:"Digital Labs", cat:"commercial", type:"digital/creative studio", lat:33.897340, lng:35.542121, dist:180},
-    {n:"Imagic", cat:"commercial", type:"production studio", lat:33.897269, lng:35.542469, dist:208},
-    {n:"Fiiierce Studio", cat:"commercial", type:"photography studio", lat:33.897227, lng:35.541786, dist:147}
-  ];
+  /* ANALYZED_POIS removed: declared and never read. These were the dots this map used to
+     draw, taken off because their positions could not be trusted on a survey accurate
+     to 14 cm. The evidence survives in the notes as a list, which is what it is. */
 
   var AGE_BRACKETS = [
     {key:'pre1950', label:'Pre-1950s', color:'#b7d3f6', colorDark:'#5598e7'},
@@ -721,7 +648,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
 
     {key:'grain', label:'Grain & Plot Size', short:'Grain', group:'FABRIC', color:'var(--layer-height)', blurb:'Every cadastral parcel in the frame shaded by its surveyed area. Answers a question the brief never asks: is 1,500 m\u00b2 a big plot here, or an ordinary one? Click any parcel for its area.'},
     {key:'edges', label:'The Five Edges', short:'Edges', group:'FABRIC', color:'var(--layer-traffic)', blurb:'The plot read one side at a time. Each edge has a different neighbour, a different legal status and a different job. Click a side for its brief.'},
-    {key:'landuse', label:'Building Functions', short:'Functions', group:'FABRIC', color:'var(--layer-landuse)', blurb:'<b>Empty on purpose.</b> This held 77 business dots whose positions were estimated by reading pixels off a Google Maps screenshot — against an accurate survey that error is visible, so they are removed rather than left to mislead. The honest replacement is the <b>Field Survey</b> tab: walk the block with it open and tag what each ground floor actually does, and the functions attach to real surveyed footprints instead of guessed points. The written research (77 named businesses, the steel and jewellery clusters, three false positives caught) is intact in <code>SITE_ANALYSIS.md</code>.'},
+    {key:'landuse', label:'Building Functions', short:'Functions', group:'FABRIC', color:'var(--layer-landuse)', blurb:'The survey records no use for any structure. What it records is extent — and extent settles one thing: the <b>six</b> pieces of enclosed built ground over 1,000 m² hold <b>75%</b> of all of it, including the 2,798 m² shed against the plot’s north edge. Nothing smaller is drawn, because footprint size cannot tell a house from a workshop. The 77 named businesses are in the notes as a list — their positions are not accurate enough to plot on this survey.'},
 
     {key:'age', label:'Field Survey', short:'Field Survey', group:'FABRIC', color:'var(--layer-movement)', blurb:'A blank recording sheet on the survey base. No age or function data for Bourj Hammoud exists in this DWG or in any free dataset \u2014 click a structure to record what you see on site. Your tags are saved in this browser.'},
 
@@ -1173,7 +1100,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     siteplot:     true,    // side dimensions  <- MAP 1, in review
     streets:      true,    // street void shading  <- MAP 5, in review
     corridor:     true,    // corridor + distance bands  <- MAP 6, in review
-    landuse:      false,   // brownfield outline
+    landuse:      true,    // large structures  <- MAP 9, in review
     access:       false,   // arrival points + walk lines
     wind:         true,    // wind arrows  <- MAP 7, in review
     green:        false,   // greenery, canopy, river
@@ -1655,15 +1582,33 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
        ================================================================== */
 
     /* ---------------- BUILDING FUNCTIONS ---------------- */
+    /* The survey records no use for any structure. It records extent, and extent settles one
+       thing: a single-span building of several thousand square metres is not housing. These six
+       are every piece of enclosed built ground over 1,000 m2 in the frame, and they hold 75% of
+       all of it. Nothing smaller is drawn, because size cannot tell a 77 m2 house from a 77 m2
+       workshop, and because STRUC$$FOOTPRINT is wall linework -- drawing a partial building map
+       would imply the blank parts are empty. */
+    var BIG_STRUCT = [{"g":[[33.897983,35.542382],[33.898396,35.542089],[33.898587,35.542443],[33.898577,35.542425],[33.89858,35.54243],[33.898584,35.542434],[33.898589,35.542437],[33.898594,35.542439],[33.898599,35.54244],[33.898604,35.542439],[33.89861,35.542438],[33.898614,35.542435],[33.898606,35.542441],[33.898723,35.542351],[33.899141,35.543135],[33.898614,35.543545],[33.898567,35.54346],[33.898581,35.543484],[33.898577,35.543479],[33.898573,35.543475],[33.898569,35.543472],[33.898564,35.54347],[33.898558,35.54347],[33.898553,35.54347],[33.898548,35.543472],[33.898543,35.543475],[33.898565,35.543458],[33.898566,35.543458],[33.898566,35.543457],[33.8983,35.543665],[33.898063,35.543232],[33.898334,35.543022],[33.897983,35.542382]],"a":9906,"d":235.1,"lp":[33.898367,35.543631]},{"g":[[33.896325,35.542632],[33.896376,35.542904],[33.896379,35.542914],[33.896382,35.542919],[33.896389,35.542925],[33.896516,35.543014],[33.896335,35.543385],[33.895727,35.54296],[33.895996,35.542404],[33.896325,35.542632]],"a":4125,"d":207.5,"lp":[33.896091,35.542844]},{"g":[[33.897096,35.53937],[33.897186,35.539411],[33.897192,35.539413],[33.897199,35.539417],[33.897194,35.539415],[33.897362,35.539492],[33.897083,35.540363],[33.897041,35.540345],[33.897036,35.540344],[33.897031,35.540344],[33.897023,35.540347],[33.897018,35.54035],[33.897014,35.540354],[33.89701,35.540362],[33.897004,35.54038],[33.896868,35.54032],[33.896874,35.540299],[33.896875,35.540293],[33.896874,35.540286],[33.896873,35.54028],[33.896868,35.540272],[33.896865,35.540268],[33.896858,35.540263],[33.896883,35.540275],[33.896878,35.540289],[33.896883,35.540275],[33.896817,35.540244],[33.897096,35.53937]],"a":2798,"d":2.9,"lp":[33.89678,35.54037]},{"g":[[33.896426,35.542027],[33.896421,35.542026],[33.896416,35.542025],[33.896395,35.542027],[33.896385,35.541917],[33.896388,35.541911],[33.89639,35.541906],[33.896392,35.541899],[33.896392,35.541893],[33.896391,35.541887],[33.896388,35.541878],[33.896385,35.541873],[33.896379,35.541868],[33.896377,35.541813],[33.896469,35.541801],[33.896473,35.541856],[33.896472,35.541862],[33.896471,35.541868],[33.896471,35.541874],[33.896473,35.54188],[33.896476,35.541888],[33.89648,35.541893],[33.896484,35.541897],[33.896488,35.5419],[33.896493,35.541901],[33.896501,35.541902],[33.896487,35.541904],[33.896616,35.541886],[33.896631,35.542047],[33.896632,35.542047],[33.896631,35.542046],[33.896628,35.542015],[33.89663,35.542024],[33.896634,35.542032],[33.896638,35.542036],[33.896645,35.542041],[33.89665,35.542043],[33.896655,35.542043],[33.896677,35.542041],[33.896692,35.542204],[33.896668,35.542207],[33.896664,35.542209],[33.896659,35.542212],[33.896655,35.542216],[33.89665,35.542224],[33.896648,35.542232],[33.896647,35.542242],[33.896647,35.54223],[33.896652,35.542306],[33.89665,35.542273],[33.896651,35.542279],[33.896653,35.542285],[33.896656,35.54229],[33.89666,35.542295],[33.896664,35.542298],[33.896669,35.542301],[33.896674,35.542302],[33.89668,35.542302],[33.896669,35.542303],[33.896739,35.542294],[33.896775,35.542656],[33.896706,35.542666],[33.896699,35.542668],[33.896692,35.542673],[33.896687,35.54268],[33.896683,35.542689],[33.896683,35.542695],[33.896683,35.542701],[33.89668,35.54267],[33.89668,35.542669],[33.89668,35.542669],[33.8967,35.542886],[33.896655,35.542893],[33.896651,35.542865],[33.896649,35.542859],[33.896646,35.542853],[33.896643,35.542848],[33.896636,35.542843],[33.896628,35.54284],[33.896622,35.54284],[33.896637,35.542839],[33.89651,35.542853],[33.896483,35.542534],[33.896482,35.542528],[33.89648,35.542522],[33.896476,35.542514],[33.896466,35.542394],[33.896469,35.542386],[33.89647,35.54238],[33.89647,35.542374],[33.896471,35.542382],[33.896443,35.542052],[33.896443,35.542054],[33.896441,35.542045],[33.896437,35.542037],[33.896431,35.54203],[33.896426,35.542027]],"a":2429,"d":141.2,"lp":[33.896727,35.542235]},{"g":[[33.895493,35.539448],[33.895491,35.539454],[33.895491,35.539461],[33.895492,35.539471],[33.895398,35.539755],[33.89527,35.539694],[33.895265,35.539693],[33.89526,35.539693],[33.895255,35.539694],[33.89525,35.539696],[33.895245,35.539699],[33.89524,35.539706],[33.895234,35.53972],[33.89519,35.539693],[33.895194,35.539683],[33.895196,35.539677],[33.895196,35.539671],[33.895195,35.539662],[33.895192,35.539653],[33.895188,35.539648],[33.895184,35.539644],[33.895177,35.53964],[33.89517,35.539639],[33.895162,35.53964],[33.895155,35.539644],[33.89515,35.539648],[33.895143,35.539649],[33.895135,35.539652],[33.895131,35.539656],[33.895127,35.53966],[33.895119,35.539673],[33.895077,35.539636],[33.8951,35.539594],[33.895097,35.539603],[33.895096,35.539612],[33.895096,35.539619],[33.895099,35.539628],[33.895102,35.539633],[33.895107,35.539639],[33.895114,35.539644],[33.895122,35.539645],[33.89513,35.539644],[33.895138,35.53964],[33.895144,35.539639],[33.895149,35.539638],[33.895156,35.539634],[33.895161,35.539628],[33.895169,35.539615],[33.895172,35.53961],[33.895174,35.539601],[33.895174,35.539594],[33.895173,35.539588],[33.895171,35.539582],[33.895167,35.539574],[33.895151,35.53956],[33.895146,35.539557],[33.895141,35.539555],[33.895135,35.539555],[33.89513,35.539556],[33.895125,35.539559],[33.89512,35.539562],[33.895115,35.539569],[33.895102,35.539592],[33.895104,35.539586],[33.895106,35.53958],[33.895106,35.539571],[33.895105,35.539565],[33.895104,35.539559],[33.895101,35.539554],[33.895097,35.539549],[33.895101,35.539541],[33.895103,35.539535],[33.895104,35.539529],[33.895103,35.539522],[33.895101,35.539513],[33.895099,35.539508],[33.895093,35.539501],[33.895087,35.539497],[33.895098,35.539468],[33.895096,35.539477],[33.895096,35.539484],[33.895096,35.53949],[33.895099,35.539498],[33.895103,35.539503],[33.895106,35.539508],[33.895115,35.539513],[33.895115,35.53952],[33.895116,35.539526],[33.89512,35.539535],[33.895123,35.539539],[33.895128,35.539543],[33.895132,35.539546],[33.89514,35.539548],[33.895148,35.539547],[33.895156,35.539543],[33.895165,35.539541],[33.895169,35.539538],[33.895175,35.539531],[33.895179,35.539523],[33.89518,35.539517],[33.895181,35.539507],[33.895179,35.539498],[33.895188,35.539472],[33.895187,35.539478],[33.895186,35.539485],[33.895187,35.539494],[33.895191,35.539503],[33.895196,35.539511],[33.895187,35.539536],[33.895186,35.539542],[33.895186,35.539551],[33.895187,35.539557],[33.895189,35.539563],[33.895192,35.539568],[33.895197,35.539573],[33.895197,35.539584],[33.895198,35.53959],[33.8952,35.539596],[33.895204,35.539601],[33.895207,35.539606],[33.895212,35.539609],[33.895219,35.539612],[33.895225,35.539612],[33.89523,35.539612],[33.895235,35.53961],[33.89524,35.539606],[33.895266,35.539628],[33.895271,35.53963],[33.895277,35.539632],[33.895285,35.539631],[33.895292,35.539628],[33.895299,35.539622],[33.895302,35.539617],[33.895305,35.539611],[33.895286,35.539667],[33.895357,35.539453],[33.895358,35.539447],[33.895359,35.53944],[33.895358,35.539434],[33.895355,35.539426],[33.895362,35.539422],[33.895366,35.539418],[33.895369,35.539414],[33.895374,35.539411],[33.895378,35.539406],[33.895382,35.539398],[33.895384,35.539392],[33.895384,35.539386],[33.895384,35.53938],[33.895383,35.539374],[33.895477,35.53909],[33.895482,35.539087],[33.895486,35.539083],[33.89549,35.539075],[33.895492,35.539069],[33.895492,35.539063],[33.895491,35.539052],[33.895596,35.538731],[33.895684,35.538773],[33.895669,35.538816],[33.895668,35.538822],[33.895669,35.538832],[33.895671,35.538841],[33.895676,35.538848],[33.895682,35.538854],[33.895695,35.53886],[33.895612,35.539111],[33.895607,35.539114],[33.895604,35.539118],[33.895601,35.539123],[33.895599,35.539129],[33.895597,35.539138],[33.895598,35.539148],[33.895588,35.539181],[33.895586,35.539191],[33.895586,35.5392],[33.895588,35.539206],[33.89559,35.539211],[33.895583,35.539214],[33.895579,35.539218],[33.895575,35.539222],[33.895571,35.53923],[33.895575,35.539218],[33.895505,35.539433],[33.895498,35.53944],[33.895493,35.539448]],"a":1521,"d":107.8,"lp":[33.895629,35.539245]},{"g":[[33.89826,35.54126],[33.898261,35.541254],[33.898261,35.541248],[33.898259,35.541239],[33.898241,35.541204],[33.898265,35.541173],[33.898303,35.541214],[33.898379,35.541302],[33.898379,35.541311],[33.89838,35.541317],[33.898382,35.541323],[33.898388,35.54133],[33.898392,35.541334],[33.898399,35.541338],[33.898405,35.541338],[33.89841,35.541338],[33.898675,35.541637],[33.898575,35.541764],[33.898308,35.541465],[33.898304,35.541456],[33.898299,35.541449],[33.898294,35.541445],[33.898289,35.541443],[33.898281,35.541442],[33.898276,35.541442],[33.898271,35.541444],[33.898266,35.541448],[33.898262,35.541452],[33.898361,35.541325],[33.89818,35.541558],[33.8981,35.54147],[33.898257,35.54127],[33.898254,35.541274],[33.898258,35.541266],[33.89826,35.54126]],"a":1145,"d":183.0,"lp":[33.898126,35.541127]}];
     (function drawFunctions(){
       if (!SHOW.landuse) return;
       var g = groups.landuse;
       if (!g) return;
-      function dot(p, style, src){
-        g.addLayer(L.circleMarker([p.lat, p.lng], style)
-          .bindPopup('<h4>' + p.n + '</h4>' + p.type + '<br>~' + p.dist + ' m from the plot edge.' +
-            '<span class="src">' + src + '</span>'));
-      }
+      BIG_STRUCT.forEach(function(b){
+        g.addLayer(L.polygon(b.g, {color:cssVar('--layer-landuse'), weight:1.6, opacity:.95,
+          fillColor:cssVar('--layer-landuse'), fillOpacity:.55})
+          .bindPopup('<h4>Large structure \u2014 ' + b.a.toLocaleString() + ' m\u00b2</h4>' +
+            '<b>' + b.d + ' m</b> from the plot edge. At this footprint it is a single-span shed or ' +
+            'warehouse: the survey does not record use, but nothing of this size is housing.' +
+            (b.d < 5 ? '<br><br>This is the one against the plot\u2019s <b>north</b> edge \u2014 the party ' +
+                       'wall on Edges, the 0\u201336\u00b0 view block, and the reason that side is blind.' : '') +
+            '<span class="src">Enclosed area recovered from STRUC$$FOOTPRINT. Six pieces over 1,000 m\u00b2 ' +
+            'hold 75% of all enclosed built ground in the frame.</span>'));
+        /* Label at a point guaranteed to be INSIDE the outline. A bounding-box centre falls
+           outside an L-shaped shed, which put the 2,798 m2 label on top of the plot's own tag. */
+        g.addLayer(L.marker(b.lp, {interactive:false,
+          icon:L.divIcon({className:'dim-label', html:b.a.toLocaleString() + '&thinsp;m\u00b2',
+            iconSize:[58,16], iconAnchor:[29,8]})}));
+      });
       ((SITE_FEATURES && SITE_FEATURES.brownfield) || []).forEach(function(b){
         g.addLayer(L.polygon(b.g, {color:cssVar('--layer-landuse'), weight:1.4, dashArray:'5,3',
           fill:false, opacity:.85})
@@ -1982,7 +1927,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     var rows = [];
 
     if (key === 'figureground') rows = [{sw:'block', color:'--ink', label:'Built parcel (160 of 216)'},{sw:'block', color:'--line-strong', label:'Vacant parcel (56 of 216)'},{sw:'line', color:'--ink-soft', label:'Surveyed wall line'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.6 m², vacant'}];
-    if (key === 'landuse') rows = FUNCTION_TYPES.map(function(f){ return {sw:'block', color:f.color.replace('var(','').replace(')',''), label:f.label}; }).concat([{sw:'outline', color:'--layer-landuse', label:'Brownfield (ex-industrial)'},{sw:'outline', color:'--unsurveyed', label:'Unsurveyed'}]);
+    if (key === 'landuse') rows = [{sw:'block', color:'--layer-landuse', label:'Structure over 1,000 m² — 6 of them, 75% of the built area'},{sw:'line', color:'--ink-soft', label:'All other surveyed wall line — use unknown'},{sw:'outline', color:'--layer-landuse', label:'Brownfield (OpenStreetMap annotation)'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.6 m²'}];
     if (key === 'age') rows = AGE_BRACKETS.map(function(a){ return {sw:'block', literal:a.color, label:a.label}; }).concat([{sw:'outline', color:'--unsurveyed', label:'Unsurveyed / no data'}]);
     if (key === 'cadastral') rows = [{sw:'line', color:'--ink-soft', label:'Parcel boundary (legal)'},{sw:'line', color:'--layer-traffic', label:'Surveyed building footprint'},{sw:'line', color:'--layer-greenery', label:'Easement'},{sw:'line', color:'--layer-environmental', label:'Encroached wall'},{sw:'block', color:'--ink', label:'Parcel number (click)'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.6 m²'}];
     if (key === 'streets') rows = [{sw:'block', literal:'#0d366b', label:'26 m and over — 5 pieces, 53%: corridor or open ground'},{sw:'block', literal:'#2a78d6', label:'16 – 26 m — 8 pieces (11%)'},{sw:'block', literal:'#6da7ec', label:'9 – 16 m — 24 pieces (20%)'},{sw:'block', literal:'#9dbfe8', label:'under 9 m — 71 pieces (16%), lane or yard'},{sw:'line', color:'--ink-soft', label:'Surveyed wall line'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.6 m²'}];
