@@ -232,6 +232,8 @@
   /* GIVE / CROSS / BUFFER name the project's own moves, so they wear the move colour
      rather than the survey's traffic orange -- one meaning, one hue, label included. */
   .edge-label--move{ color:var(--sem-move); border-color:var(--sem-move); }
+  /* A / A' mark the ends of the section cut. The cut is drawn in ink, so are they. */
+  .edge-label--ink{ color:var(--ink); border-color:var(--ink); }
   .edge-label u{ display:block; text-decoration:none; font-family:var(--font-mono); font-size:8px;
     letter-spacing:.04em; color:var(--muted); margin-top:1px; }
   .edge-label--cut{ color:var(--layer-environmental); border-color:var(--layer-environmental); }
@@ -1861,14 +1863,17 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     function drawSectionLine(){
       var g = groups.section;
       if (!g) return;
-      g.addLayer(L.polyline([SECTION.aw, SECTION.bw], {color:cssVar('--layer-movement'),
+      /* The cut line used to be --layer-movement, the same blue as the corridor it cuts
+         through. A section line is the instrument, not one of the things measured, so it
+         is drawn in ink. */
+      g.addLayer(L.polyline([SECTION.aw, SECTION.bw], {color:cssVar('--ink'),
         weight:2.5, opacity:.95, dashArray:'14 6'})
         .bindPopup('<h4>Section A\u2013A, 300 m</h4>Cut on the plot\u2019s principal axis, ' +
           '<b>198.1\u00b0 / 18.1\u00b0</b>, through the centroid. Measured against the survey every ' +
           '0.5 m. The section drawing is in the notes panel.' +
           '<span class="src">Axis measured area-weighted on the layer-0 plot.</span>'));
       [[SECTION.aw, 'A'], [SECTION.bw, 'A\u2032']].forEach(function(t){
-        g.addLayer(L.marker(t[0], {interactive:false, icon:L.divIcon({className:'edge-label',
+        g.addLayer(L.marker(t[0], {interactive:false, icon:L.divIcon({className:'edge-label edge-label--ink',
           html:'<b>' + t[1] + '</b>', iconSize:[30,20], iconAnchor:[15,10]})}));
       });
       SECTION.runs.forEach(function(r){
@@ -1879,8 +1884,8 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
                   SECTION.aw[1] + (SECTION.bw[1] - SECTION.aw[1]) * t];
         }
         g.addLayer(L.polyline([at(t0), at(t1)], {
-          color: r[2] === 'THE PLOT' ? cssVar('--layer-traffic')
-               : r[2] === 'the corridor' ? cssVar('--layer-environmental') : cssVar('--ink'),
+          color: r[2] === 'THE PLOT' ? cssVar('--sem-plot')
+               : r[2] === 'the corridor' ? cssVar('--sem-public') : cssVar('--sem-built'),
           weight:7, opacity:.75, lineCap:'butt'})
           .bindPopup('<h4>' + r[2] + '</h4>The cut crosses <b>' + (r[1] - r[0]).toFixed(1) +
             ' m</b> of it, from chainage ' + r[0] + ' to ' + r[1] + ' m.'));
@@ -2821,7 +2826,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     if (key === 'sun') rows = [{sw:'line', literal:'#D9A324', label:'21 June — noon 79.5°'},{sw:'line', literal:'#C9931B', label:'Equinox — noon 56.1°'},{sw:'line', literal:'#B0810E', label:'21 December — noon 32.6°'},{sw:'line', color:'--layer-greenery', label:'Plot face: workable sun'},{sw:'line', color:'--layer-environmental', label:'Plot face: hardest to shade'},{sw:'line', color:'--muted', label:'Plot face: least direct sun — midsummer only'}];
     if (key === 'noise') rows = [{sw:'block', color:'--sem-public', label:'The corridor — 32,853 m², up to 54.5 m wide'},{sw:'block', color:'--sem-problem', label:'Parcels 0–25 m from it — 50 of them, incl. the plot'},{sw:'block', color:'--sem-problem', label:'25–50 m — 16 parcels'},{sw:'block', color:'--sem-problem', label:'50–100 m — 43 parcels'},{sw:'line', color:'--sem-problem', label:'The exposed 22.07 m south side — 100% of it'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m²'}];
     if (key === 'wind') rows = [{sw:'line', literal:'#2A6FC4', label:'Dec–Apr  ·  SW ~210–225°'},{sw:'line', literal:'#3987e5', label:'May–Oct  ·  WSW→W ~245–270°'},{sw:'line', literal:'#8AB6EE', label:'Oct reversal  ·  NNW ~337°'},{sw:'line', color:'--layer-greenery', label:'Cross-ventilation line'}];
-    if (key === 'section') rows = [{sw:'line', color:'--layer-movement', label:'Section A–A′ — 300 m on the plot’s own axis'},{sw:'line', color:'--layer-environmental', label:'the corridor — 49.5 m of the cut'},{sw:'line', color:'--layer-traffic', label:'THE PLOT — 51.0 m of the cut'},{sw:'line', color:'--ink', label:'the shed — 31.0 m, across a 2.5 m gap'}];
+    if (key === 'section') rows = [{sw:'line', color:'--ink', label:'Section A–A′ — 300 m on the plot’s own axis'},{sw:'line', color:'--sem-public', label:'the corridor — 49.5 m of the cut'},{sw:'line', color:'--sem-plot', label:'THE PLOT — 51.0 m of the cut'},{sw:'line', color:'--sem-built', label:'the shed — 31.0 m, across a 2.5 m gap'}];
     if (key === 'vision') rows = [{sw:'block', color:'--sem-move', label:'GIVE — 67 m² setback, 4.5% of the plot'},{sw:'line', color:'--sem-move', label:'CROSS — 39 m, lane to corridor'},{sw:'line', color:'--sem-move', label:'BUFFER — 27.64 m of solid north wall'},{sw:'block', color:'--sem-public', label:'reachable public realm (faint)'},{sw:'block', color:'--sem-problem', label:'cut off (faint)'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m²'}];
     if (key === 'pcut') rows = [{sw:'block', color:'--sem-public', label:'Reachable on foot — 19,914 m², ONE connected piece'},{sw:'block', color:'--sem-problem', label:'Cut off — 19,765 m², 67 street spaces'},{sw:'line', color:'--ink', label:'THE PLOT'}];
     if (key === 'pseam') rows = [{sw:'block', color:'--sem-built', label:'Parcels 886 m² and over — 54 of them'},{sw:'block', color:'--sem-built', label:'The large sheds — nearest house plot 0.0 to 16.4 m'},{sw:'line', color:'--sem-problem', label:'The seam — 2,582 m of shared parcel edge, nothing on it'},{sw:'line', color:'--ink', label:'THE PLOT — 39.6 m from the seam'}];
@@ -3112,10 +3117,14 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     var C0 = -85, C1 = 70, SPAN = C1 - C0;
     var W = 300, Hh = 168, PADL = 8, GY = 118, SC = (W - PADL * 2) / SPAN;
     function x(ch){ return PADL + (Math.max(C0, Math.min(C1, ch)) - C0) * SC; }
-    var COL = {'THE PLOT':'--layer-traffic', 'the corridor':'--layer-environmental',
-               'building':'--ink', 'public space':'--layer-greenery', 'private ground':'--muted'};
+    /* One mapping, shared with the map above. 'public space' was --layer-greenery, which
+       said the street was vegetation; it is the same kind of thing as the corridor and now
+       takes the same hue, distinguished by opacity rather than by an unrelated colour. */
+    var COL = {'THE PLOT':'--sem-plot', 'the corridor':'--sem-public',
+               'building':'--sem-built', 'public space':'--sem-public', 'private ground':'--muted'};
+    var OPA = {'the corridor':0.55, 'public space':0.28};
     var HGT = {'building':40, 'THE PLOT':0, 'the corridor':0, 'public space':0, 'private ground':22};
-    var o = ['<svg viewBox="0 0 ' + W + ' ' + Hh + '" width="' + W + '" height="' + Hh + '" role="img" ' +
+    var o = ['<svg viewBox="0 0 ' + W + ' ' + Hh + '" style="width:100%;height:auto" role="img" ' +
              'aria-label="Section A to A prime across the site, 300 metres">'];
     o.push('<line x1="' + PADL + '" y1="' + GY + '" x2="' + (W - PADL) + '" y2="' + GY +
            '" stroke="' + cssVar('--ink') + '" stroke-width="1.5"/>');
@@ -3130,7 +3139,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
                '" stroke-width="1.2" stroke-dasharray="5 4"/>');
       } else {
         o.push('<rect x="' + x(r[0]) + '" y="' + GY + '" width="' + w + '" height="9" fill="' + c +
-               '" fill-opacity="0.55"/>');
+               '" fill-opacity="' + (OPA[r[2]] !== undefined ? OPA[r[2]] : 0.55) + '"/>');
       }
       if (w > 26){
         o.push('<text x="' + (x(r[0]) + w / 2) + '" y="' + (GY + 20) + '" text-anchor="middle" ' +
