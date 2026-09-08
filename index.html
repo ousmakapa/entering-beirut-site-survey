@@ -25,6 +25,16 @@
     --layer-landuse:#b3790a;
     --layer-environmental:#c14c79;
     --layer-height:#8a5d17;
+    /* Semantic tokens: ONE meaning each, used across every section, so a colour never has
+       to be relearned from tab to tab. The layer-* names above stay for the survey base. */
+    --sem-plot:#171B1D;        /* the project plot, and nothing else */
+    --sem-base:#9DA09B;        /* the survey base */
+    --sem-built:#4A4F52;       /* built mass, industry, sheds */
+    --sem-veg:#12946a;         /* vegetation ONLY */
+    --sem-public:#2a78d6;      /* public space, movement, water */
+    --sem-problem:#c1443f;     /* the problem argued on this tab */
+    --sem-move:#c85a29;        /* the project's own move */
+    --sem-approx:#b3790a;      /* approximate, inferred or modelled */
     --unsurveyed:#B9BBB2;
     --radius: 3px;
     --font-display:'Archivo', 'Helvetica Neue', system-ui, sans-serif;
@@ -44,6 +54,9 @@
       --layer-landuse:#d9a324;
       --layer-environmental:#e0759b;
       --layer-height:#caa053;
+      --sem-plot:#F2F1EC; --sem-base:#7D817C; --sem-built:#A8ADB0;
+      --sem-veg:#2bb989; --sem-public:#3987e5; --sem-problem:#e0655f;
+      --sem-move:#e37a44; --sem-approx:#d9a324;
       --unsurveyed:#3D4448;
     }
   }
@@ -165,6 +178,15 @@
   .map-legend{position:absolute; bottom:calc(.6rem + var(--bars, 0px)); left:.6rem; z-index:1000;
     background:color-mix(in srgb, var(--surface) 88%, transparent); backdrop-filter:blur(6px);
     border:1px solid var(--line); border-radius:6px; box-shadow:0 1px 8px rgba(0,0,0,.06); padding:.6rem .7rem; box-shadow:0 1px 4px rgba(0,0,0,.15); max-width:210px;}
+  .colour-key{position:absolute; right:.6rem; bottom:.6rem; z-index:1150; max-width:230px;
+    background:color-mix(in srgb, var(--surface) 96%, transparent); backdrop-filter:blur(8px);
+    border:1px solid var(--line-strong); border-radius:7px; padding:.5rem .6rem;
+    box-shadow:0 3px 14px rgba(0,0,0,.12); font-size:.7rem; line-height:1.45;}
+  .colour-key b{display:block; font-size:.68rem; margin-bottom:.35rem; color:var(--ink);}
+  .colour-key span{display:flex; align-items:center; gap:.4rem; color:var(--ink-soft);}
+  .colour-key i{width:11px; height:11px; border-radius:2px; flex:none;
+    border:1px solid color-mix(in srgb, var(--ink) 25%, transparent);}
+  @media (max-width:760px){ .colour-key{display:none;} }
   .map-legend .ml-title{font-family:var(--font-mono); font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); display:block; margin-bottom:.4rem;}
 
   .map-status{position:absolute; inset:0; z-index:900; background:var(--surface); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:.6rem; text-align:center; padding:1.5rem;}
@@ -500,7 +522,8 @@
     <span class="tb-meta"><i>survey</i> BOURJ HAMMOUD.dwg</span>
     <span class="tb-meta" id="today-stamp"><i>date</i> &mdash;</span>
     <button class="tb-btn" id="disc-toggle" title="About this map">About</button>
-    <button class="tb-btn" id="notes-toggle" title="Show or hide the notes column">Notes</button>
+    <button class="tb-btn" id="key-toggle" title="What the colours mean">Key</button>
+  <button class="tb-btn" id="notes-toggle" title="Show or hide the notes column">Notes</button>
     <button class="tb-btn tb-field" id="field-toggle" title="Record what you see on site">Field</button>
   </div>
 </header>
@@ -528,6 +551,17 @@
   <main class="map-shell">
     <div id="map"></div>
     <div class="map-legend" id="map-legend"></div>
+    <div class="colour-key" id="colour-key" hidden>
+      <b>What the colours mean — the same on every tab</b>
+      <span><i style="background:var(--sem-plot)"></i>the project plot</span>
+      <span><i style="background:var(--sem-base)"></i>the survey base</span>
+      <span><i style="background:var(--sem-built)"></i>built mass, industry</span>
+      <span><i style="background:var(--sem-veg)"></i>vegetation</span>
+      <span><i style="background:var(--sem-public)"></i>public space, movement, water</span>
+      <span><i style="background:var(--sem-problem)"></i>the problem on this tab</span>
+      <span><i style="background:var(--sem-move)"></i>the project’s own move</span>
+      <span><i style="background:var(--sem-approx)"></i>approximate or modelled</span>
+    </div>
     <div class="field-bar" id="field-bar">
       <button class="fb-btn fb-primary" id="field-locate">Find me</button>
       <span class="fb-gps" id="field-gps">tap the map to place a record</span>
@@ -559,7 +593,7 @@
       <div class="rec-card">
         <div class="rec-dot"></div>
         <b id="rec-time">0:00</b>
-        <span id="rec-what">recording a voice note</span>
+        <span id="rec-what">recording a voice note &mdash; no time limit</span>
         <button class="fb-btn fb-primary" id="rec-stop">Stop &amp; save</button>
         <button class="fb-btn fb-quiet" id="rec-cancel">discard</button>
       </div>
@@ -1803,17 +1837,17 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
 
       // the context the moves answer, kept faint so the moves read
       SEVER.reach.forEach(function(r){
-        g.addLayer(L.polygon(r, {color:cssVar('--layer-greenery'), weight:0.8, opacity:.5,
-          fillColor:cssVar('--layer-greenery'), fillOpacity:.10, interactive:false}));
+        g.addLayer(L.polygon(r, {color:cssVar('--sem-public'), weight:0.8, opacity:.4,
+          fillColor:cssVar('--sem-public'), fillOpacity:.08, interactive:false}));
       });
       SEVER.cut.forEach(function(r){
-        g.addLayer(L.polygon(r, {color:cssVar('--layer-environmental'), weight:0.8, opacity:.45,
-          dashArray:'4 4', fillColor:cssVar('--layer-environmental'), fillOpacity:.08, interactive:false}));
+        g.addLayer(L.polygon(r, {color:cssVar('--sem-problem'), weight:0.8, opacity:.4,
+          dashArray:'4 4', fillColor:cssVar('--sem-problem'), fillOpacity:.08, interactive:false}));
       });
 
       // 1 GIVE
-      g.addLayer(L.polygon(VISION.give, {color:cssVar('--layer-greenery'), weight:2.2,
-        fillColor:cssVar('--layer-greenery'), fillOpacity:.55})
+      g.addLayer(L.polygon(VISION.give, {color:cssVar('--sem-move'), weight:2.2,
+        fillColor:cssVar('--sem-move'), fillOpacity:.50})
         .bindPopup('<h4>GIVE \u2014 ' + VISION.give_m2 + ' m\u00b2, 4.5% of the plot</h4>' +
           'A <b>2 m</b> setback along the <b>33.66 m</b> east side. It takes the only walkable frontage ' +
           'this plot has from <b>7.8 m</b> to <b>9.8 m</b> \u2014 out of the survey\u2019s own "lane" ' +
@@ -1824,7 +1858,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
           'green from Problem 3.</span>'));
 
       // 2 CROSS
-      g.addLayer(L.polyline(VISION.cross, {color:cssVar('--accent'), weight:5, opacity:.95,
+      g.addLayer(L.polyline(VISION.cross, {color:cssVar('--sem-move'), weight:5, opacity:.95,
         dashArray:'12 6', lineCap:'round'})
         .bindPopup('<h4>CROSS \u2014 ' + VISION.cross_m + ' m through the building</h4>' +
           'From the 7.8 m east lane to the corridor edge. <b>51%</b> of the walkable public realm is ' +
@@ -1836,7 +1870,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
           'already exists.' +
           '<span class="src">Reachability routed on a 2 m grid with the corridor uncrossable \u2014 Problem 1.</span>'));
       [VISION.east_mid, VISION.south_mid].forEach(function(p, i){
-        g.addLayer(L.circleMarker(p, {radius:6, color:cssVar('--accent'), weight:2.5,
+        g.addLayer(L.circleMarker(p, {radius:6, color:cssVar('--sem-move'), weight:2.5,
           fillColor:'#fff', fillOpacity:1})
           .bindPopup(i === 0
             ? '<h4>In \u2014 off the 7.8 m lane</h4>25.4 m of the 33.66 m east side abuts it. It is the ' +
@@ -1846,7 +1880,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       });
 
       // 3 BUFFER
-      g.addLayer(L.polyline(VISION.buffer, {color:cssVar('--ink'), weight:8, opacity:.95, lineCap:'butt'})
+      g.addLayer(L.polyline(VISION.buffer, {color:cssVar('--sem-move'), weight:8, opacity:.95, lineCap:'butt'})
         .bindPopup('<h4>BUFFER \u2014 ' + VISION.buffer_m + ' m of solid north wall</h4>' +
           'A <b>2,794 m\u00b2</b> shed stands <b>2.9 m</b> away: this side is a party wall, it takes no ' +
           'sun that matters and it has no sky.<br><br>Across the district, <b>54</b> large parcels meet ' +
@@ -1887,8 +1921,8 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       }
       var t = ISO.steps[isoStep];
       (ISO.rings[isoStep] || []).forEach(function(r){
-        var l = L.polygon(r, {color:cssVar('--accent'), weight:1.6, opacity:.95,
-          fillColor:cssVar('--accent'), fillOpacity:.16, interactive:false});
+        var l = L.polygon(r, {color:cssVar('--sem-public'), weight:1.6, opacity:.95,
+          fillColor:cssVar('--sem-public'), fillOpacity:.16, interactive:false});
         groups.pcut.addLayer(l); isoLayers.push(l);
       });
       if (lab) lab.innerHTML = '<b>' + t + ' m</b> on foot \u2014 about ' +
@@ -1914,16 +1948,16 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       var g = groups.pcut;
       if (!g) return;
       SEVER.reach.forEach(function(r, i){
-        g.addLayer(L.polygon(r, {color:cssVar('--layer-greenery'), weight:1.4, opacity:.9,
-          fillColor:cssVar('--layer-greenery'), fillOpacity:.35})
+        g.addLayer(L.polygon(r, {color:cssVar('--sem-public'), weight:1.4, opacity:.9,
+          fillColor:cssVar('--sem-public'), fillOpacity:.30})
           .bindPopup('<h4>Reachable on foot \u2014 ' + SEVER.reach_m2.toLocaleString() + ' m\u00b2</h4>' +
             'Everything you can walk to from the plot without crossing the carriageway, as <b>one ' +
             'connected piece</b>. It is <b>51%</b> of the walkable public space in the frame.' +
             '<span class="src">Routed on a 2 m grid through the derived public space, corridor excluded.</span>'));
       });
       SEVER.cut.forEach(function(r){
-        g.addLayer(L.polygon(r, {color:cssVar('--layer-environmental'), weight:1.2, opacity:.9,
-          dashArray:'5 4', fillColor:cssVar('--layer-environmental'), fillOpacity:.28})
+        g.addLayer(L.polygon(r, {color:cssVar('--sem-problem'), weight:1.2, opacity:.9,
+          dashArray:'5 4', fillColor:cssVar('--sem-problem'), fillOpacity:.30})
           .bindPopup('<h4>Cut off \u2014 ' + SEVER.cut_m2.toLocaleString() + ' m\u00b2 in ' +
             SEVER.cut.length + ' fragments</h4>Public space you cannot reach from the plot on foot ' +
             'without crossing the corridor. Of everything beyond it, <b>0%</b> is reachable.' +
@@ -1942,12 +1976,12 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       var g = groups.pseam;
       if (!g) return;
       SEAM.big.forEach(function(r){
-        g.addLayer(L.polygon(r, {color:cssVar('--layer-landuse'), weight:0.9, opacity:.85,
-          fillColor:cssVar('--layer-landuse'), fillOpacity:.40, interactive:false}));
+        g.addLayer(L.polygon(r, {color:cssVar('--sem-built'), weight:0.9, opacity:.85,
+          fillColor:cssVar('--sem-built'), fillOpacity:.28, interactive:false}));
       });
       SEAM.seam.forEach(function(r){
-        g.addLayer(L.polygon(r, {color:cssVar('--layer-environmental'), weight:1.6, opacity:.95,
-          fillColor:cssVar('--layer-environmental'), fillOpacity:.75})
+        g.addLayer(L.polygon(r, {color:cssVar('--sem-problem'), weight:1.6, opacity:.95,
+          fillColor:cssVar('--sem-problem'), fillOpacity:.80})
           .bindPopup('<h4>The seam \u2014 ' + SEAM.seam_len.toLocaleString() + ' m of it</h4>' +
             'Where the <b>54</b> parcels of 886 m\u00b2 and over meet the <b>162</b> smaller ones. ' +
             'There is no transition along any of it: no setback, no service strip, no planting, no ' +
@@ -1961,8 +1995,8 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         var GAP = {};
         SEAM.gaps.forEach(function(p){ GAP[p[0]] = p[1]; });
         BIG_STRUCT.forEach(function(b){
-          g.addLayer(L.polygon(b.g, {color:cssVar('--ink'), weight:1.6, opacity:.95,
-            fillColor:cssVar('--ink'), fillOpacity:.45})
+          g.addLayer(L.polygon(b.g, {color:cssVar('--sem-built'), weight:1.6, opacity:.95,
+            fillColor:cssVar('--sem-built'), fillOpacity:.55})
             .bindPopup('<h4>' + b.a.toLocaleString() + ' m\u00b2 shed</h4>Nearest small parcel: <b>' +
               (GAP[b.a] !== undefined ? GAP[b.a] + ' m' : 'n/a') + '</b>.' +
               (GAP[b.a] !== undefined && GAP[b.a] < 4 ? ' It effectively <b>abuts housing</b>.' : '') +
@@ -2012,8 +2046,9 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
           '<span class="src">Extent read from imagery \u2014 approximate. The parcels under it are surveyed.</span>'));
 
       // THE COMPARISON: 702 m2, at true size, on the plot
-      g.addLayer(L.polygon(GREEN_CMP.square, {color:cssVar('--layer-greenery'), weight:2.5,
-        fillColor:cssVar('--layer-greenery'), fillOpacity:.55})
+      /* the square is the PROBLEM being argued, not a piece of vegetation */
+      g.addLayer(L.polygon(GREEN_CMP.square, {color:cssVar('--sem-problem'), weight:2.5,
+        fillColor:cssVar('--sem-problem'), fillOpacity:.42})
         .bindPopup('<h4>This square is every public green space within 600 m</h4>' +
           '<b>702 m\u00b2</b> \u2014 a <b>' + GREEN_CMP.side + ' \u00d7 ' + GREEN_CMP.side + ' m</b> square, ' +
           'drawn at true size on the plot. It covers <b>47%</b> of it.<br><br>The plot is ' +
@@ -2650,10 +2685,10 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     if (key === 'noise') rows = [{sw:'block', color:'--layer-environmental', label:'The corridor — 32,853 m², up to 54.5 m wide'},{sw:'block', color:'--layer-environmental', label:'Distance band (model, not measured)'},{sw:'line', color:'--layer-environmental', label:'The exposed 22.07 m south side — 100% of it'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m²'}];
     if (key === 'wind') rows = [{sw:'line', literal:'#2A6FC4', label:'Dec–Apr  ·  SW ~210–225°'},{sw:'line', literal:'#3987e5', label:'May–Oct  ·  WSW→W ~245–270°'},{sw:'line', literal:'#8AB6EE', label:'Oct reversal  ·  NNW ~337°'},{sw:'line', color:'--layer-greenery', label:'Cross-ventilation line'}];
     if (key === 'section') rows = [{sw:'line', color:'--layer-movement', label:'Section A–A′ — 300 m on the plot’s own axis'},{sw:'line', color:'--layer-environmental', label:'the corridor — 49.5 m of the cut'},{sw:'line', color:'--layer-traffic', label:'THE PLOT — 51.0 m of the cut'},{sw:'line', color:'--ink', label:'the shed — 31.0 m, across a 2.5 m gap'}];
-    if (key === 'vision') rows = [{sw:'block', color:'--layer-greenery', label:'GIVE — 67 m² setback, 4.5% of the plot'},{sw:'line', color:'--accent', label:'CROSS — 39 m, lane to corridor'},{sw:'line', color:'--ink', label:'BUFFER — 27.64 m of solid north wall'},{sw:'block', color:'--layer-greenery', label:'reachable public realm (faint)'},{sw:'block', color:'--layer-environmental', label:'cut off (faint)'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m²'}];
-    if (key === 'pcut') rows = [{sw:'block', color:'--layer-greenery', label:'Reachable on foot — 20,206 m², ONE piece'},{sw:'block', color:'--layer-environmental', label:'Cut off — 19,704 m² in 13 fragments'},{sw:'line', color:'--ink', label:'THE PLOT'}];
-    if (key === 'pseam') rows = [{sw:'block', color:'--layer-landuse', label:'Parcels 886 m² and over — 54 of them'},{sw:'block', color:'--ink', label:'The large sheds — nearest house plot 0.0 to 16.4 m'},{sw:'block', color:'--layer-environmental', label:'The seam — 2,820 m, nothing on it'},{sw:'line', color:'--ink', label:'THE PLOT — 39.6 m from the seam'}];
-    if (key === 'p1green') rows = [{sw:'block', color:'--layer-greenery', label:'702 m² — ALL the public green within 600 m, at true size'},{sw:'block', color:'--layer-greenery', label:'The two real green areas — 341 m² and 361 m²'},{sw:'outline', color:'--layer-greenery', label:'The canopy — 3,170 m², private and walled'},{sw:'block', color:'--muted', label:'Tagged greenfield — development land, struck through'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m², 2.12× all the green'}];
+    if (key === 'vision') rows = [{sw:'block', color:'--sem-move', label:'GIVE — 67 m² setback, 4.5% of the plot'},{sw:'line', color:'--sem-move', label:'CROSS — 39 m, lane to corridor'},{sw:'line', color:'--sem-move', label:'BUFFER — 27.64 m of solid north wall'},{sw:'block', color:'--sem-public', label:'reachable public realm (faint)'},{sw:'block', color:'--sem-problem', label:'cut off (faint)'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m²'}];
+    if (key === 'pcut') rows = [{sw:'block', color:'--sem-public', label:'Reachable on foot — 20,206 m², ONE piece'},{sw:'block', color:'--sem-problem', label:'Cut off — 19,704 m² in 13 fragments'},{sw:'line', color:'--ink', label:'THE PLOT'}];
+    if (key === 'pseam') rows = [{sw:'block', color:'--sem-built', label:'Parcels 886 m² and over — 54 of them'},{sw:'block', color:'--sem-built', label:'The large sheds — nearest house plot 0.0 to 16.4 m'},{sw:'block', color:'--sem-problem', label:'The seam — 2,820 m, nothing on it'},{sw:'line', color:'--ink', label:'THE PLOT — 39.6 m from the seam'}];
+    if (key === 'p1green') rows = [{sw:'block', color:'--sem-problem', label:'702 m² — ALL the public green within 600 m, at true size'},{sw:'block', color:'--sem-veg', label:'The two real green areas — 341 m² and 361 m²'},{sw:'outline', color:'--sem-veg', label:'The canopy — 3,170 m², private and walled'},{sw:'block', color:'--sem-approx', label:'Tagged greenfield — development land, struck through'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m², 2.12× all the green'}];
     if (key === 'history') rows = [{sw:'block', color:'--layer-landuse', label:'The 1930s gridiron — 108 parcels under the 285 m² median'},{sw:'block', color:'--layer-environmental', label:'1958 — Charles Helou Avenue, the corridor'},{sw:'line', color:'--layer-movement', label:'1968 — the Beirut River, channelised'},{sw:'block', color:'--ink', label:'The industrial layer — 6 sheds, 75% of built ground'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m²'}];
     if (key === 'pictures') rows = [{sw:'block', color:'--layer-movement', label:'Residential — recorded on the walk'},{sw:'block', color:'--layer-landuse', label:'Commercial / retail'},{sw:'block', color:'--layer-height', label:'Industrial / workshop'},{sw:'block', color:'--layer-environmental', label:'Mixed use'},{sw:'block', color:'--accent', label:'Recordings, use not yet given — the badge is storeys'},{sw:'block', color:'--layer-traffic', label:'Pinned where it was recorded — not about a plot'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m²'}];
     if (key === 'views') rows = [{sw:'block', color:'--layer-greenery', label:'How far you can see — 360 rays, capped at 300 m'},{sw:'block', color:'--ink', label:'Closed 322–36° — the shed at 28 m'},{sw:'block', color:'--layer-greenery', label:'Open arcs — nothing built within 150 m'},{sw:'block', color:'--layer-landuse', label:'South — a view that needs height'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m²'}];
@@ -3164,22 +3199,21 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     list.forEach(function(f){
       var k = kind === 'auto' ? (/^video\//.test(f.type) ? 'video' : /^audio\//.test(f.type) ? 'audio' : 'photo') : kind;
       if (k === 'video'){
-        /* A clip is the one thing here big enough to fill a phone in a single write, so it is
-           checked against the room actually left before anything is stored. */
-        roomFor(f.size || 0, function(fits, e){
-          if (!fits){
-            alert('Not enough room for that clip (' + human(f.size || 0) + ').' +
-                  (e ? ' About ' + human(Math.max(0, e.quota - e.usage)) + ' left.' : '') +
-                  '\nExport what you have, then delete some of it, and shoot it again.');
-            return step();
-          }
-          videoDuration(f, function(dur){
-            var id = newId();
-            picPut(id, f, function(ok){
-              if (ok) items.push({id:id, kind:'video', mime:f.type || 'video/mp4', size:f.size, dur:dur});
-              else alert('That clip would not store \u2014 the browser refused the write. Export and clear some room.');
-              step();
+        /* Never refused, whatever its size -- the phone decides what it can hold, not this page.
+           The headroom in the bar is there to be read before you shoot, and if a write really
+           does fail you are told what failed and how much room was left, rather than being
+           stopped in advance from trying. */
+        videoDuration(f, function(dur){
+          var id = newId();
+          picPut(id, f, function(ok){
+            if (ok) items.push({id:id, kind:'video', mime:f.type || 'video/mp4', size:f.size, dur:dur});
+            else withEstimate(function(e){
+              alert('That clip (' + human(f.size || 0) + ') would not store \u2014 the browser ' +
+                    'refused the write.' +
+                    (e && e.quota ? ' About ' + human(Math.max(0, e.quota - e.usage)) + ' was left.' : '') +
+                    '\nExport what you have, then shoot it again.');
             });
+            step();
           });
         });
       } else if (k === 'audio'){
@@ -3207,7 +3241,9 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   var voice = {mr:null, stream:null, chunks:[], t0:0, tick:null, attach:null, parcel:null, cancelled:false};
   var voiceParcel = null;
   var voiceAttachTarget = null;   /* used only by the no-MediaRecorder fallback */
-  var VOICE_MAX = 180;            /* a note longer than three minutes is a recording, not a note */
+  /* No cap. A note runs until you stop it -- standing in front of a building explaining what you
+     are looking at is exactly the material this is for, and cutting it off at an arbitrary three
+     minutes threw away the end of the thought. */
   function voiceSupported(){
     return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
   }
@@ -3254,7 +3290,6 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     var el = document.getElementById('rec-time');
     var t = Math.floor((Date.now() - voice.t0) / 1000);
     if (el) el.textContent = durTxt(t);
-    if (t >= VOICE_MAX) stopVoice(true);
   }
   function stopVoice(save){
     voice.cancelled = !save;
@@ -3718,17 +3753,11 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   }
   /* How much room is left, and what that is worth in recordings. A phone photograph off this
      page is about 180 KB after the resize; video runs about 6 MB a minute at 1080p30. */
-  var PHOTO_B = 180 * 1024, VIDEO_B_PER_MIN = 6 * 1024 * 1024, ROOM_MARGIN = 50 * 1024 * 1024;
+  var PHOTO_B = 700 * 1024, VIDEO_B_PER_MIN = 6 * 1024 * 1024, ROOM_MARGIN = 50 * 1024 * 1024;
   function withEstimate(cb){
     if (!navigator.storage || !navigator.storage.estimate) return cb(null);
     try { navigator.storage.estimate().then(function(e){ cb(e || null); }).catch(function(){ cb(null); }); }
     catch (e){ cb(null); }
-  }
-  function roomFor(bytes, cb){
-    withEstimate(function(e){
-      if (!e || !e.quota) return cb(true, null);
-      cb((e.quota - e.usage - bytes) > ROOM_MARGIN, e);
-    });
   }
   /* ---- anything in storage that no record accounts for ---- */
   function picKeys(cb){
@@ -4164,19 +4193,22 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     catch(e){ alert('This browser is out of storage. Export what you have, then Clear.'); return false; }
   }
 
-  /* a phone photo is 3-5 MB and this browser holds about 5 MB in total, so resize before storing */
+  /* Photographs are resized, but for detail rather than for room: 2400 px on the long edge at
+     q0.85 is about 700 KB, holds a shop sign, a storey line and a material you can still read at
+     home, and a thousand of them is 700 MB -- which a phone has. It used to be 1000 px at q0.6,
+     which was sized for the 5 MB localStorage limit this stopped using a long time ago. */
   function shrink(file, cb){
     var r = new FileReader();
     r.onload = function(){
       var img = new Image();
       img.onload = function(){
-        var max = 1000, w = img.width, h = img.height;
+        var max = 2400, w = img.width, h = img.height;
         if (w > h && w > max){ h = Math.round(h * max / w); w = max; }
         else if (h > max){ w = Math.round(w * max / h); h = max; }
         var c = document.createElement('canvas');
         c.width = w; c.height = h;
         c.getContext('2d').drawImage(img, 0, 0, w, h);
-        cb(c.toDataURL('image/jpeg', 0.6));
+        cb(c.toDataURL('image/jpeg', 0.85));
       };
       img.src = r.result;
     };
@@ -4427,7 +4459,9 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
      in it will not be one file. So the export splits into parts of about 350 MB, each carrying
      its own survey.json, and the button counts them down. Nothing is marked as backed up until
      the last part is out. */
-  var BATCH_MAX = 350 * 1024 * 1024;
+  /* Not a limit on what you may record -- a limit on what one download can reliably finish
+     writing on a phone. A walk of any size goes out; it just goes out in more files. */
+  var BATCH_MAX = 1024 * 1024 * 1024;
   var exportQueue = null;
   /* _audit-capture.py sets window.S7_BATCH_MAX to a few kilobytes so the split can be tested
      without shooting two gigabytes of video first. Nothing else ever sets it. */
@@ -4678,6 +4712,15 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   (function(){
     var b = document.getElementById('iso-play');
     if (b) b.addEventListener('click', function(){ if (window.isoPlay) window.isoPlay(); });
+  })();
+
+  (function(){
+    var k = document.getElementById('key-toggle'), box = document.getElementById('colour-key');
+    if (!k || !box) return;
+    k.addEventListener('click', function(){
+      box.hidden = !box.hidden;
+      k.classList.toggle('on', !box.hidden);
+    });
   })();
 
   document.getElementById('field-toggle').addEventListener('click', function(){ setFieldMode(!field.on); });
