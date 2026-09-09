@@ -229,6 +229,19 @@
     border-radius:3px; cursor:pointer;}
   #wp-zoom button[data-z="all"]{ width:22px; font-size:.55rem;}
   #wp-found{ font-family:var(--font-mono); font-size:.72rem; margin-top:.3rem; color:var(--muted);}
+  /* taking what is on the screen, and filing it on the plot that is chosen */
+  #wp-cap{ display:flex; gap:.3rem; margin-top:.4rem;}
+  #wp-cap button{ font:inherit; font-size:.74rem; font-weight:600; padding:.35rem .5rem;
+    border:1px solid var(--ink); border-radius:4px; background:var(--ink); color:var(--paper);
+    cursor:pointer; flex:none;}
+  #wp-cap button#wp-shotoff{ background:none; color:var(--ink-soft); font-weight:400;
+    border-color:var(--line-strong);}
+  #wp-cap input{ flex:1; min-width:0; font:inherit; font-size:.74rem; padding:.35rem .4rem;
+    border:1px solid var(--line-strong); border-radius:4px; background:var(--surface);
+    color:var(--ink); font-family:var(--font-mono);}
+  #wp-caphow{ font-family:var(--font-mono); font-size:.62rem; line-height:1.4; color:var(--muted);
+    margin-top:.2rem;}
+  .wp-drop{ outline:2px dashed var(--accent); outline-offset:-4px;}
   /* what is already on this plot, so a second walk corrects rather than duplicates */
   #wp-have{ display:flex; flex-direction:column; gap:.2rem; margin-top:.25rem;}
   #wp-have .wh{ display:flex; align-items:center; gap:.35rem; font-size:.72rem;
@@ -480,6 +493,8 @@
     border-radius:6px; padding:.3rem .4rem; margin-bottom:.2rem;}
   .pf-warn{color:var(--layer-environmental); border-left:2px solid var(--layer-environmental);}
   /* a part carries its use as its colour, so a street reads at a glance */
+  .pc-desk{ font-family:var(--font-mono); font-size:.6rem; color:var(--sem-problem);
+    display:block; margin-top:.1rem;}
   .plot-pin{display:flex; align-items:center; justify-content:center;}
   .plot-pin span{display:inline-block; padding:0 .32rem; min-width:23px; height:23px; line-height:20px;
     border-radius:999px; border:2px solid #fff; color:#fff; text-align:center;
@@ -689,6 +704,14 @@
         </div>
         <div id="wp-found">no parcel chosen</div>
         <div id="wp-have"></div>
+        <div id="wp-cap">
+          <button type="button" id="wp-shot">Capture the screen</button>
+          <input id="wp-imgdate" type="text" placeholder="imagery date" autocomplete="off"
+                 title="What Google Earth says at the bottom of the screen, e.g. Apr 2023 &mdash; a 2023 photograph is evidence of 2023, and the export has to say so.">
+          <button type="button" id="wp-shotoff" hidden>release</button>
+        </div>
+        <div id="wp-caphow">goes on the chosen plot &middot; or copy a screenshot and press Ctrl+V,
+          or drop an image here</div>
         <label>or type its number</label>
         <input id="wp-parcel" type="text" inputmode="numeric" list="wp-nums" placeholder="e.g. 2478" autocomplete="off">
         <datalist id="wp-nums"></datalist>
@@ -3059,6 +3082,11 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         dl.innerHTML = out.sort(function(a, b){ return a - b; })
           .map(function(x){ return '<option value="' + x + '">'; }).join('');
         buildPlan();
+        /* the imagery date barely changes along one street, so it is typed once */
+        try {
+          var dt = document.getElementById('wp-imgdate'), was = localStorage.getItem('studio7Imagery');
+          if (dt && was && !dt.value) dt.value = was;
+        } catch (e) {}
         ready = true;
         return true;
       } catch (e){
@@ -3173,6 +3201,105 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       sv.textContent = editing ? 'Update this one' : 'Save \u0026 next';
       sv.classList.toggle('wp-editing', !!editing);
     }
+    /* ---------- a screenshot, filed on the chosen plot ----------
+       Held here rather than in the page because the stream belongs to whichever window the
+       panel is currently in: user activation is per window, and the click is in that one. */
+    var capStream = null;
+    function capWin(){ return host || window; }
+    function say(msg, bad){
+      var l = el('wp-last');
+      if (l){ l.textContent = msg; l.className = bad ? 'bad' : ''; }
+    }
+    function capLive(){
+      var t = capStream && capStream.getVideoTracks && capStream.getVideoTracks()[0];
+      return !!(t && t.readyState === 'live');
+    }
+    function paintCap(){
+      var off = el('wp-shotoff'), b = el('wp-shot');
+      if (off) off.hidden = !capLive();
+      if (b) b.textContent = capLive() ? 'Capture' : 'Capture the screen';
+    }
+    function stopCap(){
+      if (capStream) try { capStream.getTracks().forEach(function(t){ t.stop(); }); } catch (e) {}
+      capStream = null;
+      paintCap();
+    }
+    function withStream(cb){
+      if (capLive()){ cb(capStream); return; }
+      /* the panel's own window first, because that is where the press happened; the opener
+         only as a fallback, where a picture-in-picture window is refused the permission */
+      var tries = [capWin(), window], i = 0;
+      (function next(err){
+        if (i >= tries.length){
+          say('screen capture not allowed here \u2014 use Ctrl+V instead' +
+              (err && err.name === 'NotAllowedError' ? '' : ''), true);
+          return;
+        }
+        var w = tries[i++], md = w && w.navigator && w.navigator.mediaDevices;
+        if (!md || !md.getDisplayMedia){ next(null); return; }
+        md.getDisplayMedia({video:{frameRate:2}, audio:false}).then(function(st){
+          capStream = st;
+          var t = st.getVideoTracks()[0];
+          if (t) t.addEventListener('ended', function(){ stopCap(); say('screen sharing ended'); });
+          paintCap();
+          cb(st);
+        }).catch(function(e){
+          /* a refusal is a decision, not a failure to try the next window */
+          if (e && e.name === 'NotAllowedError' && i >= 1 && w === capWin() && tries.length > 1){
+            next(e); return;
+          }
+          say('screen capture was refused', true);
+        });
+      })(null);
+    }
+    /* One painted frame, not the first: srcObject is usually still black when play() settles. */
+    function grab(){
+      if (chosen < 0){ say('pick a plot first', true); return; }
+      withStream(function(st){
+        var v = document.createElement('video');
+        v.muted = true; v.playsInline = true; v.srcObject = st;
+        var fired = false;
+        function go(){
+          if (fired) return;
+          fired = true;
+          var c = document.createElement('canvas');
+          c.width = v.videoWidth; c.height = v.videoHeight;
+          if (!c.width || !c.height){ v.srcObject = null; say('nothing to capture yet', true); return; }
+          c.getContext('2d').drawImage(v, 0, 0);
+          c.toBlob(function(bl){
+            v.srcObject = null;
+            if (!bl){ say('the capture came back empty', true); return; }
+            fileIn(new File([bl], 'screen-' + Date.now() + '.jpg', {type:'image/jpeg'}));
+          }, 'image/jpeg', 0.92);
+        }
+        v.play().then(function(){
+          if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(function(){ go(); });
+          setTimeout(go, 400);          /* and a floor, for browsers without the callback */
+        }).catch(function(){ say('could not read the captured screen', true); });
+      });
+    }
+    /* The one door all three routes go through, so provenance can never be attached by one
+       of them and forgotten by another. */
+    function fileIn(file){
+      if (chosen < 0){ say('pick a plot first', true); return; }
+      if (!file || !/^image\//.test(file.type || '')){ say('that was not an image', true); return; }
+      var whose = chosen, ctr = parcelCenter(whose);
+      var dt = el('wp-imgdate');
+      var when = dt ? String(dt.value || '').trim() : '';
+      try { if (when) localStorage.setItem('studio7Imagery', when); } catch (e) {}
+      pendingParcel = whose;
+      mediaSrc = 'screen';
+      mediaImagery = when || null;
+      /* on the parcel, not at the desk: a capture has no standing point to record */
+      mediaPos = {lat: ctr ? ctr.lat : null, lng: ctr ? ctr.lng : null, acc:null, head:null};
+      mediaDone = function(items){
+        say(items.length + ' screenshot saved to ' + parcelLabel(whose) +
+            (when ? '' : ' \u2014 no imagery date noted'));
+      };
+      say('saving the screenshot\u2026');
+      handlePicFiles([file], 'photo');
+    }
+
     function loadInto(id){
       var r = null;
       for (var i = 0; i < plots.length; i++) if (plots[i].id === id){ r = plots[i]; break; }
@@ -3266,6 +3393,28 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
           else zoom(z === 'in' ? 0.7 : 1.4);
         };
       });
+      var sh = el('wp-shot');   if (sh) sh.onclick = grab;
+      var so = el('wp-shotoff'); if (so) so.onclick = function(){ stopCap(); say('screen sharing stopped'); };
+      paintCap();
+      /* Win+Shift+S then Ctrl+V is what most hands already do, and it is the way in that
+         still works where a browser refuses screen capture. Bound on whichever document the
+         panel currently lives in. */
+      doc().onpaste = function(ev){
+        var its = (ev.clipboardData && ev.clipboardData.items) || [];
+        for (var i = 0; i < its.length; i++){
+          if (its[i].type && its[i].type.indexOf('image/') === 0){
+            var f = its[i].getAsFile();
+            if (f){ ev.preventDefault(); fileIn(f); return; }
+          }
+        }
+      };
+      panel.ondragover = function(ev){ ev.preventDefault(); panel.classList.add('wp-drop'); };
+      panel.ondragleave = function(){ panel.classList.remove('wp-drop'); };
+      panel.ondrop = function(ev){
+        panel.classList.remove('wp-drop');
+        var f = ev.dataTransfer && ev.dataTransfer.files && ev.dataTransfer.files[0];
+        if (f){ ev.preventDefault(); fileIn(f); }
+      };
       var c = el('wp-clear');
       if (c) c.onclick = function(){ clearForm(); var l = el('wp-last'); if (l) l.textContent = ''; };
       var sv = el('wp-save');
@@ -3374,6 +3523,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       w.addEventListener('pagehide', bringHome);
     }
     function bringHome(){
+      stopCap();                 /* a share left running is a share nobody asked to keep */
       panel.style.cssText = '';
       if (panel.parentNode !== homeParent) homeParent.appendChild(panel);
       panel.hidden = true;
@@ -4483,11 +4633,22 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     });
   }
   var pendingMedia = null;
+  /* Set just before handing files in, and read once. A capture off the screen is not a
+     photograph taken in the street, and the difference has to survive into the export --
+     otherwise a 2023 Street View frame reads as evidence of what is there in 2026. */
+  var mediaSrc = null;        /* 'screen' for a desk capture, null for the camera */
+  var mediaImagery = null;    /* the date Google Earth prints, typed once and remembered */
+  var mediaPos = null;        /* an explicit position, for records not made where you stand */
+  var mediaDone = null;       /* called once the record is written */
   function commitMedia(items, parcel, pos){
     var when = new Date().toISOString().slice(0, 16).replace('T', ' ');
+    var src = mediaSrc, imagery = mediaImagery, done = mediaDone;
+    mediaSrc = null; mediaImagery = null; mediaDone = null;
+    if (mediaPos){ pos = mediaPos; mediaPos = null; }
     items.forEach(function(x){
       picMeta.push({id:x.id, kind:x.kind, parcel:parcel, lat:pos.lat, lng:pos.lng, acc:pos.acc,
                     head:pos.head, when:when, t:Date.now(), mime:x.mime || null,
+                    src:src || null, imagery:imagery || null,
                     dur:(x.dur === undefined ? null : x.dur), size:x.size || 0});
     });
     /* If the record cannot be written the file is still in storage, so it is not lost -- it is
@@ -4497,8 +4658,11 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     rebuildAll();
     paintCounts();
     /* The moment straight after a shot is the only moment you still remember why you took it,
-       so the offer to talk over it is made there and then and then gets out of the way. */
-    if (items[items.length - 1].kind !== 'audio') offerNote(items[items.length - 1].id);
+       so the offer to talk over it is made there and then and then gets out of the way.
+       Not offered for a screen capture: you are at a desk and can type. */
+    if (src !== 'screen' && items[items.length - 1].kind !== 'audio')
+      offerNote(items[items.length - 1].id);
+    if (done) done(items, parcel);
   }
   function attachNotes(items, target){
     var parent = picMeta.filter(function(m){ return m.id === target; })[0];
@@ -5241,6 +5405,9 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
             '<span class="src">Recorded on site ' + r.when + '</span>'));
       });
       shots.forEach(function(m){
+        /* A desk capture has no standing point, so drawing one -- and a line to it -- would
+           invent a place someone stood. It sits on the parcel and says nothing more. */
+        if (m.src === 'screen') return;
         if (m.lat === undefined || m.lat === null) return;
         g.addLayer(L.polyline([[m.lat, m.lng], [c[1] / M_LAT2, c[0] / M_LNG2]],
           {color:cssVar('--accent'), weight:1, opacity:.5, dashArray:'3 4', interactive:false}));
@@ -5284,7 +5451,13 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     return '<h4>' + head + '</h4>' + body +
       (shots.length
         ? '<div class="pic-gal" id="' + dom + '">loading\u2026</div>' +
-          '<span class="src">The dashed line runs back to where you stood.</span>'
+          /* Only claimed where it is true: a capture off the screen has no standing
+             point and draws no line, so promising one describes something absent. */
+          (shots.some(function(m){ return m.src !== 'screen'; })
+            ? '<span class="src">The dashed line runs back to where you stood.</span>' : '') +
+          (shots.some(function(m){ return m.src === 'screen'; })
+            ? '<span class="src">Marked shots were captured off the screen, not taken in the '
+              + 'street — they are evidence of the imagery date, not of today.</span>' : '')
         : '');
   }
   function fillGallery(dom, shots){
@@ -5312,6 +5485,15 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       (m.head === null || m.head === undefined ? '' : ' \u00b7 ' + compass(m.head)) +
       (m.acc === null || m.acc === undefined ? '' : ' \u00b7 \u00b1' + m.acc + ' m');
     d.appendChild(cap);
+    /* Said on the cell itself, not only in the file: this is the one place the image is
+       looked at, and it is where the mistake would be made. */
+    if (m.src === 'screen'){
+      var prov = document.createElement('span');
+      prov.className = 'pc-desk';
+      prov.textContent = 'from the screen, not the street' +
+        (m.imagery ? ' \u00b7 imagery ' + m.imagery : ' \u00b7 imagery date not noted');
+      d.appendChild(prov);
+    }
     var acts = document.createElement('div');
     acts.className = 'pc-acts';
     if (!m.of){
