@@ -5401,7 +5401,9 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     } catch (e) {}
   }
   /* debounced, so a burst of saves is one file and not five */
+  var seeding = false;
   function autoBackup(){
+    if (seeding) return;      /* a download on page load has no click behind it */
     if (bkTimer) return;
     bkTimer = setTimeout(function(){
       bkTimer = null;
@@ -5426,6 +5428,38 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   });
   window.addEventListener('pagehide', backupOnLeave);
   window.addEventListener('beforeunload', backupOnLeave);
+
+  /* ---------- the rescue that ships with the page ----------
+     Chrome dropped this origin's storage overnight on 2026-09-09 and took a morning's survey
+     with it. The records were read back out of Chrome's own LevelDB tables and now travel
+     beside the page, so an empty survey fills itself in rather than sending anyone to look
+     for a file.
+
+     It runs ONLY into a completely empty survey, and merges by id. One record of real work
+     and it does nothing at all, so it cannot overwrite, interleave with, or duplicate
+     anything. Delete recovered-2026-09-09.json from the site to switch it off. */
+  function autoRecover(){
+    if (plots.length || picMeta.length) return;
+    var url = 'recovered-2026-09-09.json';
+    try {
+      fetch(url, {cache:'no-store'}).then(function(r){
+        return r.ok ? r.json() : null;
+      }).then(function(d){
+        if (!d || (plots.length || picMeta.length)) return;
+        seeding = true;
+        var out;
+        try { out = mergeRecords(d); } finally { seeding = false; }
+        if (out && (out.added || out.addedM)){
+          var line = document.getElementById('pic-tally');
+          if (line) line.textContent = out.added + ' survey record' +
+            (out.added === 1 ? '' : 's') + ' and ' + out.addedM + ' photo record' +
+            (out.addedM === 1 ? '' : 's') + ' restored from the 9 September backup \u2014 ' +
+            'the photographs themselves could not be recovered';
+          if (typeof paintCounts === 'function') setTimeout(paintCounts, 6000);
+        }
+      }).catch(function(){});
+    } catch (e) {}
+  }
 
   /* The way back in, which is not a button: it appears only while the survey is empty, which
      is the only moment it is any use, and disappears the instant there is anything to lose. */
@@ -6503,6 +6537,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     var rl = el('pic-rescue');
     if (rl) rl.addEventListener('click', function(){ if (impIn) impIn.click(); });
     paintRescue();
+    autoRecover();      /* every function it needs is defined by the time this runs */
     shoot.addEventListener('click', function(){ startFix(); inp.click(); });
     vid.addEventListener('click', function(){ startFix(); vinp.click(); });
     voi.addEventListener('click', function(){ startFix(); startVoice(null); });
