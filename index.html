@@ -3028,9 +3028,9 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       if (chosen < 0){ f.textContent = 'parcel ' + v + ' is not in the surveyed frame';
                        f.className = 'bad'; return; }
       var already = plotsIn(chosen).length;
-      f.textContent = parcelLabel(chosen) + ' \u00b7 ' +
-        Math.round(PARCEL_FACES[chosen].a).toLocaleString() + ' m\u00b2' +
-        (already ? ' \u00b7 ' + already + ' already recorded' : '');
+      /* parcelLabel already carries the area; printing it again read "5,581 m2 . 5,581 m2" */
+      f.textContent = parcelLabel(chosen) +
+        (already ? ' · ' + already + ' already recorded' : '');
       f.className = 'ok';
     }
     function count(){
