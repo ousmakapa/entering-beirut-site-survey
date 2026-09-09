@@ -221,7 +221,7 @@
   #wp-map{ display:block; width:100%; height:165px; touch-action:none; cursor:crosshair;}
   #wp-map .wpp{ fill:var(--ink); fill-opacity:.05; stroke:var(--line-strong); stroke-width:.5;}
   #wp-map .wpp.done{ fill:var(--sem-veg); fill-opacity:.30; stroke:var(--sem-veg); stroke-width:.7;}
-  #wp-map .wpp.sel{ fill:var(--sem-move); fill-opacity:.55; stroke:var(--ink); stroke-width:1.4;}
+  #wp-map .wpp.sel{ fill:var(--sem-move); fill-opacity:.75; stroke:var(--ink); stroke-width:2;}
   #wp-map .wpplot{ fill:none; stroke:var(--ink); stroke-width:2; }
   #wp-zoom{ position:absolute; right:4px; top:4px; display:flex; flex-direction:column; gap:2px;}
   #wp-zoom button{ font:inherit; font-size:.7rem; line-height:1; width:22px; height:22px;
@@ -3170,7 +3170,11 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
           drag = null;
           /* a drag is a pan; only a tap that barely moved is a choice */
           if (moved > 2) return;
-          var t = ev.target;
+          /* setPointerCapture above retargets every later pointer event to the <svg>, so
+             ev.target is the svg and never the path under the finger. Ask the document
+             what is actually there. (The first test dispatched events straight at a path,
+             which bypassed capture -- so it passed while the real thing did nothing.) */
+          var t = doc().elementFromPoint(ev.clientX, ev.clientY);
           if (t && t.classList && t.classList.contains('wpp'))
             selectParcelIdx(parseInt(t.getAttribute('data-i'), 10));
         };
@@ -3222,6 +3226,16 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       Array.prototype.forEach.call(
         document.querySelectorAll('style, link[rel="stylesheet"]'),
         function(n){ d.head.appendChild(n.cloneNode(true)); });
+      /* A separate window resolves prefers-color-scheme for itself, and came up dark over
+         a light page. Stamp whichever theme the page is actually showing, so the plan in
+         the panel matches the map behind it. */
+      var dark = false;
+      try {
+        var forced = document.documentElement.getAttribute('data-theme');
+        dark = forced ? forced === 'dark'
+                      : matchMedia('(prefers-color-scheme: dark)').matches;
+      } catch (e) {}
+      d.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
       d.body.style.cssText = 'margin:0;background:var(--ground);';
     }
     function moveInto(w){
