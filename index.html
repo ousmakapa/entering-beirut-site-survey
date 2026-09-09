@@ -229,18 +229,19 @@
     border-radius:3px; cursor:pointer;}
   #wp-zoom button[data-z="all"]{ width:22px; font-size:.55rem;}
   #wp-found{ font-family:var(--font-mono); font-size:.72rem; margin-top:.3rem; color:var(--muted);}
-  /* taking what is on the screen, and filing it on the plot that is chosen */
-  #wp-cap{ display:flex; gap:.3rem; margin-top:.4rem;}
-  #wp-cap button{ font:inherit; font-size:.74rem; font-weight:600; padding:.35rem .5rem;
-    border:1px solid var(--ink); border-radius:4px; background:var(--ink); color:var(--paper);
-    cursor:pointer; flex:none;}
-  #wp-cap button#wp-shotoff{ background:none; color:var(--ink-soft); font-weight:400;
-    border-color:var(--line-strong);}
+  /* Where a screenshot lands. Visible, and focusable, so Ctrl+V has somewhere to go
+     rather than depending on wherever the caret happened to be. */
+  #wp-paste{ margin-top:.4rem; padding:.45rem .5rem; border:1.5px dashed var(--line-strong);
+    border-radius:5px; background:var(--surface-2); cursor:pointer; text-align:center;}
+  #wp-paste b{ display:block; font-family:var(--font-mono); font-size:.72rem; color:var(--ink);}
+  #wp-paste i{ display:block; font-style:normal; font-family:var(--font-mono); font-size:.6rem;
+    line-height:1.4; color:var(--muted); margin-top:.15rem;}
+  #wp-paste:focus{ outline:none; border-color:var(--accent); background:var(--surface);}
+  #wp-paste.on{ border-color:var(--sem-veg); }
+  #wp-cap{ display:flex; gap:.3rem; margin-top:.3rem;}
   #wp-cap input{ flex:1; min-width:0; font:inherit; font-size:.74rem; padding:.35rem .4rem;
     border:1px solid var(--line-strong); border-radius:4px; background:var(--surface);
     color:var(--ink); font-family:var(--font-mono);}
-  #wp-caphow{ font-family:var(--font-mono); font-size:.62rem; line-height:1.4; color:var(--muted);
-    margin-top:.2rem;}
   .wp-drop{ outline:2px dashed var(--accent); outline-offset:-4px;}
   /* what is already on this plot, so a second walk corrects rather than duplicates */
   #wp-have{ display:flex; flex-direction:column; gap:.2rem; margin-top:.25rem;}
@@ -704,14 +705,15 @@
         </div>
         <div id="wp-found">no parcel chosen</div>
         <div id="wp-have"></div>
-        <div id="wp-cap">
-          <button type="button" id="wp-shot">Capture the screen</button>
-          <input id="wp-imgdate" type="text" placeholder="imagery date" autocomplete="off"
-                 title="What Google Earth says at the bottom of the screen, e.g. Apr 2023 &mdash; a 2023 photograph is evidence of 2023, and the export has to say so.">
-          <button type="button" id="wp-shotoff" hidden>release</button>
+        <div id="wp-paste" tabindex="0">
+          <b>Paste a screenshot &mdash; Ctrl+V</b>
+          <i>Win+Shift+S to snip, click here, paste. Or drop an image on the panel.</i>
         </div>
-        <div id="wp-caphow">goes on the chosen plot &middot; or copy a screenshot and press Ctrl+V,
-          or drop an image here</div>
+        <div id="wp-cap">
+          <input id="wp-imgdate" type="text" placeholder="imagery date, e.g. Apr 2023"
+                 autocomplete="off"
+                 title="What Google Earth prints at the bottom of the screen. A 2023 frame is evidence of 2023, and the export has to say so.">
+        </div>
         <label>or type its number</label>
         <input id="wp-parcel" type="text" inputmode="numeric" list="wp-nums" placeholder="e.g. 2478" autocomplete="off">
         <datalist id="wp-nums"></datalist>
@@ -3171,7 +3173,12 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       if (!f) return;
       if (chosen < 0){ f.textContent = 'no plot chosen'; f.className = ''; showHave(); return; }
       var already = plotsIn(chosen).length;
-      f.textContent = parcelLabel(chosen) + (already ? ' \u00b7 ' + already + ' already recorded' : '');
+      /* Screenshots are counted apart from records: they are evidence ABOUT the plot,
+         not answers about it, and seeing the count go up is how you know a paste landed. */
+      var shots = picMeta.filter(function(m){ return m.parcel === chosen && !m.of; }).length;
+      f.textContent = parcelLabel(chosen) +
+        (already ? ' \u00b7 ' + already + ' already recorded' : '') +
+        (shots ? ' \u00b7 ' + shots + ' ' + kindWord('photo', shots) : '');
       f.className = 'ok';
       showHave();
     }
@@ -3204,82 +3211,12 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     /* ---------- a screenshot, filed on the chosen plot ----------
        Held here rather than in the page because the stream belongs to whichever window the
        panel is currently in: user activation is per window, and the click is in that one. */
-    var capStream = null;
-    function capWin(){ return host || window; }
     function say(msg, bad){
       var l = el('wp-last');
       if (l){ l.textContent = msg; l.className = bad ? 'bad' : ''; }
     }
-    function capLive(){
-      var t = capStream && capStream.getVideoTracks && capStream.getVideoTracks()[0];
-      return !!(t && t.readyState === 'live');
-    }
-    function paintCap(){
-      var off = el('wp-shotoff'), b = el('wp-shot');
-      if (off) off.hidden = !capLive();
-      if (b) b.textContent = capLive() ? 'Capture' : 'Capture the screen';
-    }
-    function stopCap(){
-      if (capStream) try { capStream.getTracks().forEach(function(t){ t.stop(); }); } catch (e) {}
-      capStream = null;
-      paintCap();
-    }
-    function withStream(cb){
-      if (capLive()){ cb(capStream); return; }
-      /* the panel's own window first, because that is where the press happened; the opener
-         only as a fallback, where a picture-in-picture window is refused the permission */
-      var tries = [capWin(), window], i = 0;
-      (function next(err){
-        if (i >= tries.length){
-          say('screen capture not allowed here \u2014 use Ctrl+V instead' +
-              (err && err.name === 'NotAllowedError' ? '' : ''), true);
-          return;
-        }
-        var w = tries[i++], md = w && w.navigator && w.navigator.mediaDevices;
-        if (!md || !md.getDisplayMedia){ next(null); return; }
-        md.getDisplayMedia({video:{frameRate:2}, audio:false}).then(function(st){
-          capStream = st;
-          var t = st.getVideoTracks()[0];
-          if (t) t.addEventListener('ended', function(){ stopCap(); say('screen sharing ended'); });
-          paintCap();
-          cb(st);
-        }).catch(function(e){
-          /* a refusal is a decision, not a failure to try the next window */
-          if (e && e.name === 'NotAllowedError' && i >= 1 && w === capWin() && tries.length > 1){
-            next(e); return;
-          }
-          say('screen capture was refused', true);
-        });
-      })(null);
-    }
-    /* One painted frame, not the first: srcObject is usually still black when play() settles. */
-    function grab(){
-      if (chosen < 0){ say('pick a plot first', true); return; }
-      withStream(function(st){
-        var v = document.createElement('video');
-        v.muted = true; v.playsInline = true; v.srcObject = st;
-        var fired = false;
-        function go(){
-          if (fired) return;
-          fired = true;
-          var c = document.createElement('canvas');
-          c.width = v.videoWidth; c.height = v.videoHeight;
-          if (!c.width || !c.height){ v.srcObject = null; say('nothing to capture yet', true); return; }
-          c.getContext('2d').drawImage(v, 0, 0);
-          c.toBlob(function(bl){
-            v.srcObject = null;
-            if (!bl){ say('the capture came back empty', true); return; }
-            fileIn(new File([bl], 'screen-' + Date.now() + '.jpg', {type:'image/jpeg'}));
-          }, 'image/jpeg', 0.92);
-        }
-        v.play().then(function(){
-          if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(function(){ go(); });
-          setTimeout(go, 400);          /* and a floor, for browsers without the callback */
-        }).catch(function(){ say('could not read the captured screen', true); });
-      });
-    }
-    /* The one door all three routes go through, so provenance can never be attached by one
-       of them and forgotten by another. */
+    /* The one door both routes go through, so provenance can never be attached by one of
+       them and forgotten by the other. */
     function fileIn(file){
       if (chosen < 0){ say('pick a plot first', true); return; }
       if (!file || !/^image\//.test(file.type || '')){ say('that was not an image', true); return; }
@@ -3293,6 +3230,9 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       /* on the parcel, not at the desk: a capture has no standing point to record */
       mediaPos = {lat: ctr ? ctr.lat : null, lng: ctr ? ctr.lng : null, acc:null, head:null};
       mediaDone = function(items){
+        var pz = el('wp-paste');
+        if (pz){ pz.classList.add('on'); setTimeout(function(){ pz.classList.remove('on'); }, 1400); }
+        showFound();                       /* the shot count goes up where you can see it */
         say(items.length + ' screenshot saved to ' + parcelLabel(whose) +
             (when ? '' : ' \u2014 no imagery date noted'));
       };
@@ -3393,12 +3333,11 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
           else zoom(z === 'in' ? 0.7 : 1.4);
         };
       });
-      var sh = el('wp-shot');   if (sh) sh.onclick = grab;
-      var so = el('wp-shotoff'); if (so) so.onclick = function(){ stopCap(); say('screen sharing stopped'); };
-      paintCap();
-      /* Win+Shift+S then Ctrl+V is what most hands already do, and it is the way in that
-         still works where a browser refuses screen capture. Bound on whichever document the
-         panel currently lives in. */
+      /* Clicking the target focuses it, so the next Ctrl+V certainly lands in this window
+         rather than wherever the caret was before the snip. */
+      var pz = el('wp-paste');
+      if (pz) pz.onclick = function(){ try { pz.focus(); } catch (e) {} };
+      /* Bound at the document as well, so a paste works from anywhere in the panel. */
       doc().onpaste = function(ev){
         var its = (ev.clipboardData && ev.clipboardData.items) || [];
         for (var i = 0; i < its.length; i++){
@@ -3523,7 +3462,6 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       w.addEventListener('pagehide', bringHome);
     }
     function bringHome(){
-      stopCap();                 /* a share left running is a share nobody asked to keep */
       panel.style.cssText = '';
       if (panel.parentNode !== homeParent) homeParent.appendChild(panel);
       panel.hidden = true;
