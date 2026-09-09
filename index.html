@@ -1422,20 +1422,43 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
      Each section shows the cadastral survey and the plot, and nothing else.
      We turn these on ONE AT A TIME as each map is rebuilt and checked.
      ---------------------------------------------------------------------- */
+  /* ============================ WHAT IS DRAWN ============================
+     2026-09-09. Six sections were chosen to keep; the rest are EMPTIED so they can be
+     filled in from the site visit instead of from inference.
+
+       KEPT      Figure-Ground · Grain · Edges · Sun · Wind · No buffer
+       EMPTIED   everything else
+
+     Nothing is deleted. Every drawing below is one flag away from coming back, and
+     that matters because most of it was measured off the DWG and cannot be
+     reproduced on foot: the severance routing, the solar and wind geometry, the
+     street-width model, the view isovist. A walk cannot re-derive those.
+
+     Pictures and Field Survey stay live — they are how the emptied sections get
+     filled. Turning them off would remove the point of emptying anything. */
   var SHOW = {
-    figureground: true,    // built / vacant plot fills  <- MAP 3, in review
-    grain:        true,    // parcels shaded by area  <- MAP 4, in review
-    edges:        true,    // per-edge colouring + labels  <- MAP 2, in review
-    siteplot:     true,    // side dimensions  <- MAP 1, in review
-    streets:      true,    // street void shading  <- MAP 5, in review
-    corridor:     true,    // corridor + distance bands  <- MAP 6, in review
-    landuse:      true,    // large structures  <- MAP 9, in review
-    access:       true,    // arrival points + walk lines  <- MAP 10, in review
-    wind:         true,    // wind arrows  <- MAP 7, in review
-    green:        true,    // green + water  <- MAP 11, in review
-    sun:          true,    // sun path + face exposure  <- MAP 12, in review
-    views:        true,    // view profile + sectors  <- MAP 13, in review
-    fieldsurvey:  false    // per-structure tag colouring
+    /* ---- kept ---- */
+    figureground: true,    // built / vacant plot fills
+    grain:        true,    // parcels shaded by area
+    edges:        true,    // per-edge colouring + labels
+    wind:         true,    // wind arrows
+    sun:          true,    // sun path + face exposure
+    pseam:        true,    // Problem 2 - No buffer: the seam and the large parcels
+    /* ---- emptied, to be filled from the walk ---- */
+    siteplot:     false,   // side dimensions
+    streets:      false,   // street void shading
+    corridor:     false,   // corridor + distance bands
+    landuse:      false,   // large structures
+    access:       false,   // arrival points + walk lines
+    green:        false,   // green + water  -> replaced by what you record on site
+    views:        false,   // view profile + sectors
+    pcut:         false,   // Problem 1 - Cut off
+    p1green:      false,   // Problem 3 - No green
+    vision:       false,   // The vision
+    section:      false,   // the section line
+    history:      false,   // the dated layers
+    /* ---- the recording tools: always on ---- */
+    fieldsurvey:  false    // per-structure tag colouring (its own toggle, not a section)
   };
 
   /* the true extent of the survey linework, measured once from the data */
@@ -1666,7 +1689,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       '<span class="src">Professor’s cadastral survey, layer 0. Georeferenced EPSG:22780 → WGS84.</span>';
 
     if (typeof drawFieldRecords === 'function') drawFieldRecords();
-    if (groups.noise) groups.noise.addLayer(L.polyline([SITE_PLOT[0], SITE_PLOT[1]], {color:cssVar('--sem-problem'), weight:5, opacity:.95})
+    if (SHOW.corridor && groups.noise) groups.noise.addLayer(L.polyline([SITE_PLOT[0], SITE_PLOT[1]], {color:cssVar('--sem-problem'), weight:5, opacity:.95})
       .bindPopup('<h4>The exposed end — 22.07 m</h4>The shortest side of the plot, facing 197° SSW toward the corridor — the smallest face the geometry offers it.'));
     ['cadastral','figureground','age','streets','siteplot','edges','grain','sun','noise','views',
      'landuse','access','wind','green','pictures','history','p1green','pcut','pseam','vision','section'].forEach(function(k){
@@ -1891,6 +1914,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     /* The plan shows where the cut is taken; the section itself is drawn as SVG in the notes
        panel, because a section is not a map and forcing it onto one would help nobody. */
     function drawSectionLine(){
+      if (!SHOW.section) return;
       var g = groups.section;
       if (!g) return;
       /* The cut line used to be --layer-movement, the same blue as the corridor it cuts
@@ -1926,6 +1950,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     /* Three moves, each one a consequence of a measurement rather than a preference. The
        drawing is the argument: give, cross, buffer, on the one plot that touches all three. */
     function drawVision(){
+      if (!SHOW.vision) return;
       var g = groups.vision;
       if (!g) return;
 
@@ -2040,6 +2065,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
        of carriageway wherever they like. What remains is one reachable piece and sixty-seven
        street spaces that are not. That IS the argument -- it needs no caption. */
     function drawPCut(){
+      if (!SHOW.pcut) return;
       var g = groups.pcut;
       if (!g) return;
       /* The corridor was left off this map entirely -- so the drawing showed a blue half
@@ -2090,6 +2116,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     /* Large parcels in one tone, the fine grain left open, and the line where they meet drawn
        as what it is: the 2,582 m of shared parcel boundary that has nothing on it. */
     function drawPSeam(){
+      if (!SHOW.pseam) return;
       var g = groups.pseam;
       if (!g) return;
       SEAM.big.forEach(function(r){
@@ -2136,6 +2163,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
        the green itself -- dashed, because its outline is OSM and OSM is 11.0 m off here.
        The 702 vs 1,488.5 m2 comparison is a meter in the notes panel, not a shape on the map. */
     function drawP1Green(){
+      if (!SHOW.p1green) return;
       var g = groups.p1green;
       if (!g) return;
 
@@ -2210,6 +2238,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
        survey. The survey itself records no dates, so nothing here dates a single parcel --
        it dates elements, and the map says which is which. */
     function drawHistory(){
+      if (!SHOW.history) return;
       var g = groups.history;
       if (!g) return;
 
@@ -2511,6 +2540,44 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       if (!SHOW.green) return;
       var g = groups.green;
       if (!g) return;
+
+      /* ---- what YOU recorded, drawn first so it sits under nothing ----
+         These are the only green figures on this page that were seen rather than inferred.
+         The parcel outline comes from the survey; the greenery inside it comes from the walk.
+         Drawn SOLID, because unlike the OSM outlines this one has a witness. */
+      var COVER = {corner:0.18, quarter:0.30, half:0.46, most:0.66};
+      var recGreen = (typeof plots !== 'undefined' ? plots : []).filter(function(r){
+        return r.green && r.green !== 'none' && PARCEL_FACES[r.parcel];
+      });
+      recGreen.forEach(function(r){
+        var f = PARCEL_FACES[r.parcel];
+        var gk = (typeof greenOf === 'function' && greenOf(r.green)) || {lab:r.green};
+        var ga = String(r.gaccess || '');
+        var reachable = ga === 'open' || ga === 'gated';
+        g.addLayer(L.polygon(f.g, {
+          color:cssVar('--sem-veg'), weight:1.8, opacity:.95,
+          dashArray: reachable ? null : '5 4',
+          fillColor:cssVar('--sem-veg'), fillOpacity: COVER[r.gcover] || 0.22})
+          .bindPopup('<h4>Recorded on site — ' + gk.lab + '</h4>' +
+            'On ' + parcelLabel(r.parcel) + '.' +
+            (r.gcover ? ' Covering <b>' + ({corner:'a corner', quarter:'about a quarter',
+              half:'about half', most:'most'}[r.gcover] || r.gcover) + '</b> of the plot.' : '') +
+            (ga ? '<br><br><b>' + ({open:'Open — anyone can walk in',
+              gated:'Gated, but you can see in', walled:'Walled — you cannot see in',
+              private:'Private, and not visible'}[ga] || ga) + '</b>' : '') +
+            (reachable ? '' : '<br>Drawn dashed: <b>you cannot get into it</b>, so it is not public green.') +
+            (r.note ? '<br><br>“' + r.note + '”' : '') +
+            '<span class="src">Recorded on the site visit' + (r.when ? ', ' + r.when : '') +
+            '. Parcel face from the professor’s survey; the greenery from your own eyes.</span>'));
+      });
+      if (recGreen.length){
+        var reach = recGreen.filter(function(r){
+          return r.gaccess === 'open' || r.gaccess === 'gated'; }).length;
+        g.addLayer(L.marker([SITE.lat, SITE.lng], {interactive:false, zIndexOffset:1500,
+          icon:L.divIcon({className:'edge-label',
+            html:'<b>' + recGreen.length + ' recorded</b>' + reach + ' you can reach',
+            iconSize:[150,30], iconAnchor:[75,86]})}));
+      }
       ((SITE_FEATURES && SITE_FEATURES.green) || []).forEach(function(gr){
         /* landuse=greenfield means land awaiting development, not vegetation. Calling it a
            green space inflated this neighbourhood's green provision nineteenfold, and
@@ -2869,7 +2936,10 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
        the base rather than a layer that is not on the sheet. */
     var OVERLAY_OF = {figureground:'figureground', grain:'grain', edges:'edges', siteplot:'siteplot',
                       streets:'streets', noise:'corridor', landuse:'landuse', access:'access',
-                      wind:'wind', green:'green', sun:'sun', views:'views', age:'fieldsurvey'};
+                      wind:'wind', green:'green', sun:'sun', views:'views', age:'fieldsurvey',
+                      /* the argued sections, gated the same way as of 2026-09-09 */
+                      pcut:'pcut', pseam:'pseam', p1green:'p1green', vision:'vision',
+                      section:'section', history:'history'};
     var ov = OVERLAY_OF[key];
     var empty = !!(ov && !SHOW[ov]);
     if (empty){
@@ -2888,7 +2958,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       var note = document.createElement('div');
       note.className = 'legend-row';
       note.style.cssText = 'margin-top:.45rem; color:var(--muted); font-style:italic;';
-      note.textContent = 'empty — waiting to be built';
+      note.textContent = 'empty on purpose — record what you see';
       legend.appendChild(note);
     }
 
@@ -2899,8 +2969,11 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       var banner = document.createElement('div');
       banner.className = 'survey-stat';
       banner.style.cssText = 'border-color:var(--layer-traffic); color:var(--ink);';
-      banner.innerHTML = '<b>Not built yet.</b> This section shows the survey and the plot only. ' +
-        'What it will hold, and what it needs first, is in <code>PLAN.md</code>.';
+      banner.innerHTML = '<b>Emptied on purpose.</b> This section shows the survey base and the ' +
+        'plot only — it is waiting to be filled in from the site visit rather than inferred. ' +
+        'Open <b>Pictures</b> or <b>Field</b>, tap a plot, and record what is actually there. ' +
+        '<span style="color:var(--muted)">Nothing was deleted: the drawing that was here is one ' +
+        'flag away in <code>SHOW</code>.</span>';
       panel.appendChild(banner);
     }
     var blurb = document.createElement('p');
@@ -3956,6 +4029,32 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
                 'Residential entrance', 'Blank wall / shutters', 'Caf\u00e9 / restaurant',
                 'Under construction', 'Other'];
   var CONDS = ['Good', 'Fair', 'Poor', 'Derelict'];
+  /* Greenery, recorded rather than inferred. The OSM green layer is 11.0 m off this survey
+     and counted a 13,145 m2 landuse=greenfield -- development land -- as vegetation. What
+     you see standing in the street beats both. */
+  var GREENS = [
+    {k:'none',    lab:'Nothing growing'},
+    {k:'potted',  lab:'Potted plants only'},
+    {k:'shrubs',  lab:'Shrubs, hedge, climbers'},
+    {k:'trees',   lab:'Young or small trees'},
+    {k:'mature',  lab:'Mature trees'}
+  ];
+  var GCOVER = [
+    {k:'corner',  lab:'A corner of it'},
+    {k:'quarter', lab:'About a quarter'},
+    {k:'half',    lab:'About half'},
+    {k:'most',    lab:'Most of the plot'}
+  ];
+  var GACCESS = [
+    {k:'open',    lab:'Open \u2014 anyone can walk in'},
+    {k:'gated',   lab:'Gated, but you can see in'},
+    {k:'walled',  lab:'Walled \u2014 cannot see in'},
+    {k:'private', lab:'Private, and not visible'}
+  ];
+  function greenOf(k){
+    for (var i = 0; i < GREENS.length; i++) if (GREENS[i].k === k) return GREENS[i];
+    return null;
+  }
   function storeyOptions(){
     var o = ['<option value="">not counted</option>'];
     for (var i = 1; i <= 12; i++) o.push('<option value="' + i + '">' + i + '</option>');
@@ -4012,6 +4111,12 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         '<select id="pf-ground">' + opts(GROUND, cur.ground) + '</select>' +
         '<label>Condition</label>' +
         '<select id="pf-cond">' + opts(CONDS, cur.cond) + '</select>' +
+        '<label>Anything growing <i>replaces the OpenStreetMap green layer</i></label>' +
+        '<select id="pf-green">' + opts(GREENS, cur.green) + '</select>' +
+        '<label>How much of the plot</label>' +
+        '<select id="pf-gcover">' + opts(GCOVER, cur.gcover) + '</select>' +
+        '<label>Can anyone get to it</label>' +
+        '<select id="pf-gaccess">' + opts(GACCESS, cur.gaccess) + '</select>' +
         '<label>Which one is it <i>so you know it again at home</i></label>' +
         '<input id="pf-note" type="text" placeholder="name on the sign, corner shop, the shed\u2026" value="' +
           String(cur.note || '').replace(/"/g, '&quot;') + '">' +
@@ -4037,12 +4142,14 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
                         parcel:i};
       out.storeys = v('pf-storeys'); out.use = v('pf-use'); out.ground = v('pf-ground');
       out.cond = v('pf-cond'); out.note = v('pf-note');
+      out.green = v('pf-green'); out.gcover = v('pf-gcover'); out.gaccess = v('pf-gaccess');
       out.at = here ? [here.lat, here.lng] : null;
       out.from = {lat:pos.lat, lng:pos.lng, acc:pos.acc};   /* where you stood to say it */
       out.lat = pos.lat; out.lng = pos.lng; out.acc = pos.acc;   /* kept for older readers */
       out.t = Date.now();
       out.when = new Date().toISOString().slice(0, 16).replace('T', ' ');
-      if (!out.storeys && !out.use && !out.ground && !out.cond && !out.note){
+      if (!out.storeys && !out.use && !out.ground && !out.cond && !out.note &&
+          !out.green && !out.gcover && !out.gaccess){
         close(); return;                       /* an empty form is a cancel, not a record */
       }
       if (!rec) plots.push(out);
