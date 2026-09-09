@@ -3226,17 +3226,47 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       Array.prototype.forEach.call(
         document.querySelectorAll('style, link[rel="stylesheet"]'),
         function(n){ d.head.appendChild(n.cloneNode(true)); });
-      /* A separate window resolves prefers-color-scheme for itself, and came up dark over
-         a light page. Stamp whichever theme the page is actually showing, so the plan in
-         the panel matches the map behind it. */
-      var dark = false;
+      /* A separate window resolves prefers-color-scheme for itself, so the cloned
+         stylesheets can land on the other theme and the panel comes up dark over a light
+         map. There is no [data-theme] rule in this page to stamp -- the theme IS that
+         media query -- so instead copy the parent's current computed value for every
+         custom property on :root and pin them here unconditionally. Whatever the second
+         window believes about the OS, it now shows what the page is showing. */
       try {
-        var forced = document.documentElement.getAttribute('data-theme');
-        dark = forced ? forced === 'dark'
-                      : matchMedia('(prefers-color-scheme: dark)').matches;
+        var root = document.documentElement, cs = getComputedStyle(root), names = {}, out = [];
+        Array.prototype.forEach.call(document.styleSheets, function(sh){
+          var rules; try { rules = sh.cssRules; } catch (e) { return; }
+          if (!rules) return;
+          /* Collect THEN recurse, never either/or: since CSS Nesting shipped a plain
+             CSSStyleRule also carries an (empty) cssRules, so an `if (r.cssRules) return`
+             walk skips every rule it is looking for and reports nothing wrong. */
+          Array.prototype.forEach.call(rules, function walk(r){
+            if (r.style && r.selectorText && r.selectorText.indexOf(':root') !== -1){
+              for (var i = 0; i < r.style.length; i++){
+                var p = r.style[i];
+                if (p.slice(0, 2) === '--') names[p] = 1;
+              }
+            }
+            if (r.cssRules && r.cssRules.length)
+              Array.prototype.forEach.call(r.cssRules, walk);
+          });
+        });
+        Object.keys(names).forEach(function(p){
+          var v = cs.getPropertyValue(p);
+          if (v) out.push(p + ':' + v.trim() + ';');
+        });
+        var scheme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        /* an empty pin is indistinguishable from a working one until you look at the
+           colours, which is how the first version shipped */
+        if (!out.length) console.warn('walk panel: no :root custom properties found to pin');
+        var pin = d.createElement('style');
+        pin.textContent = ':root{color-scheme:' + scheme + ';' + out.join('') + '}';
+        d.head.appendChild(pin);          /* last in, so it beats the cloned media query */
       } catch (e) {}
-      d.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-      d.body.style.cssText = 'margin:0;background:var(--ground);';
+      /* --ground was never a token in this page: it resolved to transparent and the
+         browser's default canvas showed through. The page's own ground is --paper. */
+      d.body.style.cssText = 'margin:0;background:var(--paper);'
+                           + 'color:var(--ink);font-family:var(--font-body);';
     }
     function moveInto(w){
       host = w;
