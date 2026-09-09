@@ -229,6 +229,19 @@
     border-radius:3px; cursor:pointer;}
   #wp-zoom button[data-z="all"]{ width:22px; font-size:.55rem;}
   #wp-found{ font-family:var(--font-mono); font-size:.72rem; margin-top:.3rem; color:var(--muted);}
+  /* what is already on this plot, so a second walk corrects rather than duplicates */
+  #wp-have{ display:flex; flex-direction:column; gap:.2rem; margin-top:.25rem;}
+  #wp-have .wh{ display:flex; align-items:center; gap:.35rem; font-size:.72rem;
+    line-height:1.3; padding:.25rem .35rem; border-radius:4px; background:var(--surface-2);
+    border:1px solid var(--line);}
+  #wp-have .wh span{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis;
+    white-space:nowrap; color:var(--ink-soft);}
+  #wp-have .wh button{ flex:none; font-family:var(--font-mono); font-size:.62rem;
+    text-transform:uppercase; letter-spacing:.04em; padding:.25rem .4rem; cursor:pointer;
+    border:1px solid var(--line-strong); border-radius:3px; background:var(--surface);
+    color:var(--accent);}
+  #wp-have .wh.on{ border-color:var(--accent); background:var(--surface);}
+  #wp-have .wh.on span{ color:var(--ink); font-weight:600;}
   #wp-found.ok{ color:var(--sem-veg); }
   #wp-found.bad{ color:var(--sem-problem); }
   .wp-acts{ display:flex; gap:.4rem; padding:.6rem .75rem; border-top:1px solid var(--line);}
@@ -237,12 +250,39 @@
     cursor:pointer;}
   .wp-acts button.wp-quiet{ flex:0 0 auto; background:none; color:var(--ink-soft);
     border-color:var(--line-strong); font-weight:400;}
+  /* Update must not look like Save. They do different things to a record that already
+     exists, and the whole point of the list above is that you can tell which. */
+  .wp-acts button.wp-editing{ background:var(--accent); border-color:var(--accent);
+    color:#fff;}
   #wp-last{ padding:0 .75rem .6rem; font-family:var(--font-mono); font-size:.68rem;
     color:var(--muted); min-height:1em;}
   /* a recorded plot carries its storey count, or a dot if something else was noted */
   .rec-badge{ font-family:var(--font-mono); font-size:11px; font-weight:600; line-height:20px;
     text-align:center; color:var(--paper); background:var(--ink); border-radius:11px;
     border:1.5px solid var(--paper); box-shadow:0 1px 4px rgba(0,0,0,.3); }
+  /* What is recorded on a plot, written on the plot. Merged across its parts, ordered so
+     the first ones are the ones worth seeing small, and thinned out as you zoom away --
+     an overlapping chip is worse than an absent one. */
+  .rec-tags{ pointer-events:none; background:none; border:0; }
+  .rec-tags .rt-in{ position:absolute; left:0; top:0; transform:translate(-50%,-50%);
+    display:flex; flex-wrap:wrap; gap:2px; justify-content:center; width:82px;}
+  /* clear of a pin that is already sitting on the same point */
+  .rec-tags.rt-under .rt-in{ transform:translate(-50%, 15px);}
+  .rec-tags .chip{ font-family:var(--font-mono); font-size:8.5px; line-height:1;
+    letter-spacing:.02em; padding:2.5px 3.5px; border-radius:3px; white-space:nowrap;
+    background:var(--surface); color:var(--ink-soft); border:.5px solid var(--line-strong);
+    box-shadow:0 1px 2px rgba(0,0,0,.16);}
+  .rec-tags .chip.t-num{ background:var(--ink); color:var(--paper); border-color:var(--ink);
+    font-weight:700;}
+  .rec-tags .chip.t-use{ color:#fff; border-color:rgba(0,0,0,.25); font-weight:700;}
+  .rec-tags .chip.t-veg{ display:inline-flex; align-items:center; gap:2px; padding:1.5px 3.5px;
+    color:var(--sem-veg); border-color:var(--sem-veg);}
+  .rec-tags .chip.t-warn{ color:var(--sem-problem); border-color:var(--sem-problem);}
+  .rec-tags .chip.t-soft{ color:var(--muted); border-style:dashed;}
+  /* zoom thinning: the buckets are set on <body> from one zoomend, so nothing re-renders */
+  body[data-z="3"] .rec-tags .chip:nth-child(n+4){ display:none;}
+  body[data-z="2"] .rec-tags .chip:nth-child(n+3){ display:none;}
+  body[data-z="0"] .rec-tags{ display:none;}
   /* the toolbar button's on-state */
   .tb-btn.tb-on{background:var(--ink); color:var(--paper); border-color:var(--ink);}
   /* over photography the thin survey greys disappear, so lift them while it is on */
@@ -648,6 +688,7 @@
           <div id="wp-zoom"><button type="button" data-z="in">+</button><button type="button" data-z="out">&minus;</button><button type="button" data-z="all">fit</button></div>
         </div>
         <div id="wp-found">no parcel chosen</div>
+        <div id="wp-have"></div>
         <label>or type its number</label>
         <input id="wp-parcel" type="text" inputmode="numeric" list="wp-nums" placeholder="e.g. 2478" autocomplete="off">
         <datalist id="wp-nums"></datalist>
@@ -1067,6 +1108,14 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
      making the browser lay out ~1,900 individual SVG paths on every zoom step. */
   var BASE_RENDERER = L.canvas({padding:0.4});
   L.control.scale({metric:true, imperial:false, position:'bottomleft'}).addTo(map);
+  /* One bucket on <body> drives the chip thinning in CSS. Doing it here rather than by
+     re-rendering the markers means a wheel gesture stays a class change. */
+  function zoomBucket(){
+    var z = map.getZoom();
+    document.body.setAttribute('data-z', z >= 18 ? '4' : z >= 17 ? '3' : z >= 16 ? '2' : '0');
+  }
+  map.on('zoomend', zoomBucket);
+  zoomBucket();
 
   /* ---------- aerial photography, under everything ----------
      The survey is the authority on WHERE; the photograph is only ever evidence of WHAT.
@@ -2938,41 +2987,20 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         col = cssVar('--accent'); op = 0.18;
       }
 
-      var lines = recs.map(function(r){
-        var bits = [];
-        if (r.storeys) bits.push('<b>' + r.storeys + '</b> storeys');
-        var u2 = (typeof useOf === 'function' && useOf(r.use)) || null;
-        if (u2) bits.push(u2.lab);
-        if (r.ground) bits.push('ground: ' + r.ground);
-        if (r.cond) bits.push(r.cond.toLowerCase());
-        var gk = (typeof greenOf === 'function' && greenOf(r.green)) || null;
-        if (gk && r.green !== 'none'){
-          var gtxt = gk.lab;
-          if (r.gcover) gtxt += ', ' + ({corner:'a corner', quarter:'about a quarter',
-                                        half:'about half', most:'most'}[r.gcover] || r.gcover);
-          if (r.gaccess) gtxt += ' \u2014 ' + ({open:'open to anyone', gated:'gated but visible',
-                                walled:'walled off', private:'private'}[r.gaccess] || r.gaccess);
-          bits.push(gtxt);
-        }
-        return '<div style="margin:.35rem 0">' + (bits.join(' &middot; ') || 'recorded') +
-               (r.note ? '<br><i>\u201c' + r.note + '\u201d</i>' : '') +
-               (r.when ? '<br><span style="opacity:.6">' + r.when + '</span>' : '') + '</div>';
-      }).join('');
-
+      /* factsHTML is the same list Pictures shows, edit buttons and all -- so a record can
+         be corrected from whichever section you happened to spot the mistake in, and there
+         is one editor to keep right rather than two that drift. */
       g.addLayer(L.polygon(f.g, {color:col, weight:1.8, opacity:.95, dashArray:dash,
         fillColor:col, fillOpacity:op})
         .bindPopup('<h4>Recorded on site \u2014 ' + recs.length + ' ' +
           (recs.length === 1 ? 'record' : 'records') + '</h4>' +
-          'On ' + parcelLabel(i) + '.' + lines +
+          'On ' + parcelLabel(i) + '.' + factsHTML(i) +
           '<span class="src">Yours, from the walk. The parcel face is the professor\u2019s ' +
           'survey; everything inside it is what you saw.</span>'));
 
-      /* the badge: storeys if counted, otherwise a tick that something is known here */
-      var st = recs.filter(function(r){ return r.storeys; })[0];
-      var c = parcelCenter(i);
-      if (c) g.addLayer(L.marker(c, {interactive:false, zIndexOffset:1200,
-        icon:L.divIcon({className:'rec-badge',
-          html: st ? String(st.storeys) : '\u25cf', iconSize:[22,22], iconAnchor:[11,11]})}));
+      /* every tag written on the plot, so the map can be read instead of remembered */
+      var ic = recTagsIcon(recs), c = parcelCenter(i);
+      if (c && ic) g.addLayer(L.marker(c, {interactive:false, zIndexOffset:1200, icon:ic}));
     });
   }
 
@@ -2993,6 +3021,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     var btn = document.getElementById('walk-toggle');
     if (!panel || !btn) return;
     var host = null, homeParent = panel.parentNode, ready = false, chosen = -1;
+    var editing = null;    /* the id of the record being corrected, or null for a new one */
 
     function doc(){ return host ? host.document : document; }
     function el(id){ return doc().getElementById(id); }
@@ -3088,6 +3117,9 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
               VB[1] + (ev.clientY - r.top) / r.height * VB[3]];
     }
     function selectParcelIdx(k){
+      /* an edit belongs to one record on one plot; moving to another plot ends it, or the
+         next Update would write this plot's answers onto the last plot's record */
+      if (chosen !== k) editing = null;
       chosen = k;
       var svg = el('wp-map');
       if (svg) Array.prototype.forEach.call(svg.querySelectorAll('.wpp'), function(p){
@@ -3109,10 +3141,51 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     function showFound(){
       var f = el('wp-found');
       if (!f) return;
-      if (chosen < 0){ f.textContent = 'no plot chosen'; f.className = ''; return; }
+      if (chosen < 0){ f.textContent = 'no plot chosen'; f.className = ''; showHave(); return; }
       var already = plotsIn(chosen).length;
       f.textContent = parcelLabel(chosen) + (already ? ' \u00b7 ' + already + ' already recorded' : '');
       f.className = 'ok';
+      showHave();
+    }
+    /* What is already on this plot, each one openable. Without this, the only way to fix a
+       record on the street was to make a second one that contradicts it. */
+    function showHave(){
+      var h = el('wp-have');
+      if (!h) return;
+      var recs = chosen < 0 ? [] : plotsIn(chosen);
+      if (!recs.length){ h.innerHTML = ''; setSaveLabel(); return; }
+      h.innerHTML = recs.map(function(r, n){
+        return '<div class="wh' + (editing === r.id ? ' on' : '') + '">' +
+          '<span>' + (recs.length > 1 ? (n + 1) + '. ' : '') + plotLine(r) + '</span>' +
+          '<button type="button" data-fix="' + r.id + '">' +
+          (editing === r.id ? 'editing' : 'fix') + '</button></div>';
+      }).join('');
+      Array.prototype.forEach.call(h.querySelectorAll('button[data-fix]'), function(b){
+        b.onclick = function(){ loadInto(b.getAttribute('data-fix')); };
+      });
+      setSaveLabel();
+    }
+    /* Save must say what it is about to do. A button that reads "Save" and quietly appends
+       a second record over an edit is the duplicate this whole list exists to prevent. */
+    function setSaveLabel(){
+      var sv = el('wp-save');
+      if (!sv) return;
+      sv.textContent = editing ? 'Update this one' : 'Save \u0026 next';
+      sv.classList.toggle('wp-editing', !!editing);
+    }
+    function loadInto(id){
+      var r = null;
+      for (var i = 0; i < plots.length; i++) if (plots[i].id === id){ r = plots[i]; break; }
+      if (!r) return;
+      editing = id;
+      if (r.parcel !== chosen) selectParcelIdx(r.parcel);
+      var set = function(f2, v){ var e = el(f2); if (e) e.value = v || ''; };
+      set('wp-storeys', r.storeys); set('wp-use', r.use); set('wp-ground', r.ground);
+      set('wp-green', r.green); set('wp-gcover', r.gcover); set('wp-gaccess', r.gaccess);
+      set('wp-cond', r.cond); set('wp-note', r.note);
+      showHave();
+      var l = el('wp-last');
+      if (l) l.textContent = 'correcting a record from ' + (r.when || 'earlier');
     }
 
     function lookup(){
@@ -3143,6 +3216,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       if (svg) Array.prototype.forEach.call(svg.querySelectorAll('.wpp.sel'), function(p){
         p.classList.remove('sel'); });
       chosen = -1;
+      editing = null;
       showFound();
     }
 
@@ -3199,21 +3273,37 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         var f = el('wp-found');
         if (chosen < 0){ if (f){ f.textContent = 'pick a parcel first'; f.className = 'bad'; } return; }
         var v = function(id){ var e = el(id); return e ? e.value : ''; };
-        var out = {id:'w' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
-                   parcel:chosen, storeys:v('wp-storeys'), use:v('wp-use'), ground:v('wp-ground'),
-                   green:v('wp-green'), gcover:v('wp-gcover'), gaccess:v('wp-gaccess'),
-                   cond:v('wp-cond'), note:v('wp-note'), at:null, from:null, t:Date.now(),
-                   when:new Date().toISOString().slice(0, 16).replace('T', ' '),
-                   src:'walk'};   /* a desk record, never mistaken for one made on the ground */
+        /* An edit rewrites the record in place. Appending instead would leave two entries
+           that disagree with no way to tell which one you stood in front of last. */
+        var old = null, oldIx = -1;
+        if (editing) for (var oi = 0; oi < plots.length; oi++)
+          if (plots[oi].id === editing){ old = plots[oi]; oldIx = oi; break; }
+        var before = old ? JSON.parse(JSON.stringify(old)) : null;
+        var out = old || {id:'w' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
+                          parcel:chosen, at:null, from:null, src:'walk'};
+        out.parcel = chosen;
+        out.storeys = v('wp-storeys'); out.use = v('wp-use'); out.ground = v('wp-ground');
+        out.green = v('wp-green'); out.gcover = v('wp-gcover'); out.gaccess = v('wp-gaccess');
+        out.cond = v('wp-cond'); out.note = v('wp-note');
+        out.t = Date.now();
+        out.when = new Date().toISOString().slice(0, 16).replace('T', ' ');
+        if (!out.src) out.src = 'walk';   /* a desk record, never mistaken for one on the ground */
         if (!out.storeys && !out.use && !out.ground && !out.cond && !out.note &&
             !out.green && !out.gcover && !out.gaccess){
           if (f){ f.textContent = 'nothing filled in'; f.className = 'bad'; } return;
         }
         var ctr = parcelCenter(chosen);
-        if (ctr) out.at = [ctr.lat, ctr.lng];
-        plots.push(out);
-        if (!savePlots()){ plots.pop(); return; }
-        var l = el('wp-last'); if (l) l.textContent = 'saved to ' + parcelLabel(chosen);
+        if (!out.at && ctr) out.at = [ctr.lat, ctr.lng];
+        if (!old) plots.push(out);
+        if (!savePlots()){
+          /* put it back exactly as it was: a failed save must not leave the edit applied in
+             memory, or the screen shows a change the storage does not have */
+          if (old && before) plots[oldIx] = before; else plots.pop();
+          return;
+        }
+        var l = el('wp-last');
+        if (l) l.textContent = (old ? 'updated on ' : 'saved to ') + parcelLabel(chosen);
+        editing = null;
         if (typeof askPersist === 'function') askPersist();   /* engagement is higher now */
         clearForm(); count(); markDone(); rebuildAll();
         if (typeof paintCounts === 'function') paintCounts();
@@ -4627,6 +4717,103 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     for (var i = 0; i < GREENS.length; i++) if (GREENS[i].k === k) return GREENS[i];
     return null;
   }
+  /* ---------- what a tag looks like on the plot ----------
+     Short enough to sit on a 40 m frontage at z17, and still the same word you chose in the
+     form -- an abbreviation nobody can expand is a code, not a label. */
+  var GROUND_SHORT = {
+    'Shops':'shops', 'Workshops / light industry':'workshop',
+    'Storage / warehouse':'storage', 'Parking':'parking',
+    'Residential entrance':'entrance', 'Blank wall / shutters':'blank wall',
+    'Caf\u00e9 / restaurant':'caf\u00e9', 'Under construction':'building site', 'Other':'other'
+  };
+  var USE_SHORT = {residential:'homes', commercial:'retail', industrial:'industry',
+                   mixed:'mixed', institutional:'public', vacant:'vacant',
+                   construction:'building site'};
+  var GCOVER_SHORT = {corner:'a corner', quarter:'a quarter', half:'half', most:'most'};
+  var GACCESS_SHORT = {gated:'gated', walled:'walled off', 'private':'private'};
+  /* One tree that grows with what was recorded: a pot, a shrub, a young tree, a mature one.
+     Drawn rather than typed as an emoji, which renders at a different size and weight on
+     every device and would not sit in a line of mono type. */
+  function treeGlyph(level){
+    var open = '<svg viewBox="0 0 14 14" width="11" height="11" aria-hidden="true">',
+        stem = function(w, top){
+          return '<path d="M7 13V' + top + '" stroke="currentColor" stroke-width="' + w +
+                 '" fill="none" stroke-linecap="round"/>';
+        },
+        crown = function(cx, cy, r){
+          return '<circle cx="' + cx + '" cy="' + cy + '" r="' + r +
+                 '" fill="currentColor" opacity=".85"/>';
+        };
+    /* a pot, so it is plainly a plant somebody put there rather than one that grew */
+    if (level === 'potted')
+      return open + crown(7, 5.4, 3.0) +
+             '<path d="M4.7 8.9h4.6l-.8 3.4H5.5z" fill="currentColor"/></svg>';
+    /* a low clump on the ground, no stem: at this size a single circle is a bullet point */
+    if (level === 'shrubs')
+      return open + crown(4.4, 9.6, 2.5) + crown(9.6, 9.6, 2.5) + crown(7, 8.2, 3.1) + '</svg>';
+    /* one crown on a thin stem */
+    if (level === 'trees')
+      return open + stem(1.1, 7.6) + crown(7, 5.0, 3.5) + '</svg>';
+    /* a wider double crown on a thicker stem -- bigger AND a different shape, because at
+       11px a radius difference alone is not something anyone can read */
+    return open + stem(1.6, 8.4) + crown(4.7, 5.4, 3.3) + crown(9.3, 5.4, 3.3) +
+           crown(7, 3.9, 3.3) + '</svg>';
+  }
+  /* One chip per thing recorded, merged across every part on the plot: two parts that are
+     both shops say "shops" once, two parts that differ say both. Order is the thinning
+     order -- what survives when you zoom out is what is listed first. */
+  function recTags(recs, opt){
+    var out = [], seen = {};
+    opt = opt || {};
+    function add(cls, html, title, style){
+      var k = cls + '|' + html;
+      if (seen[k]) return;
+      seen[k] = 1;
+      out.push('<span class="chip ' + cls + '"' + (style ? ' style="' + style + '"' : '') +
+               ' title="' + String(title).replace(/"/g, '&quot;') + '">' + html + '</span>');
+    }
+    /* skipped where a pin already carries the storey count, so it is not said twice */
+    if (!opt.noStoreys) recs.forEach(function(r){
+      if (r.storeys) add('t-num', r.storeys + 'F', r.storeys + ' storeys above ground');
+    });
+    recs.forEach(function(r){
+      var g = greenOf(r.green);
+      if (!g) return;
+      if (r.green === 'none'){ add('t-soft', 'no green', 'Nothing growing \u2014 recorded, not assumed'); return; }
+      var extra = [];
+      if (r.gcover) extra.push(GCOVER_SHORT[r.gcover] || r.gcover);
+      if (r.gaccess && r.gaccess !== 'open') extra.push(GACCESS_SHORT[r.gaccess] || r.gaccess);
+      add('t-veg', treeGlyph(r.green) + (extra.length ? '<span>' + extra.join(', ') + '</span>' : ''),
+          g.lab + (extra.length ? ' \u2014 ' + extra.join(', ') : ''));
+    });
+    recs.forEach(function(r){
+      if (r.ground) add('t-gnd', GROUND_SHORT[r.ground] || r.ground.toLowerCase(),
+                        'Ground floor: ' + r.ground);
+    });
+    recs.forEach(function(r){
+      var u = useOf(r.use);
+      if (u) add('t-use', USE_SHORT[r.use] || u.lab, u.lab,
+                 'background:' + cssVar(u.c));
+    });
+    recs.forEach(function(r){
+      if (r.cond === 'Poor' || r.cond === 'Derelict')
+        add('t-warn', r.cond.toLowerCase(), 'Condition: ' + r.cond);
+    });
+    if (recs.length > 1) out.push('<span class="chip t-soft" title="' + recs.length +
+      ' parts recorded on this plot">' + recs.length + ' parts</span>');
+    return out;
+  }
+  /* iconSize [0,0] with the transform on an INNER div: Leaflet positions the icon element
+     itself with a transform, so centring must not be written there or it is overwritten
+     on the next pan. */
+  function recTagsIcon(recs, opt){
+    opt = opt || {};
+    var chips = recTags(recs, opt);
+    if (!chips.length) return null;
+    return L.divIcon({className:'rec-tags' + (opt.below ? ' rt-under' : ''),
+                      html:'<div class="rt-in">' + chips.join('') + '</div>',
+                      iconSize:[0, 0], iconAnchor:[0, 0]});
+  }
   function storeyOptions(){
     var o = ['<option value="">not counted</option>'];
     for (var i = 1; i <= 12; i++) o.push('<option value="' + i + '">' + i + '</option>');
@@ -4757,6 +4944,18 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     if (u) bits.push(u.lab);
     if (r.ground) bits.push('ground floor ' + r.ground.toLowerCase());
     if (r.cond) bits.push(r.cond.toLowerCase());
+    /* greenery was recorded and then not shown here, so a plot could read as blank in the
+       one list that is supposed to say what is on it */
+    var gk = greenOf(r.green);
+    if (gk){
+      if (r.green === 'none') bits.push('nothing growing');
+      else {
+        var gt = gk.lab.toLowerCase();
+        if (r.gcover) gt += ', ' + (GCOVER_SHORT[r.gcover] || r.gcover) + ' of the plot';
+        if (r.gaccess && r.gaccess !== 'open') gt += ' \u2014 ' + (GACCESS_SHORT[r.gaccess] || r.gaccess);
+        bits.push(gt);
+      }
+    }
     return (r.note ? '<b>' + String(r.note).replace(/</g, '&lt;') + '</b> \u2014 ' : '') +
            (bits.join(' \u00b7 ') || 'nothing filled in');
   }
@@ -5028,6 +5227,10 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         var ru = useOf(r.use), rc = ru ? cssVar(ru.c) : cssVar('--ink-soft');
         var rt = r.storeys ? r.storeys + 'F' : (ru ? ru.lab.charAt(0) : '\u00b7');
         var rw = 23 + Math.max(0, rt.length - 2) * 8;
+        /* Here each PART carries its own tags, because here the parts are drawn apart.
+           Below the pin, and without the storey chip: the pin is the storey count. */
+        var pic = recTagsIcon([r], {below:true, noStoreys:true});
+        if (pic) g.addLayer(L.marker(p, {interactive:false, zIndexOffset:2150, icon:pic}));
         g.addLayer(L.marker(p, {zIndexOffset:2200,
           icon:L.divIcon({className:'plot-pin',
             html:'<span style="background:' + rc + '">' + rt + '</span>',
