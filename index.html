@@ -523,6 +523,11 @@
     border-radius:6px; padding:.3rem .4rem; margin-bottom:.2rem;}
   .pf-warn{color:var(--layer-environmental); border-left:2px solid var(--layer-environmental);}
   /* a part carries its use as its colour, so a street reads at a glance */
+  /* only on screen while the survey is empty */
+  .pic-rescue{ font-family:var(--font-mono); font-size:.68rem; cursor:pointer;
+    padding:.2rem .45rem; border:1px dashed var(--line-strong); border-radius:4px;
+    color:var(--ink-soft); background:var(--surface);}
+  .pic-rescue:hover{ border-color:var(--accent); color:var(--accent);}
   .pc-desk{ font-family:var(--font-mono); font-size:.6rem; color:var(--sem-problem);
     display:block; margin-top:.1rem;}
   .plot-pin{display:flex; align-items:center; justify-content:center;}
@@ -805,9 +810,8 @@
       <button class="fb-btn" id="pic-enable">Enable</button>
       <button class="fb-btn" id="pic-attach" hidden>+ note on that</button>
       <button class="fb-btn" id="pic-recover" hidden>Restore found files</button>
-      <button class="fb-btn" id="pic-import">Restore from file</button>
-      <button class="fb-btn" id="pic-keep">Keep a backup file</button>
       <input type="file" accept="application/json,.json" id="pic-import-input" hidden>
+      <span class="pic-rescue" id="pic-rescue" hidden>nothing here &mdash; open a backup</span>
       <span class="pic-tally" id="pic-tally">nothing recorded yet</span>
       <span class="pic-tally" id="pic-store"></span>
     </div>
@@ -4659,7 +4663,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
        orphaned, and the sweep on the next open offers it back. Say so rather than failing mute. */
     if (!savePicMeta()) alert('The file is stored but its record could not be saved. Export now; ' +
                               'reopening this section will offer the file back.');
-    writeBackup();
+    autoBackup(); paintRescue();
     rebuildAll();
     paintCounts();
     /* The moment straight after a shot is the only moment you still remember why you took it,
@@ -4787,7 +4791,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     /* second copy, different key -- survives the primary being corrupted */
     try { localStorage.setItem(PLOTS_BAK, json); } catch (e) {}
     /* the only copy that is not site data, and so the only one the browser cannot drop */
-    try { writeBackup(); } catch (e) {}
+    try { autoBackup(); paintRescue(); } catch (e) {}
     /* third copy in IndexedDB -- far more room, and it is where the photographs already are,
        so a browser that keeps the photos keeps the records with them */
     try { picPut('plots-backup', json, function(){}); } catch (e) {}
@@ -5323,7 +5327,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     });
     var okP = added ? savePlots() : true;
     var okM = addedM ? savePicMeta() : true;
-    rebuildAll(); paintCounts();
+    rebuildAll(); paintCounts(); paintRescue();
     return {added:added, skipped:skipped, addedM:addedM, skippedM:skippedM,
             saved:(okP && okM)};
   }
@@ -5354,8 +5358,6 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   /* A real file on disk, written after every save. Documents is not site data, so nothing
      the browser does to this origin can touch it. Chrome desktop only -- on a phone the
      button falls back to an export and says so. */
-  var backupHandle = null;
-  function backupSupported(){ return typeof window.showSaveFilePicker === 'function'; }
   function backupPayload(){
     return JSON.stringify({
       what:'Entering Beirut \u2014 field survey backup',
@@ -5363,39 +5365,75 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       plots:plots, media:picMeta
     }, null, 1);
   }
-  function writeBackup(){
-    if (!backupHandle) return;
-    try {
-      backupHandle.createWritable().then(function(w){
-        return w.write(backupPayload()).then(function(){ return w.close(); });
-      }).then(function(){
-        var el = document.getElementById('pic-keep');
-        if (el) el.textContent = 'Backup file \u2713';
-      }).catch(function(){
-        backupHandle = null;
-        var el = document.getElementById('pic-keep');
-        if (el) el.textContent = 'Keep a backup file';
-      });
-    } catch (e) { backupHandle = null; }
+  /* ---------- it backs itself up ----------
+     A copy of the whole survey goes to Downloads on its own. Downloads is not site data, so
+     it survives what the browser did to the browser's own copy. The browser asks once, the
+     first time a page writes a second file; after that this is silent.
+
+     Timed off a Save, because a Save is a real click and a download during user activation
+     is allowed. Also when the page is hidden, so closing the tab or locking the phone leaves
+     a current copy behind. Three records or five minutes, whichever is first: every save
+     would bury the folder, once a session would lose the session. */
+  var BACKUP_AT = 'studio7BackupAt';
+  var bkAt = 0, bkCount = 0, bkTimer = null;
+  try {
+    var was = JSON.parse(localStorage.getItem(BACKUP_AT) || 'null');
+    if (was){ bkAt = was.t || 0; bkCount = was.n || 0; }
+  } catch (e) {}
+  function bkTotal(){ return plots.length + picMeta.length; }
+  function bkNote(){
+    try { localStorage.setItem(BACKUP_AT, JSON.stringify({t:bkAt, n:bkCount})); } catch (e) {}
   }
-  window.chooseBackupFile = function(){
-    if (!backupSupported()){
-      alert('This browser cannot write to a file on its own \u2014 that is desktop Chrome only.\n\n' +
-            'On a phone, use Export instead, and do it often. Anything that is only in the ' +
-            'browser can be deleted by the browser.');
-      return;
-    }
-    window.showSaveFilePicker({
-      suggestedName:'entering-beirut-survey-backup.json',
-      types:[{description:'Survey backup', accept:{'application/json':['.json']}}]
-    }).then(function(h){
-      backupHandle = h;
-      writeBackup();
-      alert('Backup file set.\n\nEvery record from now on is written straight to that file as ' +
-            'well as into the browser. A file on your disk is not site data, so nothing the ' +
-            'browser does can remove it.\n\nPick it again after each time you reopen the page.');
-    }).catch(function(){});
-  };
+  function backupNow(why){
+    var n = bkTotal();
+    if (!n) return;                       /* nothing to keep */
+    var d = new Date();
+    var pad = function(x){ return (x < 10 ? '0' : '') + x; };
+    var stamp = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) +
+                '-' + pad(d.getHours()) + pad(d.getMinutes());
+    var name = 'entering-beirut-survey-' + stamp + '-' +
+               n + '-record' + (n === 1 ? '' : 's') + '.json';
+    try {
+      download(new Blob([backupPayload()], {type:'application/json'}), name);
+      bkAt = Date.now(); bkCount = n; bkNote();
+      /* the line must not go stale on screen: a backup that landed has to show */
+      if (typeof paintCounts === 'function') paintCounts();
+    } catch (e) {}
+  }
+  /* debounced, so a burst of saves is one file and not five */
+  function autoBackup(){
+    if (bkTimer) return;
+    bkTimer = setTimeout(function(){
+      bkTimer = null;
+      var n = bkTotal();
+      if (!n) return;
+      var grew = n - bkCount;
+      var old = Date.now() - bkAt;
+      /* two records of exposure at most, or three minutes. Tighter costs a few more files
+         in Downloads; looser costs records, and records are the thing that cannot be redone. */
+      if (grew >= 2 || (grew >= 1 && old > 3 * 60 * 1000) || bkAt === 0) backupNow('save');
+    }, 1500);
+  }
+  /* Closing the tab, locking the phone, switching apps: whatever is unsaved to disk goes now.
+     There is no user activation here, so it only lands once the browser has been told this
+     site may write more than one file -- which the saves above will already have done. */
+  function backupOnLeave(){
+    if (bkTimer){ clearTimeout(bkTimer); bkTimer = null; }   /* no time to wait out a debounce */
+    if (bkTotal() > bkCount) backupNow('hide');
+  }
+  document.addEventListener('visibilitychange', function(){
+    if (document.visibilityState === 'hidden') backupOnLeave();
+  });
+  window.addEventListener('pagehide', backupOnLeave);
+  window.addEventListener('beforeunload', backupOnLeave);
+
+  /* The way back in, which is not a button: it appears only while the survey is empty, which
+     is the only moment it is any use, and disappears the instant there is anything to lose. */
+  function paintRescue(){
+    var r = document.getElementById('pic-rescue');
+    if (!r) return;
+    r.hidden = bkTotal() > 0;
+  }
 
   var EXPORT_KEY = 'studio7LastExport';
   var lastExport = 0;
@@ -5435,9 +5473,26 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     /* Only worth saying while there is something to lose. Before the first record it is
        a warning about nothing, and a bar that cries wolf gets read as decoration. */
     var anything = picMeta.length || factCount();
+    /* The automatic copy in Downloads, and how current it is. Chrome asks once whether this
+       page may write more than one file; if that was refused the backups stop, and without
+       this line nothing would ever say so. */
+    if (anything){
+      if (!bkAt){
+        bits.push('NO BACKUP FILE YET');
+      } else {
+        var bm = Math.round((Date.now() - bkAt) / 60000);
+        var behind = bkTotal() - bkCount;
+        bits.push('backup: ' + bkCount + ' record' + (bkCount === 1 ? '' : 's') +
+                  (bm < 1 ? ', just now' : bm < 60 ? ', ' + bm + ' min ago'
+                                                   : ', ' + Math.floor(bm / 60) + ' h ago') +
+                  (behind > 0 ? ' \u00b7 ' + behind + ' newer than that' : ''));
+      }
+    }
+    /* Bookmarking was never going to be enough, and saying so was the advice that lost a
+       morning's work. The browser keeping it is a bonus now, not the plan. */
     if (PERSISTED === false && anything)
-      bits.push('storage not protected \u2014 bookmark this page (or Add to Home Screen) ' +
-                'and the browser will keep it');
+      bits.push('the browser has NOT promised to keep its own copy \u2014 the file in your ' +
+                'Downloads folder is the one that matters');
     withEstimate(function(e){
       var out = bits.slice();
       if (e && e.quota){
@@ -5451,7 +5506,10 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       el.textContent = out.join(' \u00b7 ');
       /* red means ACT NOW: unexported work, or nearly out of room. Unprotected storage
          with nothing in it is neither. */
-      el.className = 'pic-tally' + ((pend || (PERSISTED === false && anything) ||
+      /* red means ACT NOW. An unprotected browser copy is no longer one of those, because
+         the file in Downloads covers it; a backup that is not running IS. */
+      var bkBad = anything && (!bkAt || bkTotal() - bkCount >= 5);
+      el.className = 'pic-tally' + ((pend || bkBad ||
         (e && e.quota && (e.quota - e.usage) < ROOM_MARGIN * 2)) ? ' warn' : '');
       layoutBars();
     });
@@ -6436,16 +6494,15 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       askPersist();          /* opt out of eviction from inside a real tap */
     });
     document.getElementById('pic-recover').addEventListener('click', restoreOrphans);
-    var imp = el('pic-import'), impIn = el('pic-import-input');
-    if (imp && impIn){
-      imp.addEventListener('click', function(){ impIn.click(); });
-      impIn.addEventListener('change', function(){
-        if (impIn.files && impIn.files[0]) restoreFromFile(impIn.files[0]);
-        impIn.value = '';
-      });
-    }
-    var keep = el('pic-keep');
-    if (keep) keep.addEventListener('click', chooseBackupFile);
+    var impIn = el('pic-import-input');
+    if (impIn) impIn.addEventListener('change', function(){
+      if (impIn.files && impIn.files[0]) restoreFromFile(impIn.files[0]);
+      impIn.value = '';
+    });
+    /* the rescue line, which only exists while there is nothing to lose */
+    var rl = el('pic-rescue');
+    if (rl) rl.addEventListener('click', function(){ if (impIn) impIn.click(); });
+    paintRescue();
     shoot.addEventListener('click', function(){ startFix(); inp.click(); });
     vid.addEventListener('click', function(){ startFix(); vinp.click(); });
     voi.addEventListener('click', function(){ startFix(); startVoice(null); });
