@@ -277,6 +277,13 @@
   /* What is recorded on a plot, written on the plot. Merged across its parts, ordered so
      the first ones are the ones worth seeing small, and thinned out as you zoom away --
      an overlapping chip is worse than an absent one. */
+  /* neither pressed until you press one: unanswered is a state, not a default */
+  .yn{display:flex; gap:.3rem;}
+  .yn button{flex:1; font:inherit; font-size:.82rem; padding:.42rem .3rem; cursor:pointer;
+    border:1px solid var(--line-strong); border-radius:4px; background:var(--surface);
+    color:var(--ink-soft); font-family:var(--font-mono); letter-spacing:.04em;}
+  .yn button.on{background:var(--ink); border-color:var(--ink); color:var(--paper);
+    font-weight:700;}
   .rec-tags{ pointer-events:none; background:none; border:0; }
   .rec-tags .rt-in{ position:absolute; left:0; top:0; transform:translate(-50%,-50%);
     display:flex; flex-wrap:wrap; gap:2px; justify-content:center; width:82px;}
@@ -291,6 +298,8 @@
   .rec-tags .chip.t-use{ color:#fff; border-color:rgba(0,0,0,.25); font-weight:700;}
   .rec-tags .chip.t-veg{ display:inline-flex; align-items:center; gap:2px; padding:1.5px 3.5px;
     color:var(--sem-veg); border-color:var(--sem-veg);}
+  .rec-tags .chip.t-add{ background:var(--sem-move); color:#fff; border-color:rgba(0,0,0,.25);
+    font-weight:700;}
   .rec-tags .chip.t-warn{ color:var(--sem-problem); border-color:var(--sem-problem);}
   .rec-tags .chip.t-soft{ color:var(--muted); border-style:dashed;}
   /* zoom thinning: the buckets are set on <body> from one zoomend, so nothing re-renders */
@@ -739,6 +748,10 @@
 
         <label>Storeys</label>
         <select id="wp-storeys"></select>
+        <label>A floor added on top <i>a newer storey on an older base</i></label>
+        <div class="yn" id="wp-added" data-v=""><button type="button" data-y="y">yes</button><button type="button" data-y="n">no</button></div>
+        <label>Columns left for another <i>rebar or bare columns waiting on the roof</i></label>
+        <div class="yn" id="wp-ready" data-v=""><button type="button" data-y="y">yes</button><button type="button" data-y="n">no</button></div>
         <label>What is it</label>
         <select id="wp-use"></select>
         <label>Ground floor</label>
@@ -3292,6 +3305,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       set('wp-storeys', r.storeys); set('wp-use', r.use); set('wp-ground', r.ground);
       set('wp-green', r.green); set('wp-gcover', r.gcover); set('wp-gaccess', r.gaccess);
       set('wp-cond', r.cond); set('wp-note', r.note);
+      ynSet(doc(), 'wp-added', r.added); ynSet(doc(), 'wp-ready', r.ready);
       showHave();
       var l = el('wp-last');
       if (l) l.textContent = 'correcting a record from ' + (r.when || 'earlier');
@@ -3321,6 +3335,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     function clearForm(){
       ['wp-storeys','wp-use','wp-ground','wp-green','wp-gcover','wp-gaccess','wp-cond',
        'wp-note','wp-parcel'].forEach(function(id){ var e = el(id); if (e) e.value = ''; });
+      ynSet(doc(), 'wp-added', ''); ynSet(doc(), 'wp-ready', '');
       var svg = el('wp-map');
       if (svg) Array.prototype.forEach.call(svg.querySelectorAll('.wpp.sel'), function(p){
         p.classList.remove('sel'); });
@@ -3375,6 +3390,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
           else zoom(z === 'in' ? 0.7 : 1.4);
         };
       });
+      ynWire(doc());          /* the yes/no buttons live in whichever document holds the panel */
       /* Clicking the target focuses it, so the next Ctrl+V certainly lands in this window
          rather than wherever the caret was before the snip. */
       var pz = el('wp-paste');
@@ -3415,11 +3431,12 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         out.storeys = v('wp-storeys'); out.use = v('wp-use'); out.ground = v('wp-ground');
         out.green = v('wp-green'); out.gcover = v('wp-gcover'); out.gaccess = v('wp-gaccess');
         out.cond = v('wp-cond'); out.note = v('wp-note');
+        out.added = ynGet(doc(), 'wp-added'); out.ready = ynGet(doc(), 'wp-ready');
         out.t = Date.now();
         out.when = new Date().toISOString().slice(0, 16).replace('T', ' ');
         if (!out.src) out.src = 'walk';   /* a desk record, never mistaken for one on the ground */
         if (!out.storeys && !out.use && !out.ground && !out.cond && !out.note &&
-            !out.green && !out.gcover && !out.gaccess){
+            !out.green && !out.gcover && !out.gaccess && !out.added && !out.ready){
           if (f){ f.textContent = 'nothing filled in'; f.className = 'bad'; } return;
         }
         var ctr = parcelCenter(chosen);
@@ -4857,6 +4874,47 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     {k:'walled',  lab:'Walled \u2014 cannot see in'},
     {k:'private', lab:'Private, and not visible'}
   ];
+  /* ---------- a yes/no that starts unanswered ----------
+     Not a select: a select opens on '\u2014', and '\u2014' cannot tell "not asked yet" from
+     "asked, and the answer is no". For a field whose entire value is that difference, the
+     control has to make answering an act. Tap the pressed one again to unpress it. */
+  var YN = [{k:'y', lab:'yes'}, {k:'n', lab:'no'}];
+  function ynHTML(id, cur){
+    return '<div class="yn" id="' + id + '" data-v="' + (cur || '') + '">' +
+      YN.map(function(o){
+        return '<button type="button" data-y="' + o.k + '"' +
+               (cur === o.k ? ' class="on"' : '') + '>' + o.lab + '</button>';
+      }).join('') + '</div>';
+  }
+  function ynWire(root){
+    if (!root) return;
+    Array.prototype.forEach.call(root.querySelectorAll('.yn'), function(box){
+      Array.prototype.forEach.call(box.querySelectorAll('button'), function(b){
+        b.onclick = function(){
+          var v = b.getAttribute('data-y');
+          var now = box.getAttribute('data-v') === v ? '' : v;
+          box.setAttribute('data-v', now);
+          Array.prototype.forEach.call(box.querySelectorAll('button'), function(x){
+            x.classList.toggle('on', x.getAttribute('data-y') === now);
+          });
+        };
+      });
+    });
+  }
+  function ynGet(d, id){
+    var b = (d || document).getElementById(id);
+    return b ? (b.getAttribute('data-v') || '') : '';
+  }
+  function ynSet(d, id, v){
+    var box = (d || document).getElementById(id);
+    if (!box) return;
+    box.setAttribute('data-v', v || '');
+    Array.prototype.forEach.call(box.querySelectorAll('button'), function(x){
+      x.classList.toggle('on', x.getAttribute('data-y') === (v || ''));
+    });
+  }
+  function ynWord(v){ return v === 'y' ? 'yes' : v === 'n' ? 'no' : ''; }
+
   function greenOf(k){
     for (var i = 0; i < GREENS.length; i++) if (GREENS[i].k === k) return GREENS[i];
     return null;
@@ -4929,6 +4987,12 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       if (r.gaccess && r.gaccess !== 'open') extra.push(GACCESS_SHORT[r.gaccess] || r.gaccess);
       add('t-veg', treeGlyph(r.green) + (extra.length ? '<span>' + extra.join(', ') + '</span>' : ''),
           g.lab + (extra.length ? ' \u2014 ' + extra.join(', ') : ''));
+    });
+    /* Only the yeses go on the map. The noes are in the record, and a chip on every plot
+       where nothing was added would bury the pattern this is drawn to show. */
+    recs.forEach(function(r){
+      if (r.added === 'y') add('t-add', 'floor added', 'A newer storey on an older base');
+      if (r.ready === 'y') add('t-add', 'columns up', 'Columns left standing for another floor');
     });
     recs.forEach(function(r){
       if (r.ground) add('t-gnd', GROUND_SHORT[r.ground] || r.ground.toLowerCase(),
@@ -5011,6 +5075,10 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         '<label>Storeys above ground <i>releases Sun &middot; Views &middot; Massing</i></label>' +
         '<select id="pf-storeys">' + storeyOptions().replace('value="' + (cur.storeys || '\u0000') + '"',
                                      'value="' + (cur.storeys || '\u0000') + '" selected') + '</select>' +
+        '<label>A floor added on top <i>a newer storey on an older base</i></label>' +
+        ynHTML('pf-added', cur.added) +
+        '<label>Columns left for another <i>rebar or bare columns waiting</i></label>' +
+        ynHTML('pf-ready', cur.ready) +
         '<label>What is it</label>' +
         '<select id="pf-use">' + opts(USES, cur.use) + '</select>' +
         '<label>Ground floor</label>' +
@@ -5040,6 +5108,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
        aiming before it opens puts the plot exactly under the form asking about it. */
     if (here) setTimeout(function(){ panIntoStrip(here); }, 30);
     function close(){ document.body.classList.remove('sheet-on'); clearSelect(); }
+    ynWire(sheet);
     document.getElementById('pf-cancel').addEventListener('click', close);
     document.getElementById('pf-save').addEventListener('click', function(){
       var v = function(id2){ return document.getElementById(id2).value; };
@@ -5048,6 +5117,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
                         parcel:i};
       out.storeys = v('pf-storeys'); out.use = v('pf-use'); out.ground = v('pf-ground');
       out.cond = v('pf-cond'); out.note = v('pf-note');
+      out.added = ynGet(document, 'pf-added'); out.ready = ynGet(document, 'pf-ready');
       out.green = v('pf-green'); out.gcover = v('pf-gcover'); out.gaccess = v('pf-gaccess');
       out.at = here ? [here.lat, here.lng] : null;
       out.from = {lat:pos.lat, lng:pos.lng, acc:pos.acc};   /* where you stood to say it */
@@ -5055,7 +5125,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       out.t = Date.now();
       out.when = new Date().toISOString().slice(0, 16).replace('T', ' ');
       if (!out.storeys && !out.use && !out.ground && !out.cond && !out.note &&
-          !out.green && !out.gcover && !out.gaccess){
+          !out.green && !out.gcover && !out.gaccess && !out.added && !out.ready){
         close(); return;                       /* an empty form is a cancel, not a record */
       }
       if (!rec) plots.push(out);
@@ -5091,6 +5161,11 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     if (u) bits.push(u.lab);
     if (r.ground) bits.push('ground floor ' + r.ground.toLowerCase());
     if (r.cond) bits.push(r.cond.toLowerCase());
+    /* Both answers are printed, including the noes: a "no" that vanishes from the record
+       reads as never asked, which is the one distinction this field exists to keep. */
+    if (r.added) bits.push(r.added === 'y' ? '<b>a floor added</b>' : 'no floor added');
+    if (r.ready) bits.push(r.ready === 'y' ? '<b>columns left for another</b>'
+                                           : 'no columns left');
     /* greenery was recorded and then not shown here, so a plot could read as blank in the
        one list that is supposed to say what is on it */
     var gk = greenOf(r.green);
