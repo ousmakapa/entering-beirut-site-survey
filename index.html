@@ -5443,7 +5443,6 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
      and it does nothing at all, so it cannot overwrite, interleave with, or duplicate
      anything. Delete recovered-2026-09-09.json from the site to switch it off. */
   function autoRecover(){
-    if (plots.length || picMeta.length) return;
     /* Only where a fetch can work. On the file:// working copy it cannot, and the browser
        logs a network error the try/catch never sees -- which would leave a console error in
        every audit from here on, and a dirty audit hides the next real one. */
@@ -5453,17 +5452,29 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       fetch(url, {cache:'no-store'}).then(function(r){
         return r.ok ? r.json() : null;
       }).then(function(d){
-        if (!d || (plots.length || picMeta.length)) return;
-        seeding = true;
-        var out;
-        try { out = mergeRecords(d); } finally { seeding = false; }
-        if (out && (out.added || out.addedM)){
-          var line = document.getElementById('pic-tally');
-          if (line) line.textContent = out.added + ' survey record' +
-            (out.added === 1 ? '' : 's') + ' and ' + out.addedM + ' photograph' +
-            (out.addedM === 1 ? '' : 's') + ' restored from 9 September';
-          seedImages((d.media || []).filter(function(m){ return m && m.file; }));
+        if (!d) return;
+        /* RECORDS only into a survey with nothing in it: putting them into a half-filled one
+           could interleave with real work. */
+        if (!plots.length && !picMeta.length){
+          seeding = true;
+          var out;
+          try { out = mergeRecords(d); } finally { seeding = false; }
+          if (out && (out.added || out.addedM)){
+            var line = document.getElementById('pic-tally');
+            if (line) line.textContent = out.added + ' survey record' +
+              (out.added === 1 ? '' : 's') + ' and ' + out.addedM + ' photograph' +
+              (out.addedM === 1 ? '' : 's') + ' restored from 9 September';
+          }
         }
+        /* IMAGES are a different risk and must not share that guard. This ran once behind it
+           and every thumbnail on the one browser that mattered read "missing", because that
+           browser had already taken the records-only seed and was no longer empty.
+           An image is fetched ONLY for a record that is already here and has no file in
+           storage, so it cannot overwrite anything, cannot invent a record, and costs nothing
+           once they have all arrived. */
+        var mine = {};
+        picMeta.forEach(function(m){ mine[m.id] = 1; });
+        seedImages((d.media || []).filter(function(m){ return m && m.file && mine[m.id]; }));
       }).catch(function(){});
     } catch (e) {}
   }
@@ -5501,6 +5512,12 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         }).then(function(url){
           picPut(m.id, url, function(ok){
             if (!ok){ m.missing = true; bad++; }
+            else {
+              /* the record in MEMORY is the one the export reads, and it is a different object
+                 from the one that came down in the seed */
+              for (var i = 0; i < picMeta.length; i++)
+                if (picMeta[i].id === m.id) delete picMeta[i].missing;
+            }
             tick();
           });
         }).catch(function(){ m.missing = true; bad++; tick(); });
