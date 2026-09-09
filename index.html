@@ -277,12 +277,13 @@
   /* What is recorded on a plot, written on the plot. Merged across its parts, ordered so
      the first ones are the ones worth seeing small, and thinned out as you zoom away --
      an overlapping chip is worse than an absent one. */
-  /* neither pressed until you press one: unanswered is a state, not a default */
-  .yn{display:flex; gap:.3rem;}
-  .yn button{flex:1; font:inherit; font-size:.82rem; padding:.42rem .3rem; cursor:pointer;
-    border:1px solid var(--line-strong); border-radius:4px; background:var(--surface);
-    color:var(--ink-soft); font-family:var(--font-mono); letter-spacing:.04em;}
-  .yn button.on{background:var(--ink); border-color:var(--ink); color:var(--paper);
+  /* Sits at no and is tapped only when there is something to see. The two states have to
+     be told apart across a room, because it is read at arm's length in daylight. */
+  .yn1{width:100%; font:inherit; font-family:var(--font-mono); font-size:.8rem;
+    letter-spacing:.05em; padding:.45rem .3rem; cursor:pointer; border-radius:4px;
+    border:1px solid var(--line-strong); background:var(--surface); color:var(--muted);
+    text-align:center;}
+  .yn1[data-v="y"]{background:var(--sem-move); border-color:var(--sem-move); color:#fff;
     font-weight:700;}
   .rec-tags{ pointer-events:none; background:none; border:0; }
   .rec-tags .rt-in{ position:absolute; left:0; top:0; transform:translate(-50%,-50%);
@@ -748,10 +749,10 @@
 
         <label>Storeys</label>
         <select id="wp-storeys"></select>
-        <label>A floor added on top <i>a newer storey on an older base</i></label>
-        <div class="yn" id="wp-added" data-v=""><button type="button" data-y="y">yes</button><button type="button" data-y="n">no</button></div>
-        <label>Columns left for another <i>rebar or bare columns waiting on the roof</i></label>
-        <div class="yn" id="wp-ready" data-v=""><button type="button" data-y="y">yes</button><button type="button" data-y="n">no</button></div>
+        <label>A floor added on top <i>tap only when you can see one</i></label>
+        <button type="button" class="yn1" id="wp-added" data-v="n" data-yes="YES &mdash; a floor added">no</button>
+        <label>Columns left for another <i>tap only when you can see rebar</i></label>
+        <button type="button" class="yn1" id="wp-ready" data-v="n" data-yes="YES &mdash; columns left">no</button>
         <label>What is it</label>
         <select id="wp-use"></select>
         <label>Ground floor</label>
@@ -3335,7 +3336,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     function clearForm(){
       ['wp-storeys','wp-use','wp-ground','wp-green','wp-gcover','wp-gaccess','wp-cond',
        'wp-note','wp-parcel'].forEach(function(id){ var e = el(id); if (e) e.value = ''; });
-      ynSet(doc(), 'wp-added', ''); ynSet(doc(), 'wp-ready', '');
+      ynSet(doc(), 'wp-added', 'n'); ynSet(doc(), 'wp-ready', 'n');
       var svg = el('wp-map');
       if (svg) Array.prototype.forEach.call(svg.querySelectorAll('.wpp.sel'), function(p){
         p.classList.remove('sel'); });
@@ -3435,8 +3436,11 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         out.t = Date.now();
         out.when = new Date().toISOString().slice(0, 16).replace('T', ' ');
         if (!out.src) out.src = 'walk';   /* a desk record, never mistaken for one on the ground */
+        /* only a YES counts as something you did: two switches sitting at their default
+           is not an observation, and would file a record saying you looked when you did not */
         if (!out.storeys && !out.use && !out.ground && !out.cond && !out.note &&
-            !out.green && !out.gcover && !out.gaccess && !out.added && !out.ready){
+            !out.green && !out.gcover && !out.gaccess &&
+            out.added !== 'y' && out.ready !== 'y'){
           if (f){ f.textContent = 'nothing filled in'; f.className = 'bad'; } return;
         }
         var ctr = parcelCenter(chosen);
@@ -4878,40 +4882,37 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
      Not a select: a select opens on '\u2014', and '\u2014' cannot tell "not asked yet" from
      "asked, and the answer is no". For a field whose entire value is that difference, the
      control has to make answering an act. Tap the pressed one again to unpress it. */
-  var YN = [{k:'y', lab:'yes'}, {k:'n', lab:'no'}];
-  function ynHTML(id, cur){
-    return '<div class="yn" id="' + id + '" data-v="' + (cur || '') + '">' +
-      YN.map(function(o){
-        return '<button type="button" data-y="' + o.k + '"' +
-               (cur === o.k ? ' class="on"' : '') + '>' + o.lab + '</button>';
-      }).join('') + '</div>';
+  /* One switch, starting at no. Two buttons cost two taps a plot for an answer that is
+     nearly always the same, and a field that expensive stops being filled in on a long
+     street. 'n' is still WRITTEN to the record, so the export reads "assessed, nothing
+     added" rather than "never asked" -- and records made before this change keep their
+     empty value, which really does mean never asked. */
+  function ynLabel(v, yes){ return v === 'y' ? yes : 'no'; }
+  function ynHTML(id, cur, yes){
+    var v = cur === 'y' ? 'y' : 'n';
+    return '<button type="button" class="yn1" id="' + id + '" data-v="' + v +
+           '" data-yes="' + yes + '">' + ynLabel(v, yes) + '</button>';
   }
   function ynWire(root){
     if (!root) return;
-    Array.prototype.forEach.call(root.querySelectorAll('.yn'), function(box){
-      Array.prototype.forEach.call(box.querySelectorAll('button'), function(b){
-        b.onclick = function(){
-          var v = b.getAttribute('data-y');
-          var now = box.getAttribute('data-v') === v ? '' : v;
-          box.setAttribute('data-v', now);
-          Array.prototype.forEach.call(box.querySelectorAll('button'), function(x){
-            x.classList.toggle('on', x.getAttribute('data-y') === now);
-          });
-        };
-      });
+    Array.prototype.forEach.call(root.querySelectorAll('.yn1'), function(b){
+      b.onclick = function(){
+        var now = b.getAttribute('data-v') === 'y' ? 'n' : 'y';
+        b.setAttribute('data-v', now);
+        b.textContent = ynLabel(now, b.getAttribute('data-yes') || 'yes');
+      };
     });
   }
   function ynGet(d, id){
     var b = (d || document).getElementById(id);
-    return b ? (b.getAttribute('data-v') || '') : '';
+    return b ? (b.getAttribute('data-v') || 'n') : '';
   }
   function ynSet(d, id, v){
-    var box = (d || document).getElementById(id);
-    if (!box) return;
-    box.setAttribute('data-v', v || '');
-    Array.prototype.forEach.call(box.querySelectorAll('button'), function(x){
-      x.classList.toggle('on', x.getAttribute('data-y') === (v || ''));
-    });
+    var b = (d || document).getElementById(id);
+    if (!b) return;
+    var now = v === 'y' ? 'y' : 'n';
+    b.setAttribute('data-v', now);
+    b.textContent = ynLabel(now, b.getAttribute('data-yes') || 'yes');
   }
   function ynWord(v){ return v === 'y' ? 'yes' : v === 'n' ? 'no' : ''; }
 
@@ -5075,10 +5076,10 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         '<label>Storeys above ground <i>releases Sun &middot; Views &middot; Massing</i></label>' +
         '<select id="pf-storeys">' + storeyOptions().replace('value="' + (cur.storeys || '\u0000') + '"',
                                      'value="' + (cur.storeys || '\u0000') + '" selected') + '</select>' +
-        '<label>A floor added on top <i>a newer storey on an older base</i></label>' +
-        ynHTML('pf-added', cur.added) +
-        '<label>Columns left for another <i>rebar or bare columns waiting</i></label>' +
-        ynHTML('pf-ready', cur.ready) +
+        '<label>A floor added on top <i>tap only when you can see one</i></label>' +
+        ynHTML('pf-added', cur.added, 'YES \u2014 a floor added') +
+        '<label>Columns left for another <i>tap only when you can see rebar</i></label>' +
+        ynHTML('pf-ready', cur.ready, 'YES \u2014 columns left') +
         '<label>What is it</label>' +
         '<select id="pf-use">' + opts(USES, cur.use) + '</select>' +
         '<label>Ground floor</label>' +
@@ -5125,7 +5126,8 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       out.t = Date.now();
       out.when = new Date().toISOString().slice(0, 16).replace('T', ' ');
       if (!out.storeys && !out.use && !out.ground && !out.cond && !out.note &&
-          !out.green && !out.gcover && !out.gaccess && !out.added && !out.ready){
+          !out.green && !out.gcover && !out.gaccess &&
+          out.added !== 'y' && out.ready !== 'y'){
         close(); return;                       /* an empty form is a cancel, not a record */
       }
       if (!rec) plots.push(out);
@@ -5161,11 +5163,10 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     if (u) bits.push(u.lab);
     if (r.ground) bits.push('ground floor ' + r.ground.toLowerCase());
     if (r.cond) bits.push(r.cond.toLowerCase());
-    /* Both answers are printed, including the noes: a "no" that vanishes from the record
-       reads as never asked, which is the one distinction this field exists to keep. */
-    if (r.added) bits.push(r.added === 'y' ? '<b>a floor added</b>' : 'no floor added');
-    if (r.ready) bits.push(r.ready === 'y' ? '<b>columns left for another</b>'
-                                           : 'no columns left');
+    /* Only the yeses read out. 'n' is now on every record by default, so printing it would
+       put the same two lines on every plot and say nothing. The value is still in the export. */
+    if (r.added === 'y') bits.push('<b>a floor added</b>');
+    if (r.ready === 'y') bits.push('<b>columns left for another</b>');
     /* greenery was recorded and then not shown here, so a plot could read as blank in the
        one list that is supposed to say what is on it */
     var gk = greenOf(r.green);
