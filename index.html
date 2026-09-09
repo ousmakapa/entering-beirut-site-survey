@@ -5257,11 +5257,15 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     });
   }
   var ORPHANS = [];
+  /* Not every key in this store is a recording. savePlots() keeps a copy of the survey here
+     too, under a fixed name, and counting it as a found file offered to turn the plot backup
+     into a photograph pinned at the site. */
+  var NOT_MEDIA = {'plots-backup':1};
   function sweepOrphans(){
     picKeys(function(keys){
       var known = {};
       picMeta.forEach(function(m){ known[m.id] = 1; });
-      ORPHANS = keys.filter(function(k){ return !known[k]; });
+      ORPHANS = keys.filter(function(k){ return !known[k] && !NOT_MEDIA[k]; });
       var b = document.getElementById('pic-recover');
       if (!b) return;
       b.hidden = !ORPHANS.length;
@@ -5456,13 +5460,52 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         if (out && (out.added || out.addedM)){
           var line = document.getElementById('pic-tally');
           if (line) line.textContent = out.added + ' survey record' +
-            (out.added === 1 ? '' : 's') + ' and ' + out.addedM + ' photo record' +
-            (out.addedM === 1 ? '' : 's') + ' restored from the 9 September backup \u2014 ' +
-            'the photographs themselves could not be recovered';
-          if (typeof paintCounts === 'function') setTimeout(paintCounts, 6000);
+            (out.added === 1 ? '' : 's') + ' and ' + out.addedM + ' photograph' +
+            (out.addedM === 1 ? '' : 's') + ' restored from 9 September';
+          seedImages((d.media || []).filter(function(m){ return m && m.file; }));
         }
       }).catch(function(){});
     } catch (e) {}
+  }
+
+  /* The photographs travel with the page as recovered/<id>.jpg and go back into IndexedDB
+     under the ids their records already carry -- which is the whole reason they land on the
+     right plots. One at a time, skipping any id already in storage, so nothing is overwritten
+     and running it again costs nothing. A file that will not arrive leaves its record standing
+     and marked missing rather than pretending. */
+  function seedImages(list){
+    if (!list || !list.length) return;
+    var left = list.length, bad = 0;
+    var line = document.getElementById('pic-tally');
+    function tick(){
+      if (--left > 0) return;
+      savePicMeta();
+      rebuildAll();
+      if (typeof paintCounts === 'function') paintCounts();
+      if (line && bad) line.textContent = bad + ' of ' + list.length +
+        ' photographs did not come back \u2014 their records are still here';
+    }
+    list.forEach(function(m){
+      picGet(m.id, function(have){
+        if (have){ tick(); return; }
+        fetch(m.file, {cache:'force-cache'}).then(function(r){
+          if (!r.ok) throw new Error('http ' + r.status);
+          return r.blob();
+        }).then(function(bl){
+          return new Promise(function(res, rej){
+            var fr = new FileReader();
+            fr.onload = function(){ res(fr.result); };
+            fr.onerror = function(){ rej(new Error('read')); };
+            fr.readAsDataURL(bl);
+          });
+        }).then(function(url){
+          picPut(m.id, url, function(ok){
+            if (!ok){ m.missing = true; bad++; }
+            tick();
+          });
+        }).catch(function(){ m.missing = true; bad++; tick(); });
+      });
+    });
   }
 
   /* The way back in, which is not a button: it appears only while the survey is empty, which

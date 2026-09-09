@@ -1,7 +1,7 @@
 {
  "what": "Entering Beirut — field survey, RECOVERED from Chrome's Local Storage tables",
  "recovered": "2026-09-10",
- "note": "Chrome dropped this origin's site data overnight. LevelDB does not overwrite, so the last states it wrote were still in older table files and were read back out of them. The 20 survey records are complete. The 12 media records are metadata only — the images lived in IndexedDB, which was recreated empty, and are gone.",
+ "note": "Chrome dropped this origin's site data overnight. The survey records were read back out of Chrome's own LevelDB tables. The screenshots were never lost at all: Windows auto-saves every Win+Shift+S snip, and each of the 12 was matched to its record by time (gaps of 1-3 seconds throughout) and re-encoded the way the page itself would have on paste.",
  "plots": [
   {
    "id": "wmttltra1zz9",
@@ -454,8 +454,9 @@
    "src": "screen",
    "imagery": null,
    "dur": null,
-   "size": 91874,
-   "missing": true
+   "size": 91382,
+   "file": "recovered/pmttoqo9zsnnll.jpg",
+   "recovered_from": "Screenshot 2026-09-09 085608.png"
   },
   {
    "id": "pmttosidbsjq97",
@@ -471,8 +472,9 @@
    "src": "screen",
    "imagery": null,
    "dur": null,
-   "size": 292982,
-   "missing": true
+   "size": 292491,
+   "file": "recovered/pmttosidbsjq97.jpg",
+   "recovered_from": "Screenshot (2286).png"
   },
   {
    "id": "pmttotzfwg5r5k",
@@ -488,8 +490,9 @@
    "src": "screen",
    "imagery": null,
    "dur": null,
-   "size": 266723,
-   "missing": true
+   "size": 266231,
+   "file": "recovered/pmttotzfwg5r5k.jpg",
+   "recovered_from": "Screenshot (2287).png"
   },
   {
    "id": "pmttovab72i6s6",
@@ -505,8 +508,9 @@
    "src": "screen",
    "imagery": null,
    "dur": null,
-   "size": 233774,
-   "missing": true
+   "size": 233282,
+   "file": "recovered/pmttovab72i6s6.jpg",
+   "recovered_from": "Screenshot (2288).png"
   },
   {
    "id": "pmttow7k2si5k7",
@@ -522,8 +526,9 @@
    "src": "screen",
    "imagery": null,
    "dur": null,
-   "size": 283550,
-   "missing": true
+   "size": 283057,
+   "file": "recovered/pmttow7k2si5k7.jpg",
+   "recovered_from": "Screenshot (2289).png"
   },
   {
    "id": "pmttqbxfse3vz9",
@@ -539,8 +544,9 @@
    "src": "screen",
    "imagery": null,
    "dur": null,
-   "size": 98267,
-   "missing": true
+   "size": 97775,
+   "file": "recovered/pmttqbxfse3vz9.jpg",
+   "recovered_from": "Screenshot 2026-09-09 094039.png"
   },
   {
    "id": "pmttqdfrqev667",
@@ -556,8 +562,9 @@
    "src": "screen",
    "imagery": null,
    "dur": null,
-   "size": 291911,
-   "missing": true
+   "size": 291418,
+   "file": "recovered/pmttqdfrqev667.jpg",
+   "recovered_from": "Screenshot (2294).png"
   },
   {
    "id": "pmttqffx6lfylc",
@@ -573,8 +580,9 @@
    "src": "screen",
    "imagery": null,
    "dur": null,
-   "size": 274952,
-   "missing": true
+   "size": 274459,
+   "file": "recovered/pmttqffx6lfylc.jpg",
+   "recovered_from": "Screenshot (2295).png"
   },
   {
    "id": "pmttqik1f1rm2b",
@@ -590,8 +598,9 @@
    "src": "screen",
    "imagery": null,
    "dur": null,
-   "size": 271886,
-   "missing": true
+   "size": 271393,
+   "file": "recovered/pmttqik1f1rm2b.jpg",
+   "recovered_from": "Screenshot (2296).png"
   },
   {
    "id": "pmttql5hn6q2dd",
@@ -607,8 +616,9 @@
    "src": "screen",
    "imagery": null,
    "dur": null,
-   "size": 301826,
-   "missing": true
+   "size": 301333,
+   "file": "recovered/pmttql5hn6q2dd.jpg",
+   "recovered_from": "Screenshot (2297).png"
   },
   {
    "id": "pmttqprqz2fhrv",
@@ -624,8 +634,9 @@
    "src": "screen",
    "imagery": null,
    "dur": null,
-   "size": 266672,
-   "missing": true
+   "size": 266181,
+   "file": "recovered/pmttqprqz2fhrv.jpg",
+   "recovered_from": "Screenshot (2298).png"
   },
   {
    "id": "pmttqripjvu70p",
@@ -641,8 +652,9 @@
    "src": "screen",
    "imagery": null,
    "dur": null,
-   "size": 268193,
-   "missing": true
+   "size": 267700,
+   "file": "recovered/pmttqripjvu70p.jpg",
+   "recovered_from": "Screenshot (2299).png"
   }
  ]
 }
