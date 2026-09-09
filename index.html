@@ -205,13 +205,29 @@
     padding:.6rem .75rem; background:var(--ink); color:var(--paper);
     font-family:var(--font-display); font-size:.95rem;}
   .wp-head span{ font-family:var(--font-mono); font-size:.68rem; opacity:.75;}
-  .wp-body{ padding:.6rem .75rem; max-height:60vh; overflow-y:auto;}
+  .wp-body{ padding:.6rem .75rem; max-height:none; overflow-y:auto; flex:1 1 auto;}
+  body.wp-out #walk-panel, #walk-panel{ display:flex; flex-direction:column; }
+  body.wp-out #walk-panel{ display:flex; height:100vh; }
   .wp-body label{ display:block; font-family:var(--font-mono); font-size:.62rem;
     letter-spacing:.09em; text-transform:uppercase; color:var(--muted); margin:.55rem 0 .18rem;}
   .wp-body label i{ font-style:normal; text-transform:none; letter-spacing:0; opacity:.8;}
   .wp-body input, .wp-body select{ width:100%; font:inherit; font-size:.88rem; padding:.36rem .45rem;
     border:1px solid var(--line-strong); border-radius:4px; background:var(--paper);
     color:var(--ink);}
+  #wp-mapwrap{ position:relative; border:1px solid var(--line-strong); border-radius:4px;
+    background:var(--paper); overflow:hidden;}
+  /* fixed height, or the plan grows to the panel's width and pushes every field out of
+     sight -- the point of the panel is that the fields are reachable without scrolling */
+  #wp-map{ display:block; width:100%; height:165px; touch-action:none; cursor:crosshair;}
+  #wp-map .wpp{ fill:var(--ink); fill-opacity:.05; stroke:var(--line-strong); stroke-width:.5;}
+  #wp-map .wpp.done{ fill:var(--sem-veg); fill-opacity:.30; stroke:var(--sem-veg); stroke-width:.7;}
+  #wp-map .wpp.sel{ fill:var(--sem-move); fill-opacity:.55; stroke:var(--ink); stroke-width:1.4;}
+  #wp-map .wpplot{ fill:none; stroke:var(--ink); stroke-width:2; }
+  #wp-zoom{ position:absolute; right:4px; top:4px; display:flex; flex-direction:column; gap:2px;}
+  #wp-zoom button{ font:inherit; font-size:.7rem; line-height:1; width:22px; height:22px;
+    padding:0; border:1px solid var(--line-strong); background:var(--surface); color:var(--ink);
+    border-radius:3px; cursor:pointer;}
+  #wp-zoom button[data-z="all"]{ width:22px; font-size:.55rem;}
   #wp-found{ font-family:var(--font-mono); font-size:.72rem; margin-top:.3rem; color:var(--muted);}
   #wp-found.ok{ color:var(--sem-veg); }
   #wp-found.bad{ color:var(--sem-problem); }
@@ -626,10 +642,15 @@
         <span id="wp-count">0 recorded</span>
       </div>
       <div class="wp-body">
-        <label>Parcel number <i>type it, or paste from the map</i></label>
+        <label>Tap the plot you are looking at</label>
+        <div id="wp-mapwrap">
+          <svg id="wp-map" viewBox="0 0 300 230" preserveAspectRatio="xMidYMid meet"></svg>
+          <div id="wp-zoom"><button type="button" data-z="in">+</button><button type="button" data-z="out">&minus;</button><button type="button" data-z="all">fit</button></div>
+        </div>
+        <div id="wp-found">no parcel chosen</div>
+        <label>or type its number</label>
         <input id="wp-parcel" type="text" inputmode="numeric" list="wp-nums" placeholder="e.g. 2478" autocomplete="off">
         <datalist id="wp-nums"></datalist>
-        <div id="wp-found">no parcel chosen</div>
 
         <label>Storeys</label>
         <select id="wp-storeys"></select>
@@ -3008,12 +3029,90 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         });
         dl.innerHTML = out.sort(function(a, b){ return a - b; })
           .map(function(x){ return '<option value="' + x + '">'; }).join('');
+        buildPlan();
         ready = true;
         return true;
       } catch (e){
         alert('Walk mode could not start: ' + e.message);
         return false;
       }
+    }
+
+    /* ---- the little plan ----
+       Local metres, north up, y flipped for SVG. Held in module scope so panning and
+       zooming only rewrite the viewBox rather than the geometry. */
+    var VB = null, HOME = null;
+    function buildPlan(){
+      var svg = document.getElementById('wp-map');
+      if (!svg) return;
+      var minx = 1e9, miny = 1e9, maxx = -1e9, maxy = -1e9, paths = [];
+      PARCEL_FACES.forEach(function(f, k){
+        var d = '';
+        f.g.forEach(function(pt, n){
+          var x = pt[1] * M_LNG2, y = -pt[0] * M_LAT2;
+          if (x < minx) minx = x; if (x > maxx) maxx = x;
+          if (y < miny) miny = y; if (y > maxy) maxy = y;
+          d += (n ? 'L' : 'M') + x.toFixed(1) + ',' + y.toFixed(1);
+        });
+        paths.push('<path class="wpp" data-i="' + k + '" d="' + d + 'Z"></path>');
+      });
+      var pd = '';
+      (typeof SITE_PLOT !== 'undefined' && SITE_PLOT ? SITE_PLOT : []).forEach(function(pt, n){
+        pd += (n ? 'L' : 'M') + (pt[1] * M_LNG2).toFixed(1) + ',' + (-pt[0] * M_LAT2).toFixed(1);
+      });
+      svg.innerHTML = '<g id="wp-g">' + paths.join('') +
+        (pd ? '<path class="wpplot" d="' + pd + 'Z"></path>' : '') + '</g>';
+      var pad = 12;
+      HOME = [minx - pad, miny - pad, (maxx - minx) + pad * 2, (maxy - miny) + pad * 2];
+      VB = HOME.slice();
+      apply();
+    }
+    function apply(){
+      var svg = el('wp-map');
+      if (svg && VB) svg.setAttribute('viewBox', VB.map(function(v){ return v.toFixed(1); }).join(' '));
+    }
+    function zoom(f, cx, cy){
+      if (!VB) return;
+      cx = (cx === undefined) ? VB[0] + VB[2] / 2 : cx;
+      cy = (cy === undefined) ? VB[1] + VB[3] / 2 : cy;
+      var w = VB[2] * f, h = VB[3] * f;
+      if (w > HOME[2] * 1.4) { w = HOME[2] * 1.4; h = HOME[3] * 1.4; }
+      if (w < 18) { w = 18; h = HOME[3] * (18 / HOME[2]); }
+      VB = [cx - (cx - VB[0]) * (w / VB[2]), cy - (cy - VB[1]) * (h / VB[3]), w, h];
+      apply();
+    }
+    /* screen point -> the plan's own coordinates, so a tap lands where it looks */
+    function toPlan(svg, ev){
+      var r = svg.getBoundingClientRect();
+      return [VB[0] + (ev.clientX - r.left) / r.width * VB[2],
+              VB[1] + (ev.clientY - r.top) / r.height * VB[3]];
+    }
+    function selectParcelIdx(k){
+      chosen = k;
+      var svg = el('wp-map');
+      if (svg) Array.prototype.forEach.call(svg.querySelectorAll('.wpp'), function(p){
+        p.classList.toggle('sel', parseInt(p.getAttribute('data-i'), 10) === k);
+      });
+      var p2 = el('wp-parcel');
+      if (p2) p2.value = (parcelNums(k) || [])[0] || '';
+      showFound();
+    }
+    function markDone(){
+      var svg = el('wp-map');
+      if (!svg) return;
+      var has = {};
+      plots.forEach(function(r){ has[r.parcel] = 1; });
+      Array.prototype.forEach.call(svg.querySelectorAll('.wpp'), function(p){
+        p.classList.toggle('done', !!has[parseInt(p.getAttribute('data-i'), 10)]);
+      });
+    }
+    function showFound(){
+      var f = el('wp-found');
+      if (!f) return;
+      if (chosen < 0){ f.textContent = 'no plot chosen'; f.className = ''; return; }
+      var already = plotsIn(chosen).length;
+      f.textContent = parcelLabel(chosen) + (already ? ' \u00b7 ' + already + ' already recorded' : '');
+      f.className = 'ok';
     }
 
     function lookup(){
@@ -3040,13 +3139,55 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     function clearForm(){
       ['wp-storeys','wp-use','wp-ground','wp-green','wp-gcover','wp-gaccess','wp-cond',
        'wp-note','wp-parcel'].forEach(function(id){ var e = el(id); if (e) e.value = ''; });
-      lookup();
+      var svg = el('wp-map');
+      if (svg) Array.prototype.forEach.call(svg.querySelectorAll('.wpp.sel'), function(p){
+        p.classList.remove('sel'); });
+      chosen = -1;
+      showFound();
     }
 
     /* re-bound whenever the panel changes window: the ids resolve in whichever document
        it currently lives in */
     function wire(){
       var p = el('wp-parcel'); if (p) p.oninput = lookup;
+      var svg = el('wp-map');
+      if (svg){
+        apply(); markDone();
+        var drag = null, moved = 0;
+        svg.onpointerdown = function(ev){
+          drag = toPlan(svg, ev); moved = 0;
+          try { svg.setPointerCapture(ev.pointerId); } catch (e) {}
+        };
+        svg.onpointermove = function(ev){
+          if (!drag) return;
+          var now = toPlan(svg, ev);
+          moved += Math.abs(now[0] - drag[0]) + Math.abs(now[1] - drag[1]);
+          VB[0] -= now[0] - drag[0]; VB[1] -= now[1] - drag[1];
+          apply();
+        };
+        svg.onpointerup = function(ev){
+          try { svg.releasePointerCapture(ev.pointerId); } catch (e) {}
+          drag = null;
+          /* a drag is a pan; only a tap that barely moved is a choice */
+          if (moved > 2) return;
+          var t = ev.target;
+          if (t && t.classList && t.classList.contains('wpp'))
+            selectParcelIdx(parseInt(t.getAttribute('data-i'), 10));
+        };
+        svg.onwheel = function(ev){
+          ev.preventDefault();
+          var pt = toPlan(svg, ev);
+          zoom(ev.deltaY > 0 ? 1.25 : 0.8, pt[0], pt[1]);
+        };
+      }
+      var zc = el('wp-zoom');
+      if (zc) Array.prototype.forEach.call(zc.querySelectorAll('button'), function(bt){
+        bt.onclick = function(){
+          var z = bt.getAttribute('data-z');
+          if (z === 'all'){ VB = HOME.slice(); apply(); }
+          else zoom(z === 'in' ? 0.7 : 1.4);
+        };
+      });
       var c = el('wp-clear');
       if (c) c.onclick = function(){ clearForm(); var l = el('wp-last'); if (l) l.textContent = ''; };
       var sv = el('wp-save');
@@ -3069,7 +3210,8 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         plots.push(out);
         if (!savePlots()){ plots.pop(); return; }
         var l = el('wp-last'); if (l) l.textContent = 'saved to ' + parcelLabel(chosen);
-        clearForm(); count(); rebuildAll();
+        if (typeof askPersist === 'function') askPersist();   /* engagement is higher now */
+        clearForm(); count(); markDone(); rebuildAll();
         if (typeof paintCounts === 'function') paintCounts();
         var pp = el('wp-parcel'); if (pp) pp.focus();
       };
@@ -3086,7 +3228,11 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       host = w;
       styleInto(w.document);
       panel.hidden = false;
-      panel.style.cssText = 'position:static;width:auto;border:none;border-radius:0;box-shadow:none;';
+      /* the panel now lives in the OTHER document, whose body carries no class of ours --
+         so the full-height column that pins Save & next to the bottom is set here, on the
+         element itself, rather than by a body.wp-out rule that cannot reach it */
+      panel.style.cssText = 'position:static;width:auto;border:none;border-radius:0;' +
+        'box-shadow:none;height:100vh;display:flex;flex-direction:column;';
       w.document.body.appendChild(panel);
       document.body.classList.add('wp-out');
       btn.classList.add('tb-on'); btn.textContent = 'Walk on';
@@ -4538,6 +4684,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       /* If it did not save, the sheet stays open -- closing it would look like success and
          the record would be gone at the next reload. */
       if (!savePlots()) return;
+      if (typeof askPersist === 'function') askPersist();     /* engagement is higher now */
       close();
       rebuildAll();
       paintCounts();
@@ -4599,13 +4746,18 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         because "did I export after the second half of the walk?" is not a thing to remember.
      ========================================================== */
   var PERSISTED = null;
+  /* Chrome refuses persistence until a site has some engagement, and engagement at first
+     load is zero -- so asking once, at the moment the answer is most likely to be no, was
+     the wrong moment. It is asked again after every save; by the tenth record the answer
+     often flips, and nothing needs to be explained to anyone for that to happen. */
   function askPersist(){
     if (!navigator.storage || !navigator.storage.persist) return;
     try {
       navigator.storage.persisted().then(function(p){
         if (p){ PERSISTED = true; paintStore(); return; }
-        navigator.storage.persist().then(function(ok){ PERSISTED = !!ok; paintStore(); })
-          .catch(function(){});
+        navigator.storage.persist().then(function(ok){
+          PERSISTED = !!ok; paintStore();
+        }).catch(function(){});
       }).catch(function(){});
     } catch (e) {}
   }
@@ -4702,7 +4854,12 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       bits.push(pend + ' not exported yet' + since);
     }
     else if (picMeta.length || factCount()) bits.push('all exported');
-    if (PERSISTED === false) bits.push('storage NOT protected \u2014 export often');
+    /* Only worth saying while there is something to lose. Before the first record it is
+       a warning about nothing, and a bar that cries wolf gets read as decoration. */
+    var anything = picMeta.length || factCount();
+    if (PERSISTED === false && anything)
+      bits.push('storage not protected \u2014 bookmark this page (or Add to Home Screen) ' +
+                'and the browser will keep it');
     withEstimate(function(e){
       var out = bits.slice();
       if (e && e.quota){
@@ -4714,7 +4871,9 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       }
       if (PERSISTED === true) out.push('storage protected');
       el.textContent = out.join(' \u00b7 ');
-      el.className = 'pic-tally' + ((pend || PERSISTED === false ||
+      /* red means ACT NOW: unexported work, or nearly out of room. Unprotected storage
+         with nothing in it is neither. */
+      el.className = 'pic-tally' + ((pend || (PERSISTED === false && anything) ||
         (e && e.quota && (e.quota - e.usage) < ROOM_MARGIN * 2)) ? ' warn' : '');
       layoutBars();
     });
