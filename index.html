@@ -195,6 +195,34 @@
   .colour-key i.ck-approx{border:1px dashed var(--ink-soft);
     background:color-mix(in srgb, var(--ink) 14%, transparent);}
   @media (max-width:760px){ .colour-key{display:none;} }
+  /* ---- walk mode: sized for a small always-on-top window, not for this page ---- */
+  #walk-panel{ position:fixed; right:.6rem; top:4.4rem; z-index:2200; width:320px;
+    background:var(--surface); border:2px solid var(--ink); border-radius:8px;
+    box-shadow:0 6px 28px rgba(0,0,0,.28); font-family:var(--font-body); overflow:hidden;}
+  #walk-panel[hidden]{ display:none; }
+  body.wp-out #walk-panel{ display:none; }        /* it lives in the other window now */
+  .wp-head{ display:flex; justify-content:space-between; align-items:baseline; gap:.5rem;
+    padding:.6rem .75rem; background:var(--ink); color:var(--paper);
+    font-family:var(--font-display); font-size:.95rem;}
+  .wp-head span{ font-family:var(--font-mono); font-size:.68rem; opacity:.75;}
+  .wp-body{ padding:.6rem .75rem; max-height:60vh; overflow-y:auto;}
+  .wp-body label{ display:block; font-family:var(--font-mono); font-size:.62rem;
+    letter-spacing:.09em; text-transform:uppercase; color:var(--muted); margin:.55rem 0 .18rem;}
+  .wp-body label i{ font-style:normal; text-transform:none; letter-spacing:0; opacity:.8;}
+  .wp-body input, .wp-body select{ width:100%; font:inherit; font-size:.88rem; padding:.36rem .45rem;
+    border:1px solid var(--line-strong); border-radius:4px; background:var(--paper);
+    color:var(--ink);}
+  #wp-found{ font-family:var(--font-mono); font-size:.72rem; margin-top:.3rem; color:var(--muted);}
+  #wp-found.ok{ color:var(--sem-veg); }
+  #wp-found.bad{ color:var(--sem-problem); }
+  .wp-acts{ display:flex; gap:.4rem; padding:.6rem .75rem; border-top:1px solid var(--line);}
+  .wp-acts button{ flex:1; font:inherit; font-size:.86rem; font-weight:600; padding:.5rem;
+    border:1px solid var(--ink); border-radius:5px; background:var(--ink); color:var(--paper);
+    cursor:pointer;}
+  .wp-acts button.wp-quiet{ flex:0 0 auto; background:none; color:var(--ink-soft);
+    border-color:var(--line-strong); font-weight:400;}
+  #wp-last{ padding:0 .75rem .6rem; font-family:var(--font-mono); font-size:.68rem;
+    color:var(--muted); min-height:1em;}
   /* a recorded plot carries its storey count, or a dot if something else was noted */
   .rec-badge{ font-family:var(--font-mono); font-size:11px; font-weight:600; line-height:20px;
     text-align:center; color:var(--paper); background:var(--ink); border-radius:11px;
@@ -563,6 +591,7 @@
     <button class="tb-btn" id="disc-toggle" title="About this map">About</button>
     <button class="tb-btn" id="key-toggle" title="What the colours mean">Key</button>
     <button class="tb-btn" id="sat-toggle" title="Aerial photography under the survey lines">Satellite</button>
+    <button class="tb-btn" id="walk-toggle" title="Float a recording panel above Google Earth">Walk</button>
   <button class="tb-btn" id="notes-toggle" title="Show or hide the notes column">Notes</button>
     <button class="tb-btn tb-field" id="field-toggle" title="Record what you see on site">Field</button>
   </div>
@@ -591,6 +620,41 @@
   <main class="map-shell">
     <div id="map"></div>
     <div class="map-legend" id="map-legend"></div>
+    <div id="walk-panel" hidden>
+      <div class="wp-head">
+        <b>Walk mode</b>
+        <span id="wp-count">0 recorded</span>
+      </div>
+      <div class="wp-body">
+        <label>Parcel number <i>type it, or paste from the map</i></label>
+        <input id="wp-parcel" type="text" inputmode="numeric" list="wp-nums" placeholder="e.g. 2478" autocomplete="off">
+        <datalist id="wp-nums"></datalist>
+        <div id="wp-found">no parcel chosen</div>
+
+        <label>Storeys</label>
+        <select id="wp-storeys"></select>
+        <label>What is it</label>
+        <select id="wp-use"></select>
+        <label>Ground floor</label>
+        <select id="wp-ground"></select>
+        <label>Anything growing</label>
+        <select id="wp-green"></select>
+        <label>How much of the plot</label>
+        <select id="wp-gcover"></select>
+        <label>Can anyone get to it</label>
+        <select id="wp-gaccess"></select>
+        <label>Condition</label>
+        <select id="wp-cond"></select>
+        <label>Which one is it</label>
+        <input id="wp-note" type="text" placeholder="name on the sign, the corner shop…">
+      </div>
+      <div class="wp-acts">
+        <button id="wp-save">Save &amp; next</button>
+        <button id="wp-clear" class="wp-quiet">clear</button>
+      </div>
+      <div id="wp-last"></div>
+    </div>
+
     <div class="colour-key" id="colour-key" hidden>
       <b>What the colours mean — the same on every tab</b>
       <span><i style="background:var(--sem-plot)"></i>the project plot</span>
@@ -2890,6 +2954,180 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
           html: st ? String(st.storeys) : '\u25cf', iconSize:[22,22], iconAnchor:[11,11]})}));
     });
   }
+
+  /* ================== WALK MODE ==================
+     A panel that floats above Google Earth, so the street can be walked on one screen and
+     recorded on the other. Document Picture-in-Picture is the only API that gives a web
+     page a window which stays above a DIFFERENT application; where it is missing a small
+     popup is used, which is still same-origin and the same JS context.
+
+     The panel element is MOVED, never cloned: it keeps its listeners and closures, so a
+     save from the floating window is the same savePlots() as a save from the map.
+
+     Everything is LAZY and wrapped. This block sits above the definitions it needs, so
+     touching them at load time threw and took the page down with it. Nothing runs until
+     the button is pressed. */
+  (function walkMode(){
+    var panel = document.getElementById('walk-panel');
+    var btn = document.getElementById('walk-toggle');
+    if (!panel || !btn) return;
+    var host = null, homeParent = panel.parentNode, ready = false, chosen = -1;
+
+    function doc(){ return host ? host.document : document; }
+    function el(id){ return doc().getElementById(id); }
+
+    function fillSelect(id, list, blank){
+      var sel = document.getElementById(id);
+      if (!sel || !list) return;
+      sel.innerHTML = '<option value="">' + (blank || '\u2014') + '</option>' +
+        list.map(function(x){
+          var k = x.k || x, lab = x.lab || x;
+          return '<option value="' + k + '">' + lab + '</option>';
+        }).join('');
+    }
+
+    /* built on first press, not at load: by then every list and the parcel faces exist */
+    function initOnce(){
+      if (ready) return true;
+      try {
+        fillSelect('wp-use', USES);
+        fillSelect('wp-ground', GROUND);
+        fillSelect('wp-green', GREENS);
+        fillSelect('wp-gcover', GCOVER);
+        fillSelect('wp-gaccess', GACCESS);
+        fillSelect('wp-cond', CONDS);
+        var sel = document.getElementById('wp-storeys');
+        var o = ['<option value="">\u2014</option>'];
+        for (var n = 1; n <= 12; n++) o.push('<option value="' + n + '">' + n + '</option>');
+        o.push('<option value="13+">13 or more</option>');
+        sel.innerHTML = o.join('');
+
+        var dl = document.getElementById('wp-nums'), seen = {}, out = [];
+        PARCEL_FACES.forEach(function(f, k){
+          (parcelNums(k) || []).forEach(function(x){ if (!seen[x]){ seen[x] = 1; out.push(x); } });
+        });
+        dl.innerHTML = out.sort(function(a, b){ return a - b; })
+          .map(function(x){ return '<option value="' + x + '">'; }).join('');
+        ready = true;
+        return true;
+      } catch (e){
+        alert('Walk mode could not start: ' + e.message);
+        return false;
+      }
+    }
+
+    function lookup(){
+      var f = el('wp-found'), p = el('wp-parcel');
+      if (!f || !p) return;
+      var v = String(p.value || '').trim();
+      chosen = -1;
+      if (!v){ f.textContent = 'no parcel chosen'; f.className = ''; return; }
+      for (var k = 0; k < PARCEL_FACES.length; k++){
+        if ((parcelNums(k) || []).map(String).indexOf(v) !== -1){ chosen = k; break; }
+      }
+      if (chosen < 0){ f.textContent = 'parcel ' + v + ' is not in the surveyed frame';
+                       f.className = 'bad'; return; }
+      var already = plotsIn(chosen).length;
+      f.textContent = parcelLabel(chosen) + ' \u00b7 ' +
+        Math.round(PARCEL_FACES[chosen].a).toLocaleString() + ' m\u00b2' +
+        (already ? ' \u00b7 ' + already + ' already recorded' : '');
+      f.className = 'ok';
+    }
+    function count(){
+      var c = el('wp-count');
+      if (c) c.textContent = factCount() + ' recorded';
+    }
+    function clearForm(){
+      ['wp-storeys','wp-use','wp-ground','wp-green','wp-gcover','wp-gaccess','wp-cond',
+       'wp-note','wp-parcel'].forEach(function(id){ var e = el(id); if (e) e.value = ''; });
+      lookup();
+    }
+
+    /* re-bound whenever the panel changes window: the ids resolve in whichever document
+       it currently lives in */
+    function wire(){
+      var p = el('wp-parcel'); if (p) p.oninput = lookup;
+      var c = el('wp-clear');
+      if (c) c.onclick = function(){ clearForm(); var l = el('wp-last'); if (l) l.textContent = ''; };
+      var sv = el('wp-save');
+      if (sv) sv.onclick = function(){
+        var f = el('wp-found');
+        if (chosen < 0){ if (f){ f.textContent = 'pick a parcel first'; f.className = 'bad'; } return; }
+        var v = function(id){ var e = el(id); return e ? e.value : ''; };
+        var out = {id:'w' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
+                   parcel:chosen, storeys:v('wp-storeys'), use:v('wp-use'), ground:v('wp-ground'),
+                   green:v('wp-green'), gcover:v('wp-gcover'), gaccess:v('wp-gaccess'),
+                   cond:v('wp-cond'), note:v('wp-note'), at:null, from:null, t:Date.now(),
+                   when:new Date().toISOString().slice(0, 16).replace('T', ' '),
+                   src:'walk'};   /* a desk record, never mistaken for one made on the ground */
+        if (!out.storeys && !out.use && !out.ground && !out.cond && !out.note &&
+            !out.green && !out.gcover && !out.gaccess){
+          if (f){ f.textContent = 'nothing filled in'; f.className = 'bad'; } return;
+        }
+        var ctr = parcelCenter(chosen);
+        if (ctr) out.at = [ctr.lat, ctr.lng];
+        plots.push(out);
+        if (!savePlots()){ plots.pop(); return; }
+        var l = el('wp-last'); if (l) l.textContent = 'saved to ' + parcelLabel(chosen);
+        clearForm(); count(); rebuildAll();
+        if (typeof paintCounts === 'function') paintCounts();
+        var pp = el('wp-parcel'); if (pp) pp.focus();
+      };
+      count(); lookup();
+    }
+
+    function styleInto(d){
+      Array.prototype.forEach.call(
+        document.querySelectorAll('style, link[rel="stylesheet"]'),
+        function(n){ d.head.appendChild(n.cloneNode(true)); });
+      d.body.style.cssText = 'margin:0;background:var(--ground);';
+    }
+    function moveInto(w){
+      host = w;
+      styleInto(w.document);
+      panel.hidden = false;
+      panel.style.cssText = 'position:static;width:auto;border:none;border-radius:0;box-shadow:none;';
+      w.document.body.appendChild(panel);
+      document.body.classList.add('wp-out');
+      btn.classList.add('tb-on'); btn.textContent = 'Walk on';
+      wire();
+      w.addEventListener('pagehide', bringHome);
+    }
+    function bringHome(){
+      panel.style.cssText = '';
+      if (panel.parentNode !== homeParent) homeParent.appendChild(panel);
+      panel.hidden = true;
+      document.body.classList.remove('wp-out');
+      btn.classList.remove('tb-on'); btn.textContent = 'Walk';
+      host = null;
+      wire();
+    }
+    function popup(){
+      var w = window.open('', 'walk', 'width=360,height=680,menubar=no,toolbar=no');
+      if (!w){
+        panel.hidden = false; btn.classList.add('tb-on'); wire();
+        alert('The browser would not open a floating window, so the panel is pinned to this ' +
+              'page instead. Allow pop-ups for this site to get the always-on-top one.');
+        return;
+      }
+      w.document.title = 'Walk mode \u2014 Entering Beirut';
+      moveInto(w);
+    }
+
+    btn.addEventListener('click', function(){
+      try {
+        if (host){ try { host.close(); } catch (e) {} bringHome(); return; }
+        if (!panel.hidden && panel.parentNode === homeParent){
+          panel.hidden = true; btn.classList.remove('tb-on'); return;
+        }
+        if (!initOnce()) return;
+        if (window.documentPictureInPicture && documentPictureInPicture.requestWindow){
+          documentPictureInPicture.requestWindow({width:360, height:680})
+            .then(moveInto).catch(popup);
+        } else popup();
+      } catch (e){ alert('Walk mode failed to open: ' + e.message); }
+    });
+  })();
 
   /* ---------- tabs ---------- */
   var currentTab = 'cadastral';
