@@ -195,6 +195,11 @@
   .colour-key i.ck-approx{border:1px dashed var(--ink-soft);
     background:color-mix(in srgb, var(--ink) 14%, transparent);}
   @media (max-width:760px){ .colour-key{display:none;} }
+  /* the toolbar button's on-state */
+  .tb-btn.tb-on{background:var(--ink); color:var(--paper); border-color:var(--ink);}
+  /* over photography the thin survey greys disappear, so lift them while it is on */
+  body.sat-on .leaflet-overlay-pane path{ paint-order:stroke; }
+  body.sat-on .parcel-no, body.sat-on .ring-label{ text-shadow:0 0 3px var(--surface), 0 0 6px var(--surface); }
   .map-legend .ml-title{font-family:var(--font-mono); font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); display:block; margin-bottom:.4rem;}
 
   .map-status{position:absolute; inset:0; z-index:900; background:var(--surface); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:.6rem; text-align:center; padding:1.5rem;}
@@ -426,6 +431,10 @@
   /* The brief you carry in one hand. Only in Field mode, and only when asked for, so it
      never sits between you and the map. */
   /* the brief clears whatever bars are up, rather than a fixed 4rem that assumed one bar */
+  .fj-kill{border-left:3px solid var(--layer-environmental); padding-left:.4rem;}
+  .fj-tag{display:inline-block; background:var(--layer-environmental); color:#fff;
+    font-family:var(--font-mono); font-size:.55rem; text-transform:uppercase; letter-spacing:.05em;
+    border-radius:3px; padding:.05rem .25rem; vertical-align:.08rem;}
   .field-jobs{display:none; position:absolute; z-index:1250; left:.6rem; right:.6rem;
     bottom:calc(.6rem + var(--bars, 3.4rem) + .4rem + env(safe-area-inset-bottom)); max-height:58vh; overflow-y:auto;
     background:color-mix(in srgb, var(--surface) 97%, transparent); backdrop-filter:blur(10px);
@@ -549,6 +558,7 @@
     <span class="tb-meta" id="today-stamp"><i>date</i> &mdash;</span>
     <button class="tb-btn" id="disc-toggle" title="About this map">About</button>
     <button class="tb-btn" id="key-toggle" title="What the colours mean">Key</button>
+    <button class="tb-btn" id="sat-toggle" title="Aerial photography under the survey lines">Satellite</button>
   <button class="tb-btn" id="notes-toggle" title="Show or hide the notes column">Notes</button>
     <button class="tb-btn tb-field" id="field-toggle" title="Record what you see on site">Field</button>
   </div>
@@ -968,6 +978,26 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
      making the browser lay out ~1,900 individual SVG paths on every zoom step. */
   var BASE_RENDERER = L.canvas({padding:0.4});
   L.control.scale({metric:true, imperial:false, position:'bottomleft'}).addTo(map);
+
+  /* ---------- aerial photography, under everything ----------
+     The survey is the authority on WHERE; the photograph is only ever evidence of WHAT.
+     So the imagery sits in Leaflet's tilePane, beneath every drawn layer, and it is OFF by
+     default -- nothing about the drawings changes unless it is asked for.
+     Held at 0.62 so the white page still reads through it and the black survey linework
+     stays legible over dark roofs and asphalt. Esri World Imagery: no key, and it is the
+     same basemap family QGIS ships with. */
+  var SAT = L.tileLayer(
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    {maxNativeZoom:19, maxZoom:22, opacity:0.62, crossOrigin:true,
+     attribution:'Imagery &copy; Esri, Maxar, Earthstar Geographics'});
+  var satOn = false;
+  function toggleSat(){
+    satOn = !satOn;
+    if (satOn) SAT.addTo(map); else map.removeLayer(SAT);
+    var b = document.getElementById('sat-toggle');
+    if (b){ b.classList.toggle('tb-on', satOn); b.textContent = satOn ? 'Satellite on' : 'Satellite'; }
+    document.body.classList.toggle('sat-on', satOn);
+  }
 
   function pinIcon(colorVarName, opts){
     opts = opts || {};
@@ -4431,16 +4461,32 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   /* What to collect, ranked by how much it unblocks. Every item names the map it releases,
      because an item with no consequence does not belong on a list you carry in one hand. */
   var FIELD_JOBS = [
-    {id:'storeys', p:1, t:'Storey counts, every building you pass',
+    {id:'storeys', p:1, t:'Storey counts, every building you pass \u2014 each part separately',
      w:'The DWG is planimetric \u2014 no height anywhere in 45,264 entities. This one number blocks Sun &amp; Shadow, Views AND the massing study.',
      m:'Sun \u00b7 Views \u00b7 Massing', how:'Tap a building, use the Building form, count floors. The 2,794 m\u00b2 shed on the north edge first.'},
-    {id:'eastlane', p:1, t:'The 7.8 m lane on the east side \u2014 public, gated or private?',
+    {id:'eastlane', p:1, k:true, t:'The 7.8 m lane on the east side \u2014 public, gated or private?',
      w:'25.4 m of the plot\u2019s only walkable frontage is on it, and the entire arrival argument rests on it being usable.',
      m:'Streets \u00b7 Access', how:'Walk it end to end. Photograph both ends. Note gates, bollards, parked cars, whether anyone else walks it.'},
     {id:'bridge', p:2, t:'The pedestrian bridge \u2014 where does the north end actually land?',
      w:'It is the nearest arrival point to the plot at 75.4 m, but it sits 29.2 m from any public space the survey records, so routed on foot it is not reachable at all.',
      m:'Access', how:'Walk to the bridge, go up the north end, photograph what you step onto and whether you can reach the plot from it without crossing private ground.'},
-    {id:'swtower', p:2, t:'How many storeys is the building 108 m south-west?',
+    {id:'shed', p:2, t:'The 2,794 m\u00b2 shed on the north edge \u2014 how tall, and is its wall blank?',
+     w:'BUFFER is 27.64 m of solid wall against it. Its height decides whether that edge is a blind party wall you build against or something you can see over, and the 2.9 m gap is the only thing between it and us.',
+     m:'Edges \u00b7 Sun \u00b7 The vision',
+     how:'Storeys, any windows or doors on our side, and what is actually in the 2.9 m gap. Use This plot and record it as its own part.'},
+    {id:'crossing', p:2, t:'Does anyone cross the corridor on foot? Where?',
+     w:'The whole severance argument rests on a pedestrian not being able to cross 54.5 m of carriageway at will. If people do cross, where they choose to is the strongest evidence on this site.',
+     m:'Corridor \u00b7 Cut off \u00b7 Access',
+     how:'Stand at the south edge for a few minutes. Photograph anyone crossing where there is no crossing, and note how long they wait. A video is better than a note here.'},
+    {id:'insurance', p:2, t:'All four frontages photographed square-on, and one video round the perimeter',
+     w:'If the east lane turns out to be private, GIVE and CROSS lose their frontage and the public move has to go to another side \u2014 and you will not be coming back. This is what lets the argument be rebuilt in a day instead of a week.',
+     m:'The vision \u00b7 Edges \u00b7 Views',
+     how:'From across the street where you can: north, east, south, west, whole and square-on. Then one video walking the whole perimeter, saying out loud what each side faces.'},
+    {id:'walkbridge', p:3, t:'Time the walk from the bridge landing to the plot',
+     w:'Access says the bridge unlocks 0 m\u00b2 because its landings sit ~44 m from anything walkable. A timed walk is what turns that computed claim into something a jury cannot argue with.',
+     m:'Access \u00b7 Cut off',
+     how:'Start the clock at the landing, walk to the plot the way a person actually would, and say the time into a voice note at the end \u2014 with what you had to cross to do it.'},
+    {id:'swtower', p:2, k:true, t:'How many storeys is the building 108 m south-west?',
      w:'It is the ONLY structure near enough and placed right to shade the plot, and it would need 24.2 m \u2014 about 8 storeys \u2014 to do it. Under that, the plot is unshaded all year.',
      m:'Sun &amp; Shadow', how:'Look south-west from the plot, find the 1,521 m\u00b2 building about 108 m off, count floors. One number settles the whole map.'},
     {id:'sound', p:2, t:'A sound reading at the south edge',
@@ -4455,10 +4501,14 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     {id:'uses', p:3, t:'Ground-floor uses along the east lane and the streets you cross',
      w:'Building Functions currently rests on OpenStreetMap, which this project already showed is unusable on this site.',
      m:'Functions', how:'Ground-floor use form. Name on the sign, category. Quantity beats detail.'},
+    {id:'typology', p:2, t:'How do you get into the buildings here \u2014 and where are the stairs?',
+     w:'The instructor spent a whole desk crit on this and the one thing he criticised was that the stairs to the upper floors had not been looked at. GIVE and CROSS are an access-typology proposal in his own language: threshold, and how you enter. The neighbourhood is full of built precedents for it.',
+     m:'The vision \u00b7 Access \u00b7 Functions',
+     how:'Photograph each way in that you find: straight off the street, through a shop lane, an external staircase off the pavement, a sunken gate, a shared threshold. And find the stairs to the upper floors \u2014 where do they start, and off what?'},
     {id:'views', p:3, t:'A photo out from each plot corner',
      w:'The open sectors are 86\u2013147\u00b0 and 228\u2013280\u00b0; the blocked one is 0\u201336\u00b0. Photographs are what turn that into a view study.',
      m:'Views', how:'Stand at each corner, shoot outward, note the compass bearing if your phone shows it.'},
-    {id:'canopy', p:3, t:'The walled tree canopy, 94 m away \u2014 is the gate open?',
+    {id:'canopy', p:2, k:true, t:'The walled tree canopy, 94 m away \u2014 is the gate open?',
      w:'Green &amp; Water argues the constraint is access to green, not the ability to grow it. That stands or falls on this gate.',
      m:'Green', how:'Greenery form, access field. Photograph the wall and the gate.'},
     {id:'empty', p:4, t:'Is the plot actually empty on the ground?',
@@ -4480,10 +4530,12 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     box.innerHTML = '<div class="fj-head"><b>What to bring back</b>' +
       '<span id="fj-left">' + jobsLeft() + ' of ' + FIELD_JOBS.length + ' left</span>' +
       '<button class="fb-btn fb-quiet" id="fj-close">hide</button></div>' +
-      FIELD_JOBS.map(function(j){
-        return '<label class="fj-row' + (jobsDone[j.id] ? ' fj-done' : '') + '">' +
+      FIELD_JOBS.slice().sort(function(a, b){ return a.p - b.p; }).map(function(j){
+        return '<label class="fj-row' + (jobsDone[j.id] ? ' fj-done' : '') +
+          (j.k ? ' fj-kill' : '') + '">' +
           '<input type="checkbox" data-job="' + j.id + '"' + (jobsDone[j.id] ? ' checked' : '') + '>' +
-          '<span><b>' + j.t + '</b>' +
+          '<span><b>' + (j.k ? '<span class="fj-tag">can overturn the argument</span> ' : '') +
+          j.t + '</b>' +
           '<i>' + j.w + '</i>' +
           '<u>' + j.how + '</u>' +
           '<em>releases: ' + j.m + '</em></span></label>';
@@ -5076,6 +5128,8 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   })();
 
   (function(){
+    var sb = document.getElementById('sat-toggle');
+    if (sb) sb.addEventListener('click', toggleSat);
     var k = document.getElementById('key-toggle'), box = document.getElementById('colour-key');
     if (!k || !box) return;
     k.addEventListener('click', function(){
