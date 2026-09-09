@@ -453,6 +453,25 @@
     background:var(--accent); color:#fff; border:2px solid #fff; border-radius:50%;
     font-family:var(--font-mono); font-size:.72rem; font-weight:700;
     box-shadow:0 1px 5px rgba(0,0,0,.3);}
+  /* Thumbnails, not a gallery. One line, scrolling sideways, so a plot with six shots on
+     it costs the popup the same height as a plot with one. */
+  .pic-strip{display:flex; gap:.25rem; overflow-x:auto; margin:.35rem 0 .1rem; padding-bottom:.15rem;}
+  .pic-strip button{flex:none; padding:0; line-height:0; position:relative; cursor:pointer;
+    border:1px solid var(--line-strong); border-radius:3px; background:var(--surface-2);}
+  .pic-strip img{width:62px; height:44px; object-fit:cover; display:block; border-radius:2px;}
+  .pic-strip .sc{position:absolute; left:2px; bottom:2px; padding:1px 2.5px; border-radius:2px;
+    font-family:var(--font-mono); font-size:.5rem; line-height:1.1;
+    background:var(--sem-problem); color:#fff;}
+  .pic-strip .other{width:62px; height:44px; display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-mono); font-size:.62rem; color:var(--ink-soft);}
+  /* full size, over everything, because the thumbnail is for finding and not for reading */
+  .shot-box{position:fixed; inset:0; z-index:4000; background:rgba(0,0,0,.85); cursor:zoom-out;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.5rem;
+    padding:2vh 2vw;}
+  .shot-box img{max-width:96vw; max-height:82vh; object-fit:contain; border-radius:3px;}
+  .shot-box p{margin:0; text-align:center; font-family:var(--font-mono); font-size:.72rem;
+    color:#fff; max-width:70ch;}
+  .shot-box p.warn{color:#ff9a90;}
   .pic-gal{display:grid; grid-template-columns:1fr 1fr; gap:.3rem; margin:.35rem 0;}
   .pic-cell img{width:100%; border-radius:3px; display:block;}
   .pic-cell span{display:block; font-family:var(--font-mono); font-size:.6rem; color:var(--muted);}
@@ -2983,7 +3002,10 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
      because on a map about vegetation that is the thing being asked. */
   function drawRecords(key){
     var g = groups[key];
-    if (!g || typeof plots === 'undefined' || !plots.length) return;
+    if (!g || typeof plots === 'undefined') return;
+    /* not `!plots.length`: a plot can carry screenshots and no answers yet, and that is
+       still something to draw */
+    if (!plots.length && !picMeta.length) return;
     if (key === 'pictures' || key === 'age') return;   /* those draw their own, richer version */
     if (typeof PARCEL_FACES === 'undefined' || !PARCEL_FACES) return;
 
@@ -2991,6 +3013,13 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     var byParcel = {};
     plots.forEach(function(r){
       if (PARCEL_FACES[r.parcel]) (byParcel[r.parcel] = byParcel[r.parcel] || []).push(r);
+    });
+    /* A plot carrying a screenshot and no answers yet is still something you did. It was
+       invisible on every section but Pictures, which is the one place you would not be
+       looking for it. */
+    picMeta.forEach(function(m){
+      if (m.of || m.parcel === null || m.parcel === undefined) return;
+      if (PARCEL_FACES[m.parcel] && !byParcel[m.parcel]) byParcel[m.parcel] = [];
     });
 
     Object.keys(byParcel).forEach(function(pk){
@@ -3012,19 +3041,32 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         col = cssVar('--accent'); op = 0.18;
       }
 
+      var shots = picMeta.filter(function(m){ return m.parcel === i && !m.of; });
+      var dom = 'rstrip-' + key + '-' + i;
+      var head = recs.length
+        ? 'Recorded on site \u2014 ' + recs.length + ' ' + (recs.length === 1 ? 'record' : 'records') +
+          (shots.length ? ' \u00b7 ' + shots.length + ' ' + kindWord('photo', shots.length) : '')
+        : shots.length + ' ' + kindWord('photo', shots.length) + ' \u2014 nothing recorded yet';
       /* factsHTML is the same list Pictures shows, edit buttons and all -- so a record can
          be corrected from whichever section you happened to spot the mistake in, and there
-         is one editor to keep right rather than two that drift. */
-      g.addLayer(L.polygon(f.g, {color:col, weight:1.8, opacity:.95, dashArray:dash,
-        fillColor:col, fillOpacity:op})
-        .bindPopup('<h4>Recorded on site \u2014 ' + recs.length + ' ' +
-          (recs.length === 1 ? 'record' : 'records') + '</h4>' +
-          'On ' + parcelLabel(i) + '.' + factsHTML(i) +
+         is one editor to keep right rather than two that drift. The shots go in as a strip
+         of thumbnails rather than the full gallery, so the popup keeps its size. */
+      var lay = L.polygon(f.g, {color:col, weight:1.8, opacity:.95, dashArray:dash,
+        fillColor:col, fillOpacity:op});
+      lay.bindPopup(function(){
+        return '<h4>' + head + '</h4>' + 'On ' + parcelLabel(i) + '.' +
+          (recs.length ? factsHTML(i)
+                       : '<button class="save-btn" onclick="addPlot(' + i + ')">' +
+                         'Storeys and use \u2014 record them</button>') +
+          (shots.length ? '<div class="pic-strip" id="' + dom + '"></div>' : '') +
           '<span class="src">Yours, from the walk. The parcel face is the professor\u2019s ' +
-          'survey; everything inside it is what you saw.</span>'));
+          'survey; everything inside it is what you saw.</span>';
+      });
+      lay.on('popupopen', function(){ if (shots.length) fillStrip(dom, shots); });
+      g.addLayer(lay);
 
       /* every tag written on the plot, so the map can be read instead of remembered */
-      var ic = recTagsIcon(recs), c = parcelCenter(i);
+      var ic = recTagsIcon(recs, {shots:shots.length}), c = parcelCenter(i);
       if (c && ic) g.addLayer(L.marker(c, {interactive:false, zIndexOffset:1200, icon:ic}));
     });
   }
@@ -4903,6 +4945,9 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     });
     if (recs.length > 1) out.push('<span class="chip t-soft" title="' + recs.length +
       ' parts recorded on this plot">' + recs.length + ' parts</span>');
+    /* where there is imagery, so a plot you have shot but not yet described still reads */
+    if (opt.shots) out.push('<span class="chip t-soft" title="' + opt.shots +
+      ' recorded on this plot">' + opt.shots + ' \u25a3</span>');
     return out;
   }
   /* iconSize [0,0] with the transform on an INNER div: Leaflet positions the icon element
@@ -5398,6 +5443,72 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
               + 'street — they are evidence of the imagery date, not of today.</span>' : '')
         : '');
   }
+  /* What a shot is evidence OF, in one line, wherever it is shown. Written once so the
+     thumbnail, the lightbox and the gallery cannot drift apart on the one thing that must
+     not be got wrong. */
+  function shotProv(m){
+    return m.src === 'screen'
+      ? 'From the screen, not the street ' + '\u00b7 imagery ' + (m.imagery || 'date not noted')
+      : 'Taken on site';
+  }
+  function fillStrip(dom, shots){
+    setTimeout(function(){
+      var box = document.getElementById(dom);
+      if (!box) return;
+      box.innerHTML = '';
+      shots.forEach(function(m){
+        var kind = mediaKind(m);
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.title = shotProv(m) + ' \u00b7 ' + m.when;
+        if (kind === 'photo'){
+          var im = document.createElement('img');
+          im.alt = '';
+          b.appendChild(im);
+          picGet(m.id, function(src){
+            if (src) im.src = src;
+            else { b.innerHTML = '<span class="other">missing</span>'; }
+          });
+        } else {
+          var o = document.createElement('span');
+          o.className = 'other';
+          o.textContent = kind === 'video' ? '\u25b6 clip' : '\u266a note';
+          b.appendChild(o);
+        }
+        if (m.src === 'screen'){
+          var t = document.createElement('span');
+          t.className = 'sc'; t.textContent = 'screen';
+          b.appendChild(t);
+        }
+        b.addEventListener('click', function(){ showShot(m); });
+        box.appendChild(b);
+      });
+    }, 40);
+  }
+  /* Full size in the main document, never in the popup: the popup is sized to be read. */
+  function showShot(m){
+    var old = document.querySelector('.shot-box');
+    if (old) old.remove();
+    var box = document.createElement('div');
+    box.className = 'shot-box';
+    box.addEventListener('click', function(){ box.remove(); });
+    picGet(m.id, function(src){
+      var kind = mediaKind(m);
+      if (src && kind === 'photo'){
+        var im = document.createElement('img'); im.src = src; im.alt = ''; box.appendChild(im);
+      } else if (src && kind === 'video'){
+        var v = document.createElement('video'); v.src = src; v.controls = true;
+        v.style.maxWidth = '96vw'; v.style.maxHeight = '82vh'; box.appendChild(v);
+      } else if (src){
+        var a = document.createElement('audio'); a.src = src; a.controls = true; box.appendChild(a);
+      }
+      var p = document.createElement('p');
+      p.textContent = shotProv(m) + ' \u00b7 ' + m.when;
+      if (m.src === 'screen') p.className = 'warn';
+      box.appendChild(p);
+    });
+    document.body.appendChild(box);
+  }
   function fillGallery(dom, shots){
     setTimeout(function(){
       var box = document.getElementById(dom);
@@ -5428,8 +5539,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     if (m.src === 'screen'){
       var prov = document.createElement('span');
       prov.className = 'pc-desk';
-      prov.textContent = 'from the screen, not the street' +
-        (m.imagery ? ' \u00b7 imagery ' + m.imagery : ' \u00b7 imagery date not noted');
+      prov.textContent = shotProv(m);
       d.appendChild(prov);
     }
     var acts = document.createElement('div');
