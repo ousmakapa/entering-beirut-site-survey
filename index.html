@@ -5440,6 +5440,10 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
      anything. Delete recovered-2026-09-09.json from the site to switch it off. */
   function autoRecover(){
     if (plots.length || picMeta.length) return;
+    /* Only where a fetch can work. On the file:// working copy it cannot, and the browser
+       logs a network error the try/catch never sees -- which would leave a console error in
+       every audit from here on, and a dirty audit hides the next real one. */
+    if (location.protocol !== 'http:' && location.protocol !== 'https:') return;
     var url = 'recovered-2026-09-09.json';
     try {
       fetch(url, {cache:'no-store'}).then(function(r){
