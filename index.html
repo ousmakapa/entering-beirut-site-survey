@@ -4448,7 +4448,21 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     if (!el) return;
     var bits = [];
     var pend = unexported();
-    if (pend) bits.push(pend + ' not exported yet');
+    if (pend){
+      var since = '';
+      try {
+        var last = parseInt(localStorage.getItem(EXPORT_KEY) || '0', 10);
+        if (last){
+          var mins = Math.round((Date.now() - last) / 60000);
+          since = mins < 1 ? ' \u00b7 exported just now'
+                : mins < 60 ? ' \u00b7 ' + mins + ' min since the last export'
+                : ' \u00b7 ' + Math.floor(mins / 60) + ' h since the last export';
+        } else {
+          since = ' \u00b7 NEVER EXPORTED';
+        }
+      } catch (e) {}
+      bits.push(pend + ' not exported yet' + since);
+    }
     else if (picMeta.length || factCount()) bits.push('all exported');
     if (PERSISTED === false) bits.push('storage NOT protected \u2014 export often');
     withEstimate(function(e){
@@ -5121,6 +5135,30 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     a.click();
     setTimeout(function(){ try { URL.revokeObjectURL(a.href); } catch (e) {} }, 30000);
   }
+  /* On a phone a download lands in the phone's own Downloads folder, which is still the
+     phone. The share sheet is the only route off it that does not need a cable, so try
+     that first and fall back to the download everywhere it is not offered.
+     If the share is dismissed the download still runs, because a cancelled share must
+     never be the reason a morning's work stayed on one device. */
+  function deliver(blob, name, done){
+    done = done || function(){};
+    var file = null;
+    try { file = new File([blob], name, {type: blob.type || 'application/octet-stream'}); }
+    catch (e) { file = null; }
+    if (file && navigator.canShare && navigator.share) {
+      var payload = {files:[file], title:name,
+                     text:'Bourj Hammoud field survey \u2014 ' + name};
+      var can = false;
+      try { can = navigator.canShare(payload); } catch (e) { can = false; }
+      if (can) {
+        navigator.share(payload).then(function(){ done(true); })
+          .catch(function(){ download(blob, name); done(true); });
+        return;
+      }
+    }
+    download(blob, name);
+    done(false);
+  }
   /* One download has to be something a phone can actually finish writing, and a walk with video
      in it will not be one file. So the export splits into parts of about 350 MB, each carrying
      its own survey.json, and the button counts them down. Nothing is marked as backed up until
@@ -5204,7 +5242,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     try {
       makeZip(part.files, function(zip){
         if (!zip || !zip.size){ exportQueue = null; return exportJSON(part.stamp, btn); }
-        download(zip, name);
+        deliver(zip, name);
         if (exportQueue.length){
           if (btn) btn.textContent = 'Export ' + (part.n + 1) + ' of ' + part.of;
         } else {
@@ -5227,8 +5265,8 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
                  count:field.records.length, records:field.records,
                  photoCount:pics.length, photos:pics, images:imgs,
                  plots:(typeof plots !== 'undefined' ? plots : [])};
-      download(new Blob([JSON.stringify(out, null, 1)], {type:'application/json'}),
-               'field-survey-' + stamp + '.json');
+      deliver(new Blob([JSON.stringify(out, null, 1)], {type:'application/json'}),
+              'field-survey-' + stamp + '.json');
       if (btn) btn.textContent = 'Export';
     }
     if (!left) return finish();
