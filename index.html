@@ -195,6 +195,10 @@
   .colour-key i.ck-approx{border:1px dashed var(--ink-soft);
     background:color-mix(in srgb, var(--ink) 14%, transparent);}
   @media (max-width:760px){ .colour-key{display:none;} }
+  /* a recorded plot carries its storey count, or a dot if something else was noted */
+  .rec-badge{ font-family:var(--font-mono); font-size:11px; font-weight:600; line-height:20px;
+    text-align:center; color:var(--paper); background:var(--ink); border-radius:11px;
+    border:1.5px solid var(--paper); box-shadow:0 1px 4px rgba(0,0,0,.3); }
   /* the toolbar button's on-state */
   .tb-btn.tb-on{background:var(--ink); color:var(--paper); border-color:var(--ink);}
   /* over photography the thin survey greys disappear, so lift them while it is on */
@@ -2807,6 +2811,84 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     })();
 
     // The Survey tab uses the same shared base as every other section — see addBase().
+
+    /* ---------- what YOU recorded, on every section ----------
+       Deliberately NOT gated on SHOW. SHOW controls the inferred analysis; these are your
+       own observations, and an emptied section showing what you recorded on it is the
+       whole reason for emptying it. */
+    TABS.forEach(function(t){ drawRecords(t.key); });
+  }
+
+  /* A record is drawn on the parcel it belongs to: the parcel filled in the colour of what
+     you said it is, and a badge carrying the storey count. Greenery overrides the fill,
+     because on a map about vegetation that is the thing being asked. */
+  function drawRecords(key){
+    var g = groups[key];
+    if (!g || typeof plots === 'undefined' || !plots.length) return;
+    if (key === 'pictures' || key === 'age') return;   /* those draw their own, richer version */
+    if (typeof PARCEL_FACES === 'undefined' || !PARCEL_FACES) return;
+
+    var COVER = {corner:0.20, quarter:0.32, half:0.48, most:0.68};
+    var byParcel = {};
+    plots.forEach(function(r){
+      if (PARCEL_FACES[r.parcel]) (byParcel[r.parcel] = byParcel[r.parcel] || []).push(r);
+    });
+
+    Object.keys(byParcel).forEach(function(pk){
+      var i = parseInt(pk, 10), recs = byParcel[pk], f = PARCEL_FACES[i];
+      if (!f) return;
+      /* the record that decides the fill: greenery first, then use */
+      var gr = recs.filter(function(r){ return r.green && r.green !== 'none'; })[0];
+      var ur = recs.filter(function(r){ return r.use; })[0];
+      var col, op, dash = null;
+      if (gr){
+        col = cssVar('--sem-veg');
+        op = COVER[gr.gcover] || 0.24;
+        if (gr.gaccess && gr.gaccess !== 'open' && gr.gaccess !== 'gated') dash = '5 4';
+      } else if (ur){
+        var u = (typeof useOf === 'function' && useOf(ur.use)) || null;
+        col = cssVar(u ? u.c : '--accent');
+        op = 0.34;
+      } else {
+        col = cssVar('--accent'); op = 0.18;
+      }
+
+      var lines = recs.map(function(r){
+        var bits = [];
+        if (r.storeys) bits.push('<b>' + r.storeys + '</b> storeys');
+        var u2 = (typeof useOf === 'function' && useOf(r.use)) || null;
+        if (u2) bits.push(u2.lab);
+        if (r.ground) bits.push('ground: ' + r.ground);
+        if (r.cond) bits.push(r.cond.toLowerCase());
+        var gk = (typeof greenOf === 'function' && greenOf(r.green)) || null;
+        if (gk && r.green !== 'none'){
+          var gtxt = gk.lab;
+          if (r.gcover) gtxt += ', ' + ({corner:'a corner', quarter:'about a quarter',
+                                        half:'about half', most:'most'}[r.gcover] || r.gcover);
+          if (r.gaccess) gtxt += ' \u2014 ' + ({open:'open to anyone', gated:'gated but visible',
+                                walled:'walled off', private:'private'}[r.gaccess] || r.gaccess);
+          bits.push(gtxt);
+        }
+        return '<div style="margin:.35rem 0">' + (bits.join(' &middot; ') || 'recorded') +
+               (r.note ? '<br><i>\u201c' + r.note + '\u201d</i>' : '') +
+               (r.when ? '<br><span style="opacity:.6">' + r.when + '</span>' : '') + '</div>';
+      }).join('');
+
+      g.addLayer(L.polygon(f.g, {color:col, weight:1.8, opacity:.95, dashArray:dash,
+        fillColor:col, fillOpacity:op})
+        .bindPopup('<h4>Recorded on site \u2014 ' + recs.length + ' ' +
+          (recs.length === 1 ? 'record' : 'records') + '</h4>' +
+          'On ' + parcelLabel(i) + '.' + lines +
+          '<span class="src">Yours, from the walk. The parcel face is the professor\u2019s ' +
+          'survey; everything inside it is what you saw.</span>'));
+
+      /* the badge: storeys if counted, otherwise a tick that something is known here */
+      var st = recs.filter(function(r){ return r.storeys; })[0];
+      var c = parcelCenter(i);
+      if (c) g.addLayer(L.marker(c, {interactive:false, zIndexOffset:1200,
+        icon:L.divIcon({className:'rec-badge',
+          html: st ? String(st.storeys) : '\u25cf', iconSize:[22,22], iconAnchor:[11,11]})}));
+    });
   }
 
   /* ---------- tabs ---------- */
@@ -3962,8 +4044,26 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
      face can carry as many parts as it actually has. */
   var PLOTS_KEY = 'studio7Plots';
   var FACTS_KEY = 'studio7ParcelFacts';   /* the old per-parcel shape, read once, never written */
+  var PLOTS_BAK = 'studio7Plots_bak';    /* a second copy, so one bad write cannot end it */
   var plots = [];
+  function mergePlots(a, b){
+    /* union by id; when both have the same record, the later-saved one wins */
+    var by = {};
+    (a || []).concat(b || []).forEach(function(r){
+      if (!r || !r.id) return;
+      var cur = by[r.id];
+      if (!cur || (r.t || 0) >= (cur.t || 0)) by[r.id] = r;
+    });
+    return Object.keys(by).map(function(k){ return by[k]; });
+  }
   try { plots = JSON.parse(localStorage.getItem(PLOTS_KEY) || '[]'); } catch (e) { plots = []; }
+  if (!Array.isArray(plots)) plots = [];
+  /* If the primary is short or corrupt -- a failed write, a partial clear -- the backup
+     copy is taken instead. Never fewer records than the most complete copy we hold. */
+  try {
+    var _bak = JSON.parse(localStorage.getItem(PLOTS_BAK) || '[]');
+    if (Array.isArray(_bak) && _bak.length) plots = mergePlots(plots, _bak);
+  } catch (e) {}
   (function migrateFacts(){
     if (plots.length) return;
     var old = {};
@@ -3978,10 +4078,54 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     /* The old key is left exactly as it was. If anything here is wrong it is still there. */
     if (plots.length) savePlots();
   })();
+  /* Three copies and a read-back. Records are text and tiny -- a thousand of them is
+     well under a megabyte -- so the cost of redundancy here is nothing, and the cost of
+     losing a morning's fieldwork is a morning. */
   function savePlots(){
-    try { localStorage.setItem(PLOTS_KEY, JSON.stringify(plots)); return true; }
-    catch (e){ alert('Out of storage for plot records. Export, then Clear.'); return false; }
+    var json;
+    try { json = JSON.stringify(plots); }
+    catch (e){ alert('Could not encode the records. Nothing was saved. Export now.'); return false; }
+
+    var ok = false;
+    try { localStorage.setItem(PLOTS_KEY, json); ok = true; } catch (e) { ok = false; }
+
+    /* verify: a write that throws nothing can still have stored nothing */
+    if (ok){
+      try {
+        var back = JSON.parse(localStorage.getItem(PLOTS_KEY) || 'null');
+        ok = Array.isArray(back) && back.length === plots.length;
+      } catch (e) { ok = false; }
+    }
+
+    /* second copy, different key -- survives the primary being corrupted */
+    try { localStorage.setItem(PLOTS_BAK, json); } catch (e) {}
+    /* third copy in IndexedDB -- far more room, and it is where the photographs already are,
+       so a browser that keeps the photos keeps the records with them */
+    try { picPut('plots-backup', json, function(){}); } catch (e) {}
+
+    if (!ok) alert('THE RECORD DID NOT SAVE.\n\nDo not close this. Export what you have now, ' +
+                   'then try again. Storage may be full.');
+    return ok;
   }
+  /* Late recovery: IndexedDB answers asynchronously, so if it holds records that neither
+     localStorage copy has, they are merged in when it replies and the map redraws. */
+  (function recoverPlots(){
+    try {
+      picGet('plots-backup', function(json){
+        if (!json) return;
+        var idb;
+        try { idb = JSON.parse(json); } catch (e) { return; }
+        if (!Array.isArray(idb) || !idb.length) return;
+        var before = plots.length;
+        plots = mergePlots(plots, idb);
+        if (plots.length > before){
+          try { localStorage.setItem(PLOTS_KEY, JSON.stringify(plots)); } catch (e) {}
+          if (typeof rebuildAll === 'function') rebuildAll();
+          if (typeof paintCounts === 'function') paintCounts();
+        }
+      });
+    } catch (e) {}
+  })();
   function factCount(){ return plots.length; }
   function plotsIn(i){ return plots.filter(function(r){ return r.parcel === i; }); }
   function plotById(id){ return plots.filter(function(r){ return r.id === id; })[0] || null; }
@@ -4153,7 +4297,9 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         close(); return;                       /* an empty form is a cancel, not a record */
       }
       if (!rec) plots.push(out);
-      savePlots();
+      /* If it did not save, the sheet stays open -- closing it would look like success and
+         the record would be gone at the next reload. */
+      if (!savePlots()) return;
       close();
       rebuildAll();
       paintCounts();
