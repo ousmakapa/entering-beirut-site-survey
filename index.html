@@ -805,6 +805,9 @@
       <button class="fb-btn" id="pic-enable">Enable</button>
       <button class="fb-btn" id="pic-attach" hidden>+ note on that</button>
       <button class="fb-btn" id="pic-recover" hidden>Restore found files</button>
+      <button class="fb-btn" id="pic-import">Restore from file</button>
+      <button class="fb-btn" id="pic-keep">Keep a backup file</button>
+      <input type="file" accept="application/json,.json" id="pic-import-input" hidden>
       <span class="pic-tally" id="pic-tally">nothing recorded yet</span>
       <span class="pic-tally" id="pic-store"></span>
     </div>
@@ -4656,6 +4659,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
        orphaned, and the sweep on the next open offers it back. Say so rather than failing mute. */
     if (!savePicMeta()) alert('The file is stored but its record could not be saved. Export now; ' +
                               'reopening this section will offer the file back.');
+    writeBackup();
     rebuildAll();
     paintCounts();
     /* The moment straight after a shot is the only moment you still remember why you took it,
@@ -4782,6 +4786,8 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
 
     /* second copy, different key -- survives the primary being corrupted */
     try { localStorage.setItem(PLOTS_BAK, json); } catch (e) {}
+    /* the only copy that is not site data, and so the only one the browser cannot drop */
+    try { writeBackup(); } catch (e) {}
     /* third copy in IndexedDB -- far more room, and it is where the photographs already are,
        so a browser that keeps the photos keeps the records with them */
     try { picPut('plots-backup', json, function(){}); } catch (e) {}
@@ -5285,6 +5291,112 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     });
   }
   /* ---- what has not left the phone yet ---- */
+  /* ---------- restoring, and a backup that does not live in the browser ----------
+     Site data is the one thing the browser may delete without asking, and it did: an entire
+     morning's survey went when Chrome dropped this origin's storage overnight. Export alone
+     was never enough, because an export you cannot read back is not a backup. */
+  function mergeRecords(data){
+    var plotsIn = [], metaIn = [];
+    if (Array.isArray(data)) {
+      /* a bare array: decide which store it belongs to by what the records carry */
+      (data[0] && (data[0].kind || data[0].mime)) ? (metaIn = data) : (plotsIn = data);
+    } else if (data && typeof data === 'object') {
+      plotsIn = data.plots || data.studio7Plots || [];
+      metaIn = data.media || data.picMeta || data.studio7PhotoMeta || [];
+    }
+    var have = {}, added = 0, skipped = 0;
+    plots.forEach(function(r){ have[r.id] = 1; });
+    plotsIn.forEach(function(r){
+      if (!r || !r.id) return;
+      /* merge, never replace: a restore must not be able to destroy what is already here */
+      if (have[r.id]) { skipped++; return; }
+      have[r.id] = 1; plots.push(r); added++;
+    });
+    var haveM = {}, addedM = 0, skippedM = 0;
+    picMeta.forEach(function(m){ haveM[m.id] = 1; });
+    metaIn.forEach(function(m){
+      if (!m || !m.id) return;
+      if (haveM[m.id]) { skippedM++; return; }
+      haveM[m.id] = 1;
+      m.missing = true;           /* the record is back; the file behind it may not be */
+      picMeta.push(m); addedM++;
+    });
+    var okP = added ? savePlots() : true;
+    var okM = addedM ? savePicMeta() : true;
+    rebuildAll(); paintCounts();
+    return {added:added, skipped:skipped, addedM:addedM, skippedM:skippedM,
+            saved:(okP && okM)};
+  }
+  window.restoreFromFile = function(file){
+    var r = new FileReader();
+    r.onload = function(){
+      var data;
+      try { data = JSON.parse(r.result); }
+      catch (e) { alert('That file is not readable JSON:\n' + e.message); return; }
+      var out = mergeRecords(data);
+      if (!out.saved){
+        alert('Restored into the page, but the write to storage FAILED. Do not close this ' +
+              'tab: use Keep a backup file, or Export, before you do anything else.');
+        return;
+      }
+      alert('Restored.\n\n' +
+            out.added + ' survey record' + (out.added === 1 ? '' : 's') + ' added' +
+            (out.skipped ? ', ' + out.skipped + ' already here' : '') + '.\n' +
+            (out.addedM ? out.addedM + ' media record' + (out.addedM === 1 ? '' : 's') +
+                          ' added \u2014 their files are not in this restore, so they are ' +
+                          'marked as missing.\n' : '') +
+            '\nNothing was overwritten: records already present were left alone.');
+    };
+    r.onerror = function(){ alert('That file could not be read.'); };
+    r.readAsText(file);
+  };
+
+  /* A real file on disk, written after every save. Documents is not site data, so nothing
+     the browser does to this origin can touch it. Chrome desktop only -- on a phone the
+     button falls back to an export and says so. */
+  var backupHandle = null;
+  function backupSupported(){ return typeof window.showSaveFilePicker === 'function'; }
+  function backupPayload(){
+    return JSON.stringify({
+      what:'Entering Beirut \u2014 field survey backup',
+      when:new Date().toISOString(),
+      plots:plots, media:picMeta
+    }, null, 1);
+  }
+  function writeBackup(){
+    if (!backupHandle) return;
+    try {
+      backupHandle.createWritable().then(function(w){
+        return w.write(backupPayload()).then(function(){ return w.close(); });
+      }).then(function(){
+        var el = document.getElementById('pic-keep');
+        if (el) el.textContent = 'Backup file \u2713';
+      }).catch(function(){
+        backupHandle = null;
+        var el = document.getElementById('pic-keep');
+        if (el) el.textContent = 'Keep a backup file';
+      });
+    } catch (e) { backupHandle = null; }
+  }
+  window.chooseBackupFile = function(){
+    if (!backupSupported()){
+      alert('This browser cannot write to a file on its own \u2014 that is desktop Chrome only.\n\n' +
+            'On a phone, use Export instead, and do it often. Anything that is only in the ' +
+            'browser can be deleted by the browser.');
+      return;
+    }
+    window.showSaveFilePicker({
+      suggestedName:'entering-beirut-survey-backup.json',
+      types:[{description:'Survey backup', accept:{'application/json':['.json']}}]
+    }).then(function(h){
+      backupHandle = h;
+      writeBackup();
+      alert('Backup file set.\n\nEvery record from now on is written straight to that file as ' +
+            'well as into the browser. A file on your disk is not site data, so nothing the ' +
+            'browser does can remove it.\n\nPick it again after each time you reopen the page.');
+    }).catch(function(){});
+  };
+
   var EXPORT_KEY = 'studio7LastExport';
   var lastExport = 0;
   try { lastExport = parseInt(localStorage.getItem(EXPORT_KEY) || '0', 10) || 0; } catch (e) {}
@@ -6324,6 +6436,16 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       askPersist();          /* opt out of eviction from inside a real tap */
     });
     document.getElementById('pic-recover').addEventListener('click', restoreOrphans);
+    var imp = el('pic-import'), impIn = el('pic-import-input');
+    if (imp && impIn){
+      imp.addEventListener('click', function(){ impIn.click(); });
+      impIn.addEventListener('change', function(){
+        if (impIn.files && impIn.files[0]) restoreFromFile(impIn.files[0]);
+        impIn.value = '';
+      });
+    }
+    var keep = el('pic-keep');
+    if (keep) keep.addEventListener('click', chooseBackupFile);
     shoot.addEventListener('click', function(){ startFix(); inp.click(); });
     vid.addEventListener('click', function(){ startFix(); vinp.click(); });
     voi.addEventListener('click', function(){ startFix(); startVoice(null); });
