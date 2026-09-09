@@ -523,6 +523,13 @@
     border-radius:6px; padding:.3rem .4rem; margin-bottom:.2rem;}
   .pf-warn{color:var(--layer-environmental); border-left:2px solid var(--layer-environmental);}
   /* a part carries its use as its colour, so a street reads at a glance */
+  /* Not a line in a bar. The one thing that lost a morning's work was a warning nobody
+     could be expected to read, so this cannot be read past. */
+  .pic-alarm{ position:absolute; left:.6rem; right:.6rem; z-index:1400;
+    background:var(--sem-problem); color:#fff; padding:.6rem .8rem; border-radius:6px;
+    font-size:.82rem; line-height:1.45; box-shadow:0 4px 18px rgba(0,0,0,.3);}
+  .pic-alarm b{ display:block; font-size:.9rem; margin-bottom:.15rem;}
+  .pic-alarm i{ font-style:normal; opacity:.9;}
   /* only on screen while the survey is empty */
   .pic-rescue{ font-family:var(--font-mono); font-size:.68rem; cursor:pointer;
     padding:.2rem .45rem; border:1px dashed var(--line-strong); border-radius:4px;
@@ -682,6 +689,12 @@
     text-align:center; color:var(--ink-soft); white-space:nowrap;
     text-shadow:0 0 3px var(--surface), 0 0 3px var(--surface), 0 0 3px var(--surface); }
 </style>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/plot-192.png">
+  <link rel="apple-touch-icon" href="icons/plot-180.png">
+  <meta name="theme-color" content="#15171A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Entering Beirut">
 </head>
 <body>
 
@@ -815,6 +828,7 @@
       <span class="pic-tally" id="pic-tally">nothing recorded yet</span>
       <span class="pic-tally" id="pic-store"></span>
     </div>
+    <div class="pic-alarm" id="pic-alarm" hidden></div>
     <div class="pic-sheet" id="pic-sheet"></div>
     <div class="iso-bar" id="iso-bar">
       <button class="fb-btn fb-primary" id="iso-play">Watch the walk</button>
@@ -5400,8 +5414,10 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     try {
       download(new Blob([backupPayload()], {type:'application/json'}), name);
       bkAt = Date.now(); bkCount = n; bkNote();
-      /* the line must not go stale on screen: a backup that landed has to show */
+      /* the line must not go stale on screen, and the alarm has to come down: a backup that
+         landed is the whole reason the alarm was up */
       if (typeof paintCounts === 'function') paintCounts();
+      if (typeof paintRescue === 'function') paintRescue();
     } catch (e) {}
   }
   /* debounced, so a burst of saves is one file and not five */
@@ -5423,6 +5439,19 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   /* Closing the tab, locking the phone, switching apps: whatever is unsaved to disk goes now.
      There is no user activation here, so it only lands once the browser has been told this
      site may write more than one file -- which the saves above will already have done. */
+  /* Opening with records newer than the last backup means the previous session ended
+     without one. A download needs user activation, so it goes on the first click. */
+  function catchUpOnce(){
+    function go(){
+      document.removeEventListener('pointerdown', go, true);
+      document.removeEventListener('keydown', go, true);
+      if (bkTotal() > bkCount) backupNow('catch-up');
+    }
+    if (bkTotal() > bkCount){
+      document.addEventListener('pointerdown', go, true);
+      document.addEventListener('keydown', go, true);
+    }
+  }
   function backupOnLeave(){
     if (bkTimer){ clearTimeout(bkTimer); bkTimer = null; }   /* no time to wait out a debounce */
     if (bkTotal() > bkCount) backupNow('hide');
@@ -5529,8 +5558,27 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
      is the only moment it is any use, and disappears the instant there is anything to lose. */
   function paintRescue(){
     var r = document.getElementById('pic-rescue');
-    if (!r) return;
-    r.hidden = bkTotal() > 0;
+    if (r) r.hidden = bkTotal() > 0;
+    paintAlarm();
+  }
+  /* A blocked download looks exactly like a successful one from here, so the only way to
+     catch a refusal is to state, loudly, that no file has ever been written. */
+  function paintAlarm(){
+    var a = document.getElementById('pic-alarm');
+    if (!a) return;
+    var n = bkTotal();
+    var show = n > 0 && !bkAt;
+    a.hidden = !show;
+    if (!show) return;
+    a.innerHTML = '<b>Nothing has been backed up yet.</b>' +
+      '<i>This page saves a copy of the survey to your Downloads folder by itself. If Chrome ' +
+      'asked <b>&ldquo;Allow multiple downloads?&rdquo;</b> and it was blocked, that is why &mdash; ' +
+      'allow it from the icon at the right of the address bar. Everything here lives only in ' +
+      'this browser until a file lands.</i>';
+    /* layoutBars() already measures the bar into --picbar, and measuring it again here ran
+       before it had been laid out: offsetHeight was 0 and the alarm sat on top of the
+       buttons it is telling you about. */
+    a.style.bottom = 'calc(var(--picbar, 0px) + 12px + env(safe-area-inset-bottom))';
   }
 
   var EXPORT_KEY = 'studio7LastExport';
@@ -5589,8 +5637,9 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     /* Bookmarking was never going to be enough, and saying so was the advice that lost a
        morning's work. The browser keeping it is a bonus now, not the plan. */
     if (PERSISTED === false && anything)
-      bits.push('the browser has NOT promised to keep its own copy \u2014 the file in your ' +
-                'Downloads folder is the one that matters');
+      bits.push('the browser has NOT promised to keep its own copy \u2014 install this page ' +
+                '(the icon at the right of the address bar, or Add to Home Screen) and it ' +
+                'will, and the file in your Downloads folder covers you meanwhile');
     withEstimate(function(e){
       var out = bits.slice();
       if (e && e.quota){
@@ -5626,6 +5675,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     var onPics = document.body.classList.contains('pictures-on');
     var h = onPics ? bar.offsetHeight : 0;
     document.documentElement.style.setProperty('--picbar', h + 'px');
+    if (typeof paintAlarm === 'function') paintAlarm();   /* the bar wraps; the alarm follows */
     /* Everything else that lives in the bottom corners -- the legend, the north mark -- sits
        above the whole stack rather than underneath it. */
     var total = h + (h ? 6 : 0);
@@ -6601,6 +6651,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     var rl = el('pic-rescue');
     if (rl) rl.addEventListener('click', function(){ if (impIn) impIn.click(); });
     paintRescue();
+    catchUpOnce();
     autoRecover();      /* every function it needs is defined by the time this runs */
     shoot.addEventListener('click', function(){ startFix(); inp.click(); });
     vid.addEventListener('click', function(){ startFix(); vinp.click(); });
