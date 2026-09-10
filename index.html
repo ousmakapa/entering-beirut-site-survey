@@ -847,7 +847,7 @@
     <input type="file" accept="image/*" capture="environment" id="pic-input" hidden>
     <input type="file" accept="video/*" capture="environment" id="pic-input-vid" hidden>
     <input type="file" accept="audio/*" id="pic-input-aud" hidden>
-    <input type="file" accept="image/*,video/*" multiple id="pic-input-lib" hidden>
+    <input type="file" accept="image/*,video/*,application/json,.json" multiple id="pic-input-lib" hidden>
     <div class="layer-panel" id="layer-panel">
       <button class="lp-toggle" id="lp-toggle" aria-expanded="true">SURVEY LAYERS <span>−</span></button>
       <div class="lp-body" id="lp-body"></div>
@@ -5406,6 +5406,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
      is allowed. Also when the page is hidden, so closing the tab or locking the phone leaves
      a current copy behind. Three records or five minutes, whichever is first: every save
      would bury the folder, once a session would lose the session. */
+  var SEED_STAMP = 'studio7SeedStamp';   /* which snapshot this device has already taken */
   var BACKUP_AT = 'studio7BackupAt';
   var bkAt = 0, bkCount = 0, bkTimer = null;
   try {
@@ -5496,17 +5497,24 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         return r.ok ? r.json() : null;
       }).then(function(d){
         if (!d) return;
-        /* RECORDS only into a survey with nothing in it: putting them into a half-filled one
-           could interleave with real work. */
-        if (!plots.length && !picMeta.length){
+        /* The survey lives in the browser it was made in, so a second device starts empty and
+           a phone shows nothing that was recorded on the laptop. The snapshot carries the whole
+           of it and merges BY ID, which is the only way a device that already took an earlier
+           one can catch up.
+           Once per snapshot, though, remembered by its stamp: merging on every load would
+           resurrect a record deleted on purpose. */
+        var stamp = d.stamp || 'none', seen = null;
+        try { seen = localStorage.getItem(SEED_STAMP); } catch (e) {}
+        if (seen !== stamp){
           seeding = true;
           var out;
           try { out = mergeRecords(d); } finally { seeding = false; }
+          try { localStorage.setItem(SEED_STAMP, stamp); } catch (e) {}
           if (out && (out.added || out.addedM)){
             var line = document.getElementById('pic-tally');
             if (line) line.textContent = out.added + ' survey record' +
               (out.added === 1 ? '' : 's') + ' and ' + out.addedM + ' photograph' +
-              (out.addedM === 1 ? '' : 's') + ' restored from 9 September';
+              (out.addedM === 1 ? '' : 's') + ' brought in from the shared copy';
           }
         }
         /* IMAGES are a different risk and must not share that guard. This ran once behind it
@@ -6689,7 +6697,18 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     ainp.addEventListener('change', function(){ handlePicFiles(ainp.files, 'audio'); ainp.value = ''; });
     /* The camera roll holds videos as well as photographs, so take whichever each file is
        rather than making you sort them first. */
-    lib.addEventListener('change',  function(){ handlePicFiles(lib.files, 'auto');   lib.value = ''; });
+    /* "Add existing" is a file picker for things you already have, and a backup file is one
+       of those. It is how work recorded on the phone comes home, and it needs no button of its
+       own: a .json goes to the restore, everything else to the media intake. */
+    lib.addEventListener('change',  function(){
+      var fs = Array.prototype.slice.call(lib.files || []);
+      var js = fs.filter(function(f){ return /\.json$/i.test(f.name) ||
+                                             f.type === 'application/json'; });
+      var rest = fs.filter(function(f){ return js.indexOf(f) === -1; });
+      js.forEach(function(f){ restoreFromFile(f); });
+      if (rest.length) handlePicFiles(rest, 'auto');
+      lib.value = '';
+    });
     el('rec-stop').addEventListener('click', function(){ stopVoice(true); });
     el('rec-cancel').addEventListener('click', function(){ stopVoice(false); });
     /* Object URLs for video and audio are handed out per popup and taken back when it closes,
