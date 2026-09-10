@@ -238,10 +238,6 @@
     line-height:1.4; color:var(--muted); margin-top:.15rem;}
   #wp-paste:focus{ outline:none; border-color:var(--accent); background:var(--surface);}
   #wp-paste.on{ border-color:var(--sem-veg); }
-  #wp-cap{ display:flex; gap:.3rem; margin-top:.3rem;}
-  #wp-cap input{ flex:1; min-width:0; font:inherit; font-size:.74rem; padding:.35rem .4rem;
-    border:1px solid var(--line-strong); border-radius:4px; background:var(--surface);
-    color:var(--ink); font-family:var(--font-mono);}
   .wp-drop{ outline:2px dashed var(--accent); outline-offset:-4px;}
   /* what is already on this plot, so a second walk corrects rather than duplicates */
   #wp-have{ display:flex; flex-direction:column; gap:.2rem; margin-top:.25rem;}
@@ -542,6 +538,8 @@
     border-radius:999px; border:2px solid #fff; color:#fff; text-align:center;
     font-family:var(--font-mono); font-size:.66rem; font-weight:700;
     box-shadow:0 1px 5px rgba(0,0,0,.32);}
+  .plot-pin.missing-shot span{background:var(--sem-problem) !important;
+    outline:3px solid rgba(210,61,47,.28);}
   /* the plot you are working on, so there is never a doubt which one the form is about */
   .sel-plot{animation:selpulse 1.3s ease-in-out infinite;}
   @keyframes selpulse{0%,100%{stroke-opacity:1;} 50%{stroke-opacity:.35;}}
@@ -603,6 +601,7 @@
     border-radius:999px; padding:.42rem .85rem; min-height:34px;}
   .fb-primary{background:var(--layer-traffic); border-color:var(--layer-traffic); color:#fff;}
   .fb-quiet{color:var(--muted);}
+  .fb-btn.pic-filter-on{background:var(--sem-problem); border-color:var(--sem-problem); color:#fff;}
   .fb-gps{font-family:var(--font-mono); font-size:.68rem; color:var(--ink-soft); flex:1;
     min-width:8rem;}
   .fb-count{font-family:var(--font-mono); font-size:.68rem; color:var(--muted);}
@@ -757,11 +756,6 @@
           <b>Paste a screenshot &mdash; Ctrl+V</b>
           <i>Win+Shift+S to snip, click here, paste. Or drop an image on the panel.</i>
         </div>
-        <div id="wp-cap">
-          <input id="wp-imgdate" type="text" placeholder="imagery date, e.g. Apr 2023"
-                 autocomplete="off"
-                 title="What Google Earth prints at the bottom of the screen. A 2023 frame is evidence of 2023, and the export has to say so.">
-        </div>
         <label>or type its number</label>
         <input id="wp-parcel" type="text" inputmode="numeric" list="wp-nums" placeholder="e.g. 2478" autocomplete="off">
         <datalist id="wp-nums"></datalist>
@@ -820,6 +814,7 @@
       <button class="fb-btn" id="pic-video">Video</button>
       <button class="fb-btn" id="pic-voice">Voice note</button>
       <button class="fb-btn" id="pic-plot">This plot</button>
+      <button class="fb-btn" id="pic-missing" aria-pressed="false">Needs screenshot</button>
       <button class="fb-btn" id="pic-pick">Add existing</button>
       <button class="fb-btn" id="pic-enable">Enable</button>
       <button class="fb-btn" id="pic-attach" hidden>+ note on that</button>
@@ -845,6 +840,7 @@
       </div>
     </div>
     <input type="file" accept="image/*" capture="environment" id="pic-input" hidden>
+    <input type="file" accept="image/*" multiple id="pic-input-screen" hidden>
     <input type="file" accept="video/*" capture="environment" id="pic-input-vid" hidden>
     <input type="file" accept="audio/*" id="pic-input-aud" hidden>
     <input type="file" accept="image/*,video/*,application/json,.json" multiple id="pic-input-lib" hidden>
@@ -3162,11 +3158,6 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         dl.innerHTML = out.sort(function(a, b){ return a - b; })
           .map(function(x){ return '<option value="' + x + '">'; }).join('');
         buildPlan();
-        /* the imagery date barely changes along one street, so it is typed once */
-        try {
-          var dt = document.getElementById('wp-imgdate'), was = localStorage.getItem('studio7Imagery');
-          if (dt && was && !dt.value) dt.value = was;
-        } catch (e) {}
         ready = true;
         return true;
       } catch (e){
@@ -3311,21 +3302,21 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     function fileIn(file){
       if (chosen < 0){ say('pick a plot first', true); return; }
       if (!file || !/^image\//.test(file.type || '')){ say('that was not an image', true); return; }
-      var whose = chosen, ctr = parcelCenter(whose);
-      var dt = el('wp-imgdate');
-      var when = dt ? String(dt.value || '').trim() : '';
-      try { if (when) localStorage.setItem('studio7Imagery', when); } catch (e) {}
+      var whose = chosen, ctr = parcelCenter(whose), recs = plotsIn(whose);
+      if (recs.length > 1 && !editing){
+        say('this plot has several recorded parts \u2014 tap fix on the part first', true);
+        return;
+      }
       pendingParcel = whose;
       mediaSrc = 'screen';
-      mediaImagery = when || null;
+      mediaPlot = editing || (recs.length === 1 ? recs[0].id : null);
       /* on the parcel, not at the desk: a capture has no standing point to record */
       mediaPos = {lat: ctr ? ctr.lat : null, lng: ctr ? ctr.lng : null, acc:null, head:null};
       mediaDone = function(items){
         var pz = el('wp-paste');
         if (pz){ pz.classList.add('on'); setTimeout(function(){ pz.classList.remove('on'); }, 1400); }
         showFound();                       /* the shot count goes up where you can see it */
-        say(items.length + ' screenshot saved to ' + parcelLabel(whose) +
-            (when ? '' : ' \u2014 no imagery date noted'));
+        say(items.length + ' screenshot saved to ' + parcelLabel(whose));
       };
       say('saving the screenshot\u2026');
       handlePicFiles([file], 'photo');
@@ -4672,21 +4663,20 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   }
   var pendingMedia = null;
   /* Set just before handing files in, and read once. A capture off the screen is not a
-     photograph taken in the street, and the difference has to survive into the export --
-     otherwise a 2023 Street View frame reads as evidence of what is there in 2026. */
+     photograph taken in the street, and the difference has to survive into the export. */
   var mediaSrc = null;        /* 'screen' for a desk capture, null for the camera */
-  var mediaImagery = null;    /* the date Google Earth prints, typed once and remembered */
+  var mediaPlot = null;       /* exact survey-part id when the user chose one */
   var mediaPos = null;        /* an explicit position, for records not made where you stand */
   var mediaDone = null;       /* called once the record is written */
   function commitMedia(items, parcel, pos){
     var when = new Date().toISOString().slice(0, 16).replace('T', ' ');
-    var src = mediaSrc, imagery = mediaImagery, done = mediaDone;
-    mediaSrc = null; mediaImagery = null; mediaDone = null;
+    var src = mediaSrc, plot = mediaPlot, done = mediaDone;
+    mediaSrc = null; mediaPlot = null; mediaDone = null;
     if (mediaPos){ pos = mediaPos; mediaPos = null; }
     items.forEach(function(x){
       picMeta.push({id:x.id, kind:x.kind, parcel:parcel, lat:pos.lat, lng:pos.lng, acc:pos.acc,
                     head:pos.head, when:when, t:Date.now(), mime:x.mime || null,
-                    src:src || null, imagery:imagery || null,
+                    src:src || null, plot:plot || null,
                     dur:(x.dur === undefined ? null : x.dur), size:x.size || 0});
     });
     /* If the record cannot be written the file is still in storage, so it is not lost -- it is
@@ -4855,6 +4845,54 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   function factCount(){ return plots.length; }
   function plotsIn(i){ return plots.filter(function(r){ return r.parcel === i; }); }
   function plotById(id){ return plots.filter(function(r){ return r.id === id; })[0] || null; }
+  function isScreenshot(m){
+    return !!m && !m.of && mediaKind(m) === 'photo' && m.src === 'screen';
+  }
+  /* New screenshots carry an exact `plot` id. Older screenshots predate that field, so they
+     are paired one-to-one inside their parcel by the original observation/capture times. This
+     is the same rule used by the evidence audit; it never borrows a screenshot from a neighbour. */
+  function screenshotLinks(){
+    var out = {}, legacy = {};
+    function add(id, m){ (out[id] = out[id] || []).push(m); }
+    picMeta.forEach(function(m){
+      if (!isScreenshot(m)) return;
+      var r = m.plot ? plotById(m.plot) : null;
+      if (r && r.parcel === m.parcel) add(r.id, m);
+      else (legacy[m.parcel] = legacy[m.parcel] || []).push(m);
+    });
+    Object.keys(legacy).forEach(function(k){
+      var ms = legacy[k], ps = plotsIn(parseInt(k, 10));
+      if (!ps.length) return;
+      var free = ps.filter(function(r){ return !out[r.id]; }), pairs = [];
+      ms.forEach(function(m){ free.forEach(function(r){
+        pairs.push({d:Math.abs(Number(m.capturedT || m.t || 0) -
+                               Number(r.observedT || r.t || 0)), m:m, r:r});
+      }); });
+      pairs.sort(function(a, b){ return a.d - b.d || String(a.m.id).localeCompare(String(b.m.id)); });
+      var usedM = {}, usedR = {};
+      pairs.forEach(function(x){
+        if (usedM[x.m.id] || usedR[x.r.id]) return;
+        usedM[x.m.id] = 1; usedR[x.r.id] = 1; add(x.r.id, x.m);
+      });
+      /* Extra views of an already-covered part remain useful, but do not make another part
+         look covered: only leftovers after the one-to-one pass may share their nearest record. */
+      ms.forEach(function(m){
+        if (usedM[m.id]) return;
+        var near = ps.slice().sort(function(a, b){
+          var mt = Number(m.capturedT || m.t || 0);
+          return Math.abs(mt - Number(a.observedT || a.t || 0)) -
+                 Math.abs(mt - Number(b.observedT || b.t || 0));
+        })[0];
+        if (near) add(near.id, m);
+      });
+    });
+    return out;
+  }
+  function missingScreenshotRecords(){
+    var linked = screenshotLinks();
+    return plots.filter(function(r){ return !linked[r.id]; });
+  }
+  window.missingScreenshotRecords = missingScreenshotRecords;
   function plotAt(r){
     if (r.at && r.at.length === 2) return L.latLng(r.at[0], r.at[1]);
     var c = parcelCenter(r.parcel);
@@ -5147,6 +5185,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         '<button class="fb-btn fb-primary" id="pf-save">Save this part</button>' +
         '<button class="fb-btn" id="pf-voice">\ud83c\udfa4 voice note on it</button>' +
         '<button class="fb-btn" id="pf-photo">Photograph it</button>' +
+        (rec ? '<button class="fb-btn" id="pf-screen">Add screenshot</button>' : '') +
         (rec ? '<button class="fb-btn fb-quiet" id="pf-del">delete</button>' : '') +
       '</div>';
     var bar = document.getElementById('pic-bar');
@@ -5194,9 +5233,12 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     document.getElementById('pf-photo').addEventListener('click', function(){
       close(); selectParcel(i, here);
       pendingParcel = i;                       /* skip the shortlist: you have already said which */
+      mediaSrc = null; mediaPlot = rec ? rec.id : null; mediaPos = null;
       startFix();
       document.getElementById('pic-input').click();
     });
+    var screen = document.getElementById('pf-screen');
+    if (screen) screen.addEventListener('click', function(){ close(); addScreenshot(rec.id); });
     var del = document.getElementById('pf-del');
     if (del) del.addEventListener('click', function(){
       if (!confirm('Delete this part?')) return;
@@ -5910,11 +5952,23 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     if (np) bits.push(np + ' part' + (np === 1 ? '' : 's') + ' described');
     el.textContent = bits.length ? bits.join(' \u00b7 ') + (bytes ? ' \u00b7 ' + human(bytes) : '')
                                  : 'nothing recorded yet';
+    paintMissingFilter();
     paintStore();
     layoutBars();
   }
 
   /* ---- draw: parcels that hold media, and the records that belong to no plot ---- */
+  var picturesMissingOnly = false;
+  function paintMissingFilter(){
+    var b = document.getElementById('pic-missing');
+    if (!b) return;
+    var n = missingScreenshotRecords().length;
+    b.textContent = (picturesMissingOnly ? 'Showing missing \u00b7 ' : 'Needs screenshot \u00b7 ') + n;
+    b.classList.toggle('pic-filter-on', picturesMissingOnly);
+    b.setAttribute('aria-pressed', picturesMissingOnly ? 'true' : 'false');
+    b.title = n ? n + ' started record' + (n === 1 ? '' : 's') +
+      ' have no screenshot linked to that exact part' : 'Every started record has a screenshot';
+  }
   var GAL_URLS = [];
   function objURL(blob){ var u = URL.createObjectURL(blob); GAL_URLS.push(u); return u; }
   function releaseURLs(){
@@ -5925,8 +5979,10 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     var g = groups.pictures;
     if (!g) return;
     parcelGeom();
+    paintMissingFilter();
     var byParcel = {}, solo = [];
     picMeta.forEach(function(m){
+      if (picturesMissingOnly) return;
       if (m.of) return;                                 /* attached notes live inside their parent */
       if (m.parcel === null || m.parcel === undefined || !PARCEL_FACES[m.parcel]){
         if (m.lat !== undefined && m.lat !== null) solo.push(m);
@@ -5937,7 +5993,8 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     /* A plot earns a mark here for either reason: something was recorded on it, or it was
        surveyed by hand. Usually both, and then it is one mark, not two on top of each other. */
     var byPlot = {};
-    plots.forEach(function(r){
+    var visiblePlots = picturesMissingOnly ? missingScreenshotRecords() : plots;
+    visiblePlots.forEach(function(r){
       if (PARCEL_FACES[r.parcel]) (byPlot[r.parcel] = byPlot[r.parcel] || []).push(r);
     });
     var marked = {};
@@ -5951,7 +6008,8 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       /* The face takes a use colour only when the whole of it is one thing. A face holding
          several parts is drawn neutral, because it is not one use -- the parts carry theirs. */
       var only = (recs.length === 1) ? useOf(recs[0].use) : null;
-      var col = only ? cssVar(only.c) : cssVar('--accent');
+      var col = picturesMissingOnly ? cssVar('--sem-problem')
+              : only ? cssVar(only.c) : cssVar('--accent');
       var txt = shots.length ? String(shots.length) : (recs.length ? String(recs.length) : '\u00b7');
       var pw = txt.length <= 2 ? 30 : 12 + txt.length * 9;
       /* The gallery must be filled when the popup OPENS, not when the layer is bound --
@@ -5966,12 +6024,13 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         layer.on('popupopen', function(){ if (shots.length) fillGallery(dom, shots); });
         g.addLayer(layer);
       }
-      attach(L.polygon(f.g, {color:col, weight:2, opacity:.95,
-        fillColor:col, fillOpacity:.30}));
+      attach(L.polygon(f.g, {color:col, weight:picturesMissingOnly ? 3 : 2, opacity:.95,
+        dashArray:picturesMissingOnly ? '7 5' : null,
+        fillColor:col, fillOpacity:picturesMissingOnly ? .13 : .30}));
       var c = PARCEL_C[i];
       /* The recordings badge sits a fixed 26 px ABOVE the middle of the plot, where the parts
          are. A metric offset shrinks to nothing when you zoom out; a pixel one does not. */
-      attach(L.marker([c[1] / M_LAT2, c[0] / M_LNG2], {zIndexOffset:2000,
+      if (!picturesMissingOnly) attach(L.marker([c[1] / M_LAT2, c[0] / M_LNG2], {zIndexOffset:2000,
         icon:L.divIcon({className:'pic-pin', html:'<b>' + txt + '</b>',
           iconSize:[pw, 30], iconAnchor:[pw / 2, 41]})}));
       /* one badge per part, where it was tapped, coloured by what it is */
@@ -5986,12 +6045,13 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         var pic = recTagsIcon([r], {below:true, noStoreys:true});
         if (pic) g.addLayer(L.marker(p, {interactive:false, zIndexOffset:2150, icon:pic}));
         g.addLayer(L.marker(p, {zIndexOffset:2200,
-          icon:L.divIcon({className:'plot-pin',
+          icon:L.divIcon({className:'plot-pin' + (picturesMissingOnly ? ' missing-shot' : ''),
             html:'<span style="background:' + rc + '">' + rt + '</span>',
             iconSize:[rw, 23], iconAnchor:[rw / 2, 11.5]})})
           .bindPopup('<h4>' + (r.note ? String(r.note).replace(/</g, '&lt;') : 'A part of ' + parcelLabel(i)) + '</h4>' +
             plotLine(r) +
             '<br><button class="save-btn" onclick="editPlot(\'' + r.id + '\')">Edit this part</button>' +
+            (picturesMissingOnly ? ' <button class="save-btn" onclick="addScreenshot(\'' + r.id + '\')">Add screenshot</button>' : '') +
             '<span class="src">Recorded on site ' + r.when + '</span>'));
       });
       shots.forEach(function(m){
@@ -6047,7 +6107,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
             ? '<span class="src">The dashed line runs back to where you stood.</span>' : '') +
           (shots.some(function(m){ return m.src === 'screen'; })
             ? '<span class="src">Marked shots were captured off the screen, not taken in the '
-              + 'street — they are evidence of the imagery date, not of today.</span>' : '')
+              + 'street. They are visual references, not proof of current site conditions.</span>' : '')
         : '');
   }
   /* What a shot is evidence OF, in one line, wherever it is shown. Written once so the
@@ -6055,7 +6115,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
      not be got wrong. */
   function shotProv(m){
     return m.src === 'screen'
-      ? 'From the screen, not the street ' + '\u00b7 imagery ' + (m.imagery || 'date not noted')
+      ? 'From the screen, not the street'
       : 'Taken on site';
   }
   /* `d` is the document the strip lives in: the walk panel moves between two windows, and
@@ -6846,11 +6906,23 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     }
     layoutBars();
   }
+  var screenTarget = null;
+  function addScreenshot(id){
+    var r = plotById(id), input = document.getElementById('pic-input-screen');
+    if (!r || !input) return;
+    var p = plotAt(r) || parcelCenter(r.parcel);
+    map.closePopup();
+    screenTarget = {plot:r.id, parcel:r.parcel, pos:{lat:p ? p.lat : null, lng:p ? p.lng : null,
+                    acc:null, head:null}};
+    input.click();
+  }
+  window.addScreenshot = addScreenshot;
   (function wirePictures(){
     function el(id){ return document.getElementById(id); }
     var shoot = el('pic-shoot'), vid = el('pic-video'), voi = el('pic-voice'), pick = el('pic-pick'),
-        en = el('pic-enable'), att = el('pic-attach'),
-        inp = el('pic-input'), vinp = el('pic-input-vid'), ainp = el('pic-input-aud'), lib = el('pic-input-lib');
+        en = el('pic-enable'), att = el('pic-attach'), miss = el('pic-missing'),
+        inp = el('pic-input'), sinp = el('pic-input-screen'),
+        vinp = el('pic-input-vid'), ainp = el('pic-input-aud'), lib = el('pic-input-lib');
     if (!shoot) return;
     /* iOS will only hand over the compass, and will only ask for location, from inside a
        real tap. That is what this button is for. */
@@ -6871,20 +6943,36 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     catchUpOnce();
     autoRecover();      /* every function it needs is defined by the time this runs */
     setTimeout(function(){ syncNow('load'); }, 2500);   /* after the snapshot has settled */
-    shoot.addEventListener('click', function(){ startFix(); inp.click(); });
-    vid.addEventListener('click', function(){ startFix(); vinp.click(); });
+    shoot.addEventListener('click', function(){ pendingParcel = null; mediaSrc = null; mediaPlot = null;
+                                                mediaPos = null; mediaDone = null; startFix(); inp.click(); });
+    vid.addEventListener('click', function(){ pendingParcel = null; mediaSrc = null; mediaPlot = null;
+                                              mediaPos = null; mediaDone = null; startFix(); vinp.click(); });
     voi.addEventListener('click', function(){ startFix(); startVoice(null); });
     /* The manual survey lives here too: storeys, use, ground floor, apparent construction era. */
     el('pic-plot').addEventListener('click', function(){
       startFix();
       chooseParcel('Which plot are you describing?', function(i){ openFacts(i, null, null); });
     });
-    pick.addEventListener('click', function(){ startFix(); lib.click(); });
+    miss.addEventListener('click', function(){
+      picturesMissingOnly = !picturesMissingOnly;
+      rebuildAll(); paintMissingFilter(); layoutBars();
+    });
+    pick.addEventListener('click', function(){ pendingParcel = null; mediaSrc = null; mediaPlot = null;
+                                               mediaPos = null; mediaDone = null; startFix(); lib.click(); });
     att.addEventListener('click', function(){
       var t = att.getAttribute('data-for');
       if (t) startVoice(t);
     });
     inp.addEventListener('change',  function(){ handlePicFiles(inp.files, 'photo');  inp.value = ''; });
+    sinp.addEventListener('change', function(){
+      var target = screenTarget; screenTarget = null;
+      if (target && sinp.files && sinp.files.length){
+        pendingParcel = target.parcel; mediaPlot = target.plot; mediaSrc = 'screen';
+        mediaPos = target.pos;
+        handlePicFiles(sinp.files, 'photo');
+      }
+      sinp.value = '';
+    });
     vinp.addEventListener('change', function(){ handlePicFiles(vinp.files, 'video'); vinp.value = ''; });
     ainp.addEventListener('change', function(){ handlePicFiles(ainp.files, 'audio'); ainp.value = ''; });
     /* The camera roll holds videos as well as photographs, so take whichever each file is
