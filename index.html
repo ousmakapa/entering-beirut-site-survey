@@ -752,6 +752,7 @@
         </div>
         <div id="wp-found">no parcel chosen</div>
         <div id="wp-have"></div>
+        <div class="pic-strip" id="wp-shots" hidden></div>
         <div id="wp-paste" tabindex="0">
           <b>Paste a screenshot &mdash; Ctrl+V</b>
           <i>Win+Shift+S to snip, click here, paste. Or drop an image on the panel.</i>
@@ -3261,7 +3262,20 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     }
     /* What is already on this plot, each one openable. Without this, the only way to fix a
        record on the street was to make a second one that contradicts it. */
+    /* What is already photographed here, small. Standing in the street the question is
+       whether this plot has been shot and of what, and the header line saying "1 photo" while
+       showing nothing meant leaving the panel to find out. */
+    function showShots(){
+      var box = el('wp-shots');
+      if (!box) return;
+      var shots = chosen < 0 ? []
+                : picMeta.filter(function(m){ return m.parcel === chosen && !m.of; });
+      box.hidden = !shots.length;
+      if (shots.length) fillStrip('wp-shots', shots, doc());
+      else box.innerHTML = '';
+    }
     function showHave(){
+      showShots();
       var h = el('wp-have');
       if (!h) return;
       var recs = chosen < 0 ? [] : plotsIn(chosen);
@@ -5845,18 +5859,21 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       ? 'From the screen, not the street ' + '\u00b7 imagery ' + (m.imagery || 'date not noted')
       : 'Taken on site';
   }
-  function fillStrip(dom, shots){
+  /* `d` is the document the strip lives in: the walk panel moves between two windows, and
+     the main document does not contain it while it is out. */
+  function fillStrip(dom, shots, d){
+    d = d || document;
     setTimeout(function(){
-      var box = document.getElementById(dom);
+      var box = d.getElementById(dom);
       if (!box) return;
       box.innerHTML = '';
       shots.forEach(function(m){
         var kind = mediaKind(m);
-        var b = document.createElement('button');
+        var b = d.createElement('button');
         b.type = 'button';
         b.title = shotProv(m) + ' \u00b7 ' + m.when;
         if (kind === 'photo'){
-          var im = document.createElement('img');
+          var im = d.createElement('img');
           im.alt = '';
           b.appendChild(im);
           picGet(m.id, function(src){
@@ -5864,44 +5881,45 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
             else { b.innerHTML = '<span class="other">missing</span>'; }
           });
         } else {
-          var o = document.createElement('span');
+          var o = d.createElement('span');
           o.className = 'other';
           o.textContent = kind === 'video' ? '\u25b6 clip' : '\u266a note';
           b.appendChild(o);
         }
         if (m.src === 'screen'){
-          var t = document.createElement('span');
+          var t = d.createElement('span');
           t.className = 'sc'; t.textContent = 'screen';
           b.appendChild(t);
         }
-        b.addEventListener('click', function(){ showShot(m); });
+        b.addEventListener('click', function(){ showShot(m, d); });
         box.appendChild(b);
       });
     }, 40);
   }
   /* Full size in the main document, never in the popup: the popup is sized to be read. */
-  function showShot(m){
-    var old = document.querySelector('.shot-box');
+  function showShot(m, d){
+    d = d || document;
+    var old = d.querySelector('.shot-box');
     if (old) old.remove();
-    var box = document.createElement('div');
+    var box = d.createElement('div');
     box.className = 'shot-box';
     box.addEventListener('click', function(){ box.remove(); });
     picGet(m.id, function(src){
       var kind = mediaKind(m);
       if (src && kind === 'photo'){
-        var im = document.createElement('img'); im.src = src; im.alt = ''; box.appendChild(im);
+        var im = d.createElement('img'); im.src = src; im.alt = ''; box.appendChild(im);
       } else if (src && kind === 'video'){
-        var v = document.createElement('video'); v.src = src; v.controls = true;
+        var v = d.createElement('video'); v.src = src; v.controls = true;
         v.style.maxWidth = '96vw'; v.style.maxHeight = '82vh'; box.appendChild(v);
       } else if (src){
-        var a = document.createElement('audio'); a.src = src; a.controls = true; box.appendChild(a);
+        var a = d.createElement('audio'); a.src = src; a.controls = true; box.appendChild(a);
       }
-      var p = document.createElement('p');
+      var p = d.createElement('p');
       p.textContent = shotProv(m) + ' \u00b7 ' + m.when;
       if (m.src === 'screen') p.className = 'warn';
       box.appendChild(p);
     });
-    document.body.appendChild(box);
+    d.body.appendChild(box);
   }
   function fillGallery(dom, shots){
     setTimeout(function(){
