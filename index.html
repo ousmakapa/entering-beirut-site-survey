@@ -162,7 +162,9 @@
   .leaflet-popup-content-wrapper{background:var(--surface-2); color:var(--ink); border-radius:var(--radius); box-shadow:0 2px 10px rgba(0,0,0,.18);}
   .leaflet-popup-pane{z-index:1150;}
   .leaflet-popup-tip{background:var(--surface-2);}
-  .leaflet-popup-content{font-size:.82rem; line-height:1.45; margin:.7rem .8rem; min-width:190px;}
+  .leaflet-popup-content{font-size:.82rem; line-height:1.45; margin:.7rem .8rem; min-width:190px;
+    max-height:var(--map-popup-max,70vh); overflow-y:auto; overscroll-behavior:contain;
+    scrollbar-gutter:stable;}
   .leaflet-popup-content h4{font-family:var(--font-display); font-size:.85rem; margin:0 0 .3rem;}
   .leaflet-popup-content .src{display:block; margin-top:.4rem; font-family:var(--font-mono); font-size:.68rem; color:var(--muted);}
   .leaflet-popup-content textarea{width:100%; font-family:var(--font-body); font-size:.8rem; border:1px solid var(--line-strong); border-radius:var(--radius); padding:.4rem; resize:vertical; min-height:50px; background:var(--surface); color:var(--ink);}
@@ -1235,6 +1237,50 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   }
   map.on('zoomend', zoomBucket);
   zoomBucket();
+
+  /* A plot can carry several survey-part cards. Leaflet only pans a popup when it first opens;
+     after a map zoom the same tall popup can move behind the fixed page header. Fit every open
+     popup to the map itself (not the browser window), give excess content its own scrollbar,
+     and re-run Leaflet's pan after zoom/resize so the top and bottom stay reachable. */
+  var popupFitObserver = null;
+  function fitOpenPopup(popup){
+    popup = popup && popup._contentNode ? popup : map._popup;
+    if (!popup || !popup._contentNode) return;
+    /* Leave room for the popup's margins, close button, pointer and an eight-pixel map inset. */
+    var max = Math.max(110, map.getSize().y - 96);
+    var sig = max + '|' + popup._contentNode.scrollHeight;
+    if (popup._studioFitSig !== sig){
+      popup._studioFitSig = sig;
+      popup.options.maxHeight = max;
+      popup._contentNode.style.setProperty('--map-popup-max', max + 'px');
+      popup._contentNode.style.maxHeight = max + 'px';
+      popup.update();
+    }
+    requestAnimationFrame(function(){
+      if (map._popup !== popup || popup._map !== map || !popup._container) return;
+      var mb = map.getContainer().getBoundingClientRect();
+      var pb = popup._container.getBoundingClientRect();
+      var pad = 8, dx = 0, dy = 0;
+      if (pb.left < mb.left + pad) dx = pb.left - mb.left - pad;
+      else if (pb.right > mb.right - pad) dx = pb.right - mb.right + pad;
+      if (pb.top < mb.top + pad) dy = pb.top - mb.top - pad;
+      else if (pb.bottom > mb.bottom - pad) dy = pb.bottom - mb.bottom + pad;
+      if (dx || dy) map.panBy([dx, dy], {animate:false});
+    });
+  }
+  map.on('popupopen', function(e){
+    fitOpenPopup(e.popup);
+    if (popupFitObserver) popupFitObserver.disconnect();
+    popupFitObserver = new MutationObserver(function(){ fitOpenPopup(e.popup); });
+    popupFitObserver.observe(e.popup._contentNode, {childList:true, subtree:true});
+  });
+  map.on('popupclose', function(){
+    if (popupFitObserver) popupFitObserver.disconnect();
+    popupFitObserver = null;
+  });
+  map.on('zoomend resize', function(){
+    requestAnimationFrame(function(){ fitOpenPopup(); });
+  });
 
   /* ---------- aerial photography, under everything ----------
      The survey is the authority on WHERE; the photograph is only ever evidence of WHAT.
