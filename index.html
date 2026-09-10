@@ -5487,10 +5487,20 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     }
     var np = merge(plots, d.plots), nm = merge(picMeta, d.media);
     var changed = np.length !== plots.length || nm.length !== picMeta.length;
+    var wasP = plots, wasM = picMeta;
     plots = np; picMeta = nm;
     /* seeding suppresses the automatic backup: this runs on load, with no click behind it */
     seeding = true;
-    try { savePlots(); savePicMeta(); } finally { seeding = false; }
+    var okP, okM;
+    try { okP = savePlots(); okM = savePicMeta(); } finally { seeding = false; }
+    if (okP === false || okM === false){
+      /* The device is out of room. Leaving memory ahead of storage would show records that
+         are not written down and vanish at the next reload; and nothing is lost by stepping
+         back, because everything here came FROM the shared copy and is still on it. */
+      plots = wasP; picMeta = wasM;
+      syncErr = 'no room on this device to take the shared copy';
+      return;
+    }
     if (changed){ rebuildAll(); if (typeof paintCounts === 'function') paintCounts(); }
   }
   /* Both directions, and only the gaps: send what the server has not got, fetch what we have
