@@ -4692,6 +4692,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     if (!savePicMeta()) alert('The file is stored but its record could not be saved. Export now; ' +
                               'reopening this section will offer the file back.');
     autoBackup(); paintRescue();
+    try { if (!seeding) syncSoon(); } catch (e) {}
     rebuildAll();
     paintCounts();
     /* The moment straight after a shot is the only moment you still remember why you took it,
@@ -4737,6 +4738,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     var gone = {};
     gone[id] = 1;
     kids.forEach(function(k){ gone[k.id] = 1; });
+    Object.keys(gone).forEach(tomb);      /* the deletion has to travel, not just the absence */
     picMeta = picMeta.filter(function(m){ return !gone[m.id]; });
     savePicMeta();
     Object.keys(gone).forEach(picDel);
@@ -4820,6 +4822,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     try { localStorage.setItem(PLOTS_BAK, json); } catch (e) {}
     /* the only copy that is not site data, and so the only one the browser cannot drop */
     try { autoBackup(); paintRescue(); } catch (e) {}
+    try { if (!seeding) syncSoon(); } catch (e) {}
     /* third copy in IndexedDB -- far more room, and it is where the photographs already are,
        so a browser that keeps the photos keeps the records with them */
     try { picPut('plots-backup', json, function(){}); } catch (e) {}
@@ -5189,8 +5192,10 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     var del = document.getElementById('pf-del');
     if (del) del.addEventListener('click', function(){
       if (!confirm('Delete this part?')) return;
+      tomb(rec.id);        /* or it returns from the other device on the next sync */
       plots = plots.filter(function(r){ return r.id !== rec.id; });
       savePlots(); close(); rebuildAll(); paintCounts();
+      try { syncSoon(); } catch (e) {}
     });
   }
   window.editPlot = function(id){ var r = plotById(id); if (r) openFacts(r.parcel, null, id); };
@@ -5406,6 +5411,163 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
      is allowed. Also when the page is hidden, so closing the tab or locking the phone leaves
      a current copy behind. Three records or five minutes, whichever is first: every save
      would bury the folder, once a session would lose the session. */
+  /* ================== THE SHARED COPY ==================
+     A phone and a laptop are two separate surveys, because the survey lives in the browser it
+     was made in. This is the one shared copy they both converge on, and nothing has to be
+     pressed for it to happen.
+
+     Recording never waits on it. Everything is written to the device first; this runs
+     afterwards and is wrapped throughout, so no network failure can stop a record being made.
+
+     The key is in a page whose repository is public, so it is obscurity, not security. It
+     keeps the endpoint from being stumbled on. Every write merges, so the worst anyone could
+     do is add, not destroy -- and the Downloads backups sit behind all of it. */
+  var SYNC = 'https://entering-beirut-survey-sync-production.up.railway.app';
+  var SYNC_KEY = 'DuKpLrjzWuSczhdnHgduaFlZlGymtKx6LczNEgP-Fhk';
+  var TOMB_KEY = 'studio7Deleted';
+  var syncBusy = false, syncAt = 0, syncErr = null, syncTimer = null;
+
+  function tombs(){
+    try { return JSON.parse(localStorage.getItem(TOMB_KEY) || '[]') || []; } catch (e) { return []; }
+  }
+  /* Remembered, because a record deleted on one device returns from the other on the next
+     sync unless the deletion itself is a thing that travels. */
+  function tomb(id){
+    if (!id) return;
+    var t = tombs();
+    if (t.indexOf(id) === -1){
+      t.push(id);
+      try { localStorage.setItem(TOMB_KEY, JSON.stringify(t)); } catch (e) {}
+    }
+  }
+  function syncFetch(path, opts){
+    opts = opts || {};
+    opts.headers = opts.headers || {};
+    opts.headers['X-Key'] = SYNC_KEY;
+    return fetch(SYNC + path, opts);
+  }
+  /* One round trip for the records: post what we have, get the merged whole back, merge it in
+     the same way. Two calls would need an order, and either order loses something. */
+  function syncNow(why){
+    if (syncBusy) return;
+    if (location.protocol !== 'http:' && location.protocol !== 'https:') return;
+    syncBusy = true;
+    syncFetch('/survey', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({plots:plots, media:picMeta, deleted:tombs()})
+    }).then(function(r){
+      if (!r.ok) throw new Error('http ' + r.status);
+      return r.json();
+    }).then(function(d){
+      applyShared(d);
+      return reconcileImages(d);
+    }).then(function(){
+      syncAt = Date.now(); syncErr = null;
+    }).catch(function(e){
+      syncErr = String(e && e.message || e);
+    }).then(function(){
+      syncBusy = false;
+      if (typeof paintCounts === 'function') paintCounts();
+    });
+  }
+  function applyShared(d){
+    var gone = {};
+    (d.deleted || []).forEach(function(id){ gone[id] = 1; });
+    function merge(mine, theirs){
+      var by = {}, order = [];
+      mine.forEach(function(r){ if (r && r.id && !gone[r.id]){ by[r.id] = r; order.push(r.id); } });
+      (theirs || []).forEach(function(r){
+        if (!r || !r.id || gone[r.id]) return;
+        var have = by[r.id];
+        if (!have){ by[r.id] = r; order.push(r.id); return; }
+        if (Number(r.t || 0) > Number(have.t || 0)) by[r.id] = r;
+      });
+      return order.map(function(id){ return by[id]; });
+    }
+    var np = merge(plots, d.plots), nm = merge(picMeta, d.media);
+    var changed = np.length !== plots.length || nm.length !== picMeta.length;
+    plots = np; picMeta = nm;
+    /* seeding suppresses the automatic backup: this runs on load, with no click behind it */
+    seeding = true;
+    try { savePlots(); savePicMeta(); } finally { seeding = false; }
+    if (changed){ rebuildAll(); if (typeof paintCounts === 'function') paintCounts(); }
+  }
+  /* Both directions, and only the gaps: send what the server has not got, fetch what we have
+     not got. A few at a time, because a walk can hold hundreds. */
+  function reconcileImages(d){
+    var there = {};
+    (d.files || []).forEach(function(id){ there[id] = 1; });
+    var mine = picMeta.filter(function(m){ return m && m.id && !m.of; });
+    var jobs = [];
+    return new Promise(function(done){
+      var pending = mine.length;
+      if (!pending) return done();
+      mine.forEach(function(m){
+        picGet(m.id, function(bytes){
+          if (bytes && !there[m.id]) jobs.push({up:true, m:m, bytes:bytes});
+          else if (!bytes && there[m.id]) jobs.push({up:false, m:m});
+          if (!--pending) run();
+        });
+      });
+      function run(){
+        var i = 0, active = 0, LIM = 3;
+        if (!jobs.length) return done();
+        function next(){
+          if (i >= jobs.length && !active) return done();
+          while (active < LIM && i < jobs.length){
+            var j = jobs[i++]; active++;
+            (j.up ? send(j) : grab(j)).catch(function(){}).then(function(){
+              active--; next();
+            });
+          }
+        }
+        next();
+      }
+      function send(j){
+        /* stored as a data URL by the page; the server wants the bytes */
+        return fetch(j.bytes).then(function(r){ return r.blob(); }).then(function(b){
+          return syncFetch('/file/' + encodeURIComponent(j.m.id),
+                           {method:'PUT', headers:{'Content-Type':'image/jpeg'}, body:b});
+        });
+      }
+      function grab(j){
+        return syncFetch('/file/' + encodeURIComponent(j.m.id)).then(function(r){
+          if (!r.ok) throw new Error('http ' + r.status);
+          return r.blob();
+        }).then(function(b){
+          return new Promise(function(res, rej){
+            var fr = new FileReader();
+            fr.onload = function(){ res(fr.result); };
+            fr.onerror = function(){ rej(new Error('read')); };
+            fr.readAsDataURL(b);
+          });
+        }).then(function(url){
+          return new Promise(function(res){
+            picPut(j.m.id, url, function(ok){
+              if (ok){
+                for (var k = 0; k < picMeta.length; k++)
+                  if (picMeta[k].id === j.m.id) delete picMeta[k].missing;
+              }
+              res();
+            });
+          });
+        });
+      }
+    });
+  }
+  /* A few seconds after a save, so a burst of records is one conversation and not five. */
+  function syncSoon(){
+    if (syncTimer) return;
+    syncTimer = setTimeout(function(){ syncTimer = null; syncNow('save'); }, 4000);
+  }
+  document.addEventListener('visibilitychange', function(){
+    if (document.visibilityState === 'visible') syncNow('return');
+  });
+  /* Exposed so a sync can be forced from the console if the bar ever says something you do
+     not believe. It only ever merges, so calling it cannot do harm. */
+  window.syncNow = syncNow;
+
   var SEED_STAMP = 'studio7SeedStamp';   /* which snapshot this device has already taken */
   var BACKUP_AT = 'studio7BackupAt';
   var bkAt = 0, bkCount = 0, bkTimer = null;
@@ -5654,6 +5816,17 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
                   (bm < 1 ? ', just now' : bm < 60 ? ', ' + bm + ' min ago'
                                                    : ', ' + Math.floor(bm / 60) + ' h ago') +
                   (behind > 0 ? ' \u00b7 ' + behind + ' newer than that' : ''));
+      }
+    }
+    /* Whether the two devices are actually one survey. Silence here would mean finding out
+       at the desk that the phone's morning never arrived. */
+    if (anything || syncAt){
+      if (syncErr) bits.push('SHARED COPY UNREACHABLE \u2014 kept on this device');
+      else if (!syncAt) bits.push('not yet shared');
+      else {
+        var sm = Math.round((Date.now() - syncAt) / 60000);
+        bits.push('shared ' + (sm < 1 ? 'just now' : sm < 60 ? sm + ' min ago'
+                                                             : Math.floor(sm / 60) + ' h ago'));
       }
     }
     /* Bookmarking was never going to be enough, and saying so was the advice that lost a
@@ -6679,6 +6852,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     paintRescue();
     catchUpOnce();
     autoRecover();      /* every function it needs is defined by the time this runs */
+    setTimeout(function(){ syncNow('load'); }, 2500);   /* after the snapshot has settled */
     shoot.addEventListener('click', function(){ startFix(); inp.click(); });
     vid.addEventListener('click', function(){ startFix(); vinp.click(); });
     voi.addEventListener('click', function(){ startFix(); startVoice(null); });
