@@ -782,8 +782,8 @@
         <select id="wp-gcover"></select>
         <label>Can anyone get to it</label>
         <select id="wp-gaccess"></select>
-        <label>Condition</label>
-        <select id="wp-cond"></select>
+        <label>Apparent construction range <i>visual estimate from the screenshot — VERIFY</i></label>
+        <select id="wp-era"></select>
         <label>Which one is it</label>
         <input id="wp-note" type="text" placeholder="name on the sign, the corner shop…">
       </div>
@@ -3148,7 +3148,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         fillSelect('wp-green', GREENS);
         fillSelect('wp-gcover', GCOVER);
         fillSelect('wp-gaccess', GACCESS);
-        fillSelect('wp-cond', CONDS);
+        fillSelect('wp-era', ERAS);
         var sel = document.getElementById('wp-storeys');
         var o = ['<option value="">\u2014</option>'];
         for (var n = 1; n <= 12; n++) o.push('<option value="' + n + '">' + n + '</option>');
@@ -3340,7 +3340,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       var set = function(f2, v){ var e = el(f2); if (e) e.value = v || ''; };
       set('wp-storeys', r.storeys); set('wp-use', r.use); set('wp-ground', r.ground);
       set('wp-green', r.green); set('wp-gcover', r.gcover); set('wp-gaccess', r.gaccess);
-      set('wp-cond', r.cond); set('wp-note', r.note);
+      set('wp-era', r.era); set('wp-note', r.note);
       ynSet(doc(), 'wp-added', r.added); ynSet(doc(), 'wp-ready', r.ready);
       showHave();
       var l = el('wp-last');
@@ -3369,7 +3369,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       if (c) c.textContent = factCount() + ' recorded';
     }
     function clearForm(){
-      ['wp-storeys','wp-use','wp-ground','wp-green','wp-gcover','wp-gaccess','wp-cond',
+      ['wp-storeys','wp-use','wp-ground','wp-green','wp-gcover','wp-gaccess','wp-era',
        'wp-note','wp-parcel'].forEach(function(id){ var e = el(id); if (e) e.value = ''; });
       ynSet(doc(), 'wp-added', 'n'); ynSet(doc(), 'wp-ready', 'n');
       var svg = el('wp-map');
@@ -3466,14 +3466,16 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         out.parcel = chosen;
         out.storeys = v('wp-storeys'); out.use = v('wp-use'); out.ground = v('wp-ground');
         out.green = v('wp-green'); out.gcover = v('wp-gcover'); out.gaccess = v('wp-gaccess');
-        out.cond = v('wp-cond'); out.note = v('wp-note');
+        out.era = v('wp-era'); out.note = v('wp-note');
+        if (out.era) out.eraBasis = 'visual estimate from linked screenshot — VERIFY';
+        else delete out.eraBasis;
         out.added = ynGet(doc(), 'wp-added'); out.ready = ynGet(doc(), 'wp-ready');
         out.t = Date.now();
         out.when = new Date().toISOString().slice(0, 16).replace('T', ' ');
         if (!out.src) out.src = 'walk';   /* a desk record, never mistaken for one on the ground */
         /* only a YES counts as something you did: two switches sitting at their default
            is not an observation, and would file a record saying you looked when you did not */
-        if (!out.storeys && !out.use && !out.ground && !out.cond && !out.note &&
+        if (!out.storeys && !out.use && !out.ground && !out.era && !out.note &&
             !out.green && !out.gcover && !out.gaccess &&
             out.added !== 'y' && out.ready !== 'y'){
           if (f){ f.textContent = 'nothing filled in'; f.className = 'bad'; } return;
@@ -4896,7 +4898,11 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   var GROUND = ['Shops', 'Workshops / light industry', 'Storage / warehouse', 'Parking',
                 'Residential entrance', 'Blank wall / shutters', 'Caf\u00e9 / restaurant',
                 'Under construction', 'Other'];
-  var CONDS = ['Good', 'Fair', 'Poor', 'Derelict'];
+  /* Construction date is not present in the cadastral survey. These intentionally broad
+     ranges describe apparent age from the linked street-view screenshot only. They are
+     hypotheses to verify against permits, archives or dated imagery — never documentary dates. */
+  var ERAS = ['before 1930', '1930–1979', '1980–1999', '2000–2010',
+              '2011–2020', '2021–present'];
   /* Greenery, recorded rather than inferred. The OSM green layer is 11.0 m off this survey
      and counted a 13,145 m2 landuse=greenfield -- development land -- as vegetation. What
      you see standing in the street beats both. */
@@ -5046,8 +5052,8 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
                  'background:' + cssVar(u.c));
     });
     recs.forEach(function(r){
-      if (r.cond === 'Poor' || r.cond === 'Derelict')
-        add('t-warn', r.cond.toLowerCase(), 'Condition: ' + r.cond);
+      if (r.era) add('t-soft', r.era + ' est.',
+                     'Apparent construction range from screenshot — VERIFY');
     });
     if (recs.length > 1) out.push('<span class="chip t-soft" title="' + recs.length +
       ' parts recorded on this plot">' + recs.length + ' parts</span>');
@@ -5125,8 +5131,8 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         '<select id="pf-use">' + opts(USES, cur.use) + '</select>' +
         '<label>Ground floor</label>' +
         '<select id="pf-ground">' + opts(GROUND, cur.ground) + '</select>' +
-        '<label>Condition</label>' +
-        '<select id="pf-cond">' + opts(CONDS, cur.cond) + '</select>' +
+        '<label>Apparent construction range <i>visual estimate from the linked screenshot — VERIFY</i></label>' +
+        '<select id="pf-era">' + opts(ERAS, cur.era) + '</select>' +
         '<label>Anything growing <i>replaces the OpenStreetMap green layer</i></label>' +
         '<select id="pf-green">' + opts(GREENS, cur.green) + '</select>' +
         '<label>How much of the plot</label>' +
@@ -5158,7 +5164,9 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       var out = rec || {id:'q' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
                         parcel:i};
       out.storeys = v('pf-storeys'); out.use = v('pf-use'); out.ground = v('pf-ground');
-      out.cond = v('pf-cond'); out.note = v('pf-note');
+      out.era = v('pf-era'); out.note = v('pf-note');
+      if (out.era) out.eraBasis = 'visual estimate from linked screenshot — VERIFY';
+      else delete out.eraBasis;
       out.added = ynGet(document, 'pf-added'); out.ready = ynGet(document, 'pf-ready');
       out.green = v('pf-green'); out.gcover = v('pf-gcover'); out.gaccess = v('pf-gaccess');
       out.at = here ? [here.lat, here.lng] : null;
@@ -5166,7 +5174,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       out.lat = pos.lat; out.lng = pos.lng; out.acc = pos.acc;   /* kept for older readers */
       out.t = Date.now();
       out.when = new Date().toISOString().slice(0, 16).replace('T', ' ');
-      if (!out.storeys && !out.use && !out.ground && !out.cond && !out.note &&
+      if (!out.storeys && !out.use && !out.ground && !out.era && !out.note &&
           !out.green && !out.gcover && !out.gaccess &&
           out.added !== 'y' && out.ready !== 'y'){
         close(); return;                       /* an empty form is a cancel, not a record */
@@ -5205,7 +5213,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     if (r.storeys) bits.push('<b>' + r.storeys + '</b> storey' + (r.storeys === '1' ? '' : 's'));
     if (u) bits.push(u.lab);
     if (r.ground) bits.push('ground floor ' + r.ground.toLowerCase());
-    if (r.cond) bits.push(r.cond.toLowerCase());
+    if (r.era) bits.push('apparent construction ' + r.era + ' <b>(VERIFY)</b>');
     /* Only the yeses read out. 'n' is now on every record by default, so printing it would
        put the same two lines on every plot and say nothing. The value is still in the export. */
     if (r.added === 'y') bits.push('<b>a floor added</b>');
@@ -6866,7 +6874,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     shoot.addEventListener('click', function(){ startFix(); inp.click(); });
     vid.addEventListener('click', function(){ startFix(); vinp.click(); });
     voi.addEventListener('click', function(){ startFix(); startVoice(null); });
-    /* The manual survey lives here too: storeys, use, ground floor, condition. */
+    /* The manual survey lives here too: storeys, use, ground floor, apparent construction era. */
     el('pic-plot').addEventListener('click', function(){
       startFix();
       chooseParcel('Which plot are you describing?', function(i){ openFacts(i, null, null); });
