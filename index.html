@@ -6130,7 +6130,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         var kind = mediaKind(m);
         var b = d.createElement('button');
         b.type = 'button';
-        b.title = shotProv(m) + ' \u00b7 ' + m.when;
+        b.title = shotProv(m) + (m.src === 'screen' ? '' : ' \u00b7 ' + m.when);
         if (kind === 'photo'){
           var im = d.createElement('img');
           im.alt = '';
@@ -6174,7 +6174,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         var a = d.createElement('audio'); a.src = src; a.controls = true; box.appendChild(a);
       }
       var p = d.createElement('p');
-      p.textContent = shotProv(m) + ' \u00b7 ' + m.when;
+      p.textContent = shotProv(m) + (m.src === 'screen' ? '' : ' \u00b7 ' + m.when);
       if (m.src === 'screen') p.className = 'warn';
       box.appendChild(p);
     });
@@ -6201,7 +6201,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     var holder = document.createElement('div');
     d.appendChild(holder);
     var cap = document.createElement('span');
-    cap.textContent = m.when +
+    cap.textContent = m.src === 'screen' ? 'Saved as survey evidence' : m.when +
       (m.head === null || m.head === undefined ? '' : ' \u00b7 ' + compass(m.head)) +
       (m.acc === null || m.acc === undefined ? '' : ' \u00b7 \u00b1' + m.acc + ' m');
     d.appendChild(cap);
