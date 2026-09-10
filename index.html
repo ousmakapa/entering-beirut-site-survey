@@ -160,6 +160,7 @@
     .map-shell{min-height:72vh;}}
   .leaflet-container{font-family:var(--font-body); background:var(--surface-2);}
   .leaflet-popup-content-wrapper{background:var(--surface-2); color:var(--ink); border-radius:var(--radius); box-shadow:0 2px 10px rgba(0,0,0,.18);}
+  .leaflet-popup-pane{z-index:1150;}
   .leaflet-popup-tip{background:var(--surface-2);}
   .leaflet-popup-content{font-size:.82rem; line-height:1.45; margin:.7rem .8rem; min-width:190px;}
   .leaflet-popup-content h4{font-family:var(--font-display); font-size:.85rem; margin:0 0 .3rem;}
@@ -303,6 +304,21 @@
   body[data-z="3"] .rec-tags .chip:nth-child(n+4){ display:none;}
   body[data-z="2"] .rec-tags .chip:nth-child(n+3){ display:none;}
   body[data-z="0"] .rec-tags{ display:none;}
+  /* One calm summary replaces the old pile of field-by-field chips. The parcel remains the
+     clickable object; this label only answers the two questions needed before opening it. */
+  .plot-summary{pointer-events:none; background:none; border:0;}
+  .plot-summary .ps-card{position:absolute; left:0; top:0; transform:translate(-50%,-50%);
+    display:flex; align-items:center; gap:4px; max-width:112px; min-height:23px;
+    padding:2px 6px 2px 5px; border:1px solid var(--line-strong); border-left:4px solid var(--pc);
+    border-radius:5px; background:color-mix(in srgb,var(--surface-2) 94%,transparent);
+    box-shadow:0 1px 4px rgba(0,0,0,.18); white-space:nowrap;
+    font-family:var(--font-mono); font-size:9px; line-height:1; color:var(--ink-soft);}
+  .plot-summary .ps-card b{font-size:10px; color:var(--ink);}
+  .plot-summary .ps-card span{overflow:hidden; text-overflow:ellipsis;}
+  .plot-summary .ps-card i{font-style:normal; color:var(--muted); font-size:8px;
+    padding-left:3px; border-left:1px solid var(--line);}
+  body[data-z="2"] .plot-summary .ps-card span{display:none;}
+  body[data-z="0"] .plot-summary{display:none;}
   /* the toolbar button's on-state */
   .tb-btn.tb-on{background:var(--ink); color:var(--paper); border-color:var(--ink);}
   /* over photography the thin survey greys disappear, so lift them while it is on */
@@ -508,12 +524,39 @@
     font-family:var(--font-body); color:var(--ink); background:var(--surface-2);
     border:1px solid var(--line-strong); border-radius:6px; padding:.3rem .45rem;}
   .pf-acts{display:flex; flex-wrap:wrap; gap:.35rem;}
-  .pf-read{font-size:.78rem; line-height:1.45; border-left:2px solid var(--accent);
-    padding-left:.45rem; margin:.1rem 0 .4rem;}
-  .pf-read b{font-size:.95rem;}
-  .pf-part{padding:.15rem 0; border-bottom:1px dotted var(--line);}
-  .pf-part i{font-family:var(--font-mono); font-size:.6rem; color:var(--muted);
-    text-transform:uppercase; letter-spacing:.05em;}
+  .pf-read{margin:.45rem 0 .3rem;}
+  .plot-data{display:grid; gap:.5rem; width:min(270px,calc(100vw - 86px)); box-sizing:border-box;}
+  .plot-card{border:1px solid var(--line); border-left:4px solid var(--pc,var(--accent));
+    border-radius:8px; background:var(--surface); padding:.55rem .6rem; box-sizing:border-box;}
+  .plot-card-head{display:flex; align-items:flex-start; gap:.45rem; margin-bottom:.5rem;}
+  .plot-card-head div{min-width:0; flex:1;}
+  .plot-card-head small{display:block; font-family:var(--font-mono); font-size:.56rem;
+    letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin-bottom:.12rem;}
+  .plot-card-head strong{display:block; font-family:var(--font-display); font-size:.88rem;
+    line-height:1.2; color:var(--ink); overflow-wrap:anywhere;}
+  .plot-storey{flex:none; min-width:34px; padding:.3rem .35rem; border-radius:6px;
+    background:var(--ink); color:var(--paper); text-align:center; font-family:var(--font-mono);
+    font-size:.72rem; font-weight:700;}
+  .plot-storey small{display:block; margin:0 0 .1rem; color:inherit; opacity:.68;
+    font-size:.43rem; line-height:1; letter-spacing:.04em;}
+  .plot-storey b{display:block; color:inherit; font-size:.76rem; line-height:1;}
+  .plot-grid{display:grid; grid-template-columns:1fr 1fr; gap:1px; overflow:hidden;
+    border:1px solid var(--line); border-radius:6px; background:var(--line);}
+  .plot-field{min-width:0; padding:.38rem .42rem; background:var(--surface-2);}
+  .plot-field.wide{grid-column:1/-1;}
+  .plot-field span{display:block; font-family:var(--font-mono); font-size:.54rem;
+    letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:.13rem;}
+  .plot-field b{display:block; font-size:.72rem; line-height:1.28; color:var(--ink); font-weight:600;}
+  .plot-field b.empty{color:var(--muted); font-weight:400;}
+  .plot-field em{display:block; margin-top:.13rem; font-family:var(--font-mono);
+    font-size:.55rem; line-height:1.25; font-style:normal; color:var(--sem-problem);}
+  .plot-proof{display:inline-flex; align-items:center; gap:.25rem;}
+  .plot-proof::before{content:''; width:6px; height:6px; border-radius:50%; background:var(--sem-veg);}
+  .plot-proof.missing::before{background:var(--sem-problem);}
+  .plot-card-foot{display:flex; gap:.35rem; flex-wrap:wrap; align-items:center; margin-top:.48rem;}
+  .plot-card-foot .pf-edit{font-size:.66rem; padding:.26rem .48rem; border:1px solid var(--line-strong);
+    border-radius:999px; background:var(--surface-2); color:var(--ink);}
+  .plot-card-foot .pf-screen{color:var(--sem-problem); border-color:var(--sem-problem);}
   .pf-edit{font-size:.62rem; color:var(--accent); background:none; border:0; cursor:pointer;}
   .pf-others{font-size:.7rem; color:var(--muted); background:var(--surface-2);
     border-radius:6px; padding:.3rem .4rem; margin-bottom:.2rem;}
@@ -3097,8 +3140,8 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       lay.on('popupopen', function(){ if (shots.length) fillStrip(dom, shots); });
       g.addLayer(lay);
 
-      /* every tag written on the plot, so the map can be read instead of remembered */
-      var ic = recTagsIcon(recs, {shots:shots.length}), c = parcelCenter(i);
+      /* One compact summary on the plot; every field remains in the click card below. */
+      var ic = recSummaryIcon(recs, shots.length), c = parcelCenter(i);
       if (c && ic) g.addLayer(L.marker(c, {interactive:false, zIndexOffset:1200, icon:ic}));
     });
   }
@@ -5111,6 +5154,31 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
                       html:'<div class="rt-in">' + chips.join('') + '</div>',
                       iconSize:[0, 0], iconAnchor:[0, 0]});
   }
+  function uniqueValues(rows, key){
+    var seen = {}, out = [];
+    rows.forEach(function(r){ var v = r[key]; if (v && !seen[v]){ seen[v] = 1; out.push(v); } });
+    return out;
+  }
+  function recSummaryIcon(recs, shots){
+    if (!recs.length && !shots) return null;
+    var floors = uniqueValues(recs, 'storeys'), uses = uniqueValues(recs, 'use');
+    var hasGreen = recs.some(function(r){ return r.green && r.green !== 'none'; });
+    var floorText = floors.length === 1 ? floors[0] + 'F'
+                  : floors.length > 1 ? floors.slice(0, 2).join('/') + (floors.length > 2 ? '+' : '') + 'F'
+                  : hasGreen ? 'greenery' : recs.length ? 'recorded' : 'image';
+    var useText = '';
+    if (uses.length === 1){ var u = useOf(uses[0]); useText = u ? (USE_SHORT[uses[0]] || u.lab) : uses[0]; }
+    else if (uses.length > 1) useText = uses.length + ' uses';
+    var meta = [];
+    if (recs.length > 1) meta.push(recs.length + ' parts');
+    if (!recs.length && shots) meta.push(shots + ' files');
+    var oneUse = uses.length === 1 ? useOf(uses[0]) : null;
+    var col = cssVar(oneUse ? oneUse.c : hasGreen ? '--sem-veg' : '--accent');
+    var html = '<div class="ps-card" style="--pc:' + col + '"><b>' + floorText + '</b>' +
+      (useText ? '<span>' + useText + '</span>' : '') +
+      (meta.length ? '<i>' + meta.join(' · ') + '</i>' : '') + '</div>';
+    return L.divIcon({className:'plot-summary', html:html, iconSize:[0,0], iconAnchor:[0,0]});
+  }
   function storeyOptions(){
     var o = ['<option value="">not counted</option>'];
     for (var i = 1; i <= 12; i++) o.push('<option value="' + i + '">' + i + '</option>');
@@ -5275,18 +5343,62 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     return (r.note ? '<b>' + String(r.note).replace(/</g, '&lt;') + '</b> \u2014 ' : '') +
            (bits.join(' \u00b7 ') || 'nothing filled in');
   }
+  function plotEsc(v){
+    return String(v === null || v === undefined ? '' : v)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function plotField(label, value, wide, note, cls){
+    var empty = !value;
+    return '<div class="plot-field' + (wide ? ' wide' : '') + '"><span>' + label + '</span>' +
+      '<b' + (empty ? ' class="empty"' : (cls ? ' class="' + cls + '"' : '')) + '>' +
+      (empty ? 'Not recorded' : value) + '</b>' + (note ? '<em>' + note + '</em>' : '') + '</div>';
+  }
+  function plotCardHTML(r, n, total, links){
+    var u = useOf(r.use), g = greenOf(r.green), shots = links[r.id] || [];
+    var col = cssVar(u ? u.c : (g && r.green !== 'none') ? '--sem-veg' : '--accent');
+    var title = r.note ? plotEsc(r.note) : (total > 1 ? 'Building part ' + (n + 1) : 'Recorded building');
+    var part = total > 1 ? 'Part ' + (n + 1) + ' of ' + total : 'Survey record';
+    var green = '';
+    if (g){
+      green = plotEsc(g.lab);
+      if (r.gcover) green += ' · ' + plotEsc(GCOVER_SHORT[r.gcover] || r.gcover);
+    }
+    var access = r.gaccess ? plotEsc(GACCESS_SHORT[r.gaccess] || r.gaccess) : '';
+    var change = [];
+    if (r.added === 'y') change.push('Added floor visible');
+    if (r.ready === 'y') change.push('Columns left for another floor');
+    var proof = shots.length ? shots.length + ' screenshot' + (shots.length === 1 ? '' : 's') + ' linked'
+                             : 'Needs screenshot';
+    return '<section class="plot-card" style="--pc:' + col + '">' +
+      '<div class="plot-card-head"><div><small>' + part + '</small><strong>' + title + '</strong></div>' +
+      '<span class="plot-storey" title="Storeys above ground"><small>storeys</small><b>' +
+        (r.storeys ? plotEsc(r.storeys) : '—') + '</b></span></div>' +
+      '<div class="plot-grid">' +
+        plotField('Use', u ? plotEsc(u.lab) : '', false) +
+        plotField('Ground floor', r.ground ? plotEsc(r.ground) : '', false) +
+        plotField('Apparent construction', r.era ? plotEsc(r.era) : 'Not estimated', true,
+                  r.era ? 'Visual estimate from screenshot · VERIFY' : '', r.era ? '' : 'empty') +
+        plotField('Greenery', green, false) +
+        plotField('Access', access, false) +
+        plotField('Visible vertical change', change.join(' · '), true) +
+        plotField('Screenshot evidence', proof, true, '', 'plot-proof' + (shots.length ? '' : ' missing')) +
+      '</div>' +
+      '<div class="plot-card-foot"><button class="pf-edit" onclick="editPlot(\'' + r.id + '\')">Edit data</button>' +
+      (!shots.length ? '<button class="pf-edit pf-screen" onclick="addScreenshot(\'' + r.id + '\')">Add screenshot</button>' : '') +
+      '</div></section>';
+  }
   /* What the popup says about the parts recorded on a plot. */
   function factsHTML(i){
     var recs = plotsIn(i);
     if (!recs.length) return '';
-    return '<div class="pf-read">' +
+    var links = screenshotLinks();
+    return '<div class="pf-read"><div class="plot-data">' +
       recs.map(function(r, n){
-        return '<div class="pf-part">' + (recs.length > 1 ? '<i>part ' + (n + 1) + '</i> ' : '') +
-          plotLine(r) +
-          ' <button class="pf-edit" onclick="editPlot(\'' + r.id + '\')">edit</button></div>';
+        return plotCardHTML(r, n, recs.length, links);
       }).join('') +
+      '</div>' +
       '<button class="save-btn" onclick="addPlot(' + i + ')">Add another part</button>' +
-      '<span class="src">Recorded on site. Each part is pinned where it was tapped.</span></div>';
+      '<span class="src">Each card is one recorded building part. Blank means not recorded, not assumed.</span></div>';
   }
 
   /* ===================== KEEPING IT ALL =====================
@@ -6040,19 +6152,12 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         var ru = useOf(r.use), rc = ru ? cssVar(ru.c) : cssVar('--ink-soft');
         var rt = r.storeys ? r.storeys + 'F' : (ru ? ru.lab.charAt(0) : '\u00b7');
         var rw = 23 + Math.max(0, rt.length - 2) * 8;
-        /* Here each PART carries its own tags, because here the parts are drawn apart.
-           Below the pin, and without the storey chip: the pin is the storey count. */
-        var pic = recTagsIcon([r], {below:true, noStoreys:true});
-        if (pic) g.addLayer(L.marker(p, {interactive:false, zIndexOffset:2150, icon:pic}));
         g.addLayer(L.marker(p, {zIndexOffset:2200,
           icon:L.divIcon({className:'plot-pin' + (picturesMissingOnly ? ' missing-shot' : ''),
             html:'<span style="background:' + rc + '">' + rt + '</span>',
             iconSize:[rw, 23], iconAnchor:[rw / 2, 11.5]})})
-          .bindPopup('<h4>' + (r.note ? String(r.note).replace(/</g, '&lt;') : 'A part of ' + parcelLabel(i)) + '</h4>' +
-            plotLine(r) +
-            '<br><button class="save-btn" onclick="editPlot(\'' + r.id + '\')">Edit this part</button>' +
-            (picturesMissingOnly ? ' <button class="save-btn" onclick="addScreenshot(\'' + r.id + '\')">Add screenshot</button>' : '') +
-            '<span class="src">Recorded on site ' + r.when + '</span>'));
+          .bindPopup('<h4>' + parcelLabel(i) + '</h4><div class="plot-data">' +
+            plotCardHTML(r, plotsIn(i).indexOf(r), plotsIn(i).length, screenshotLinks()) + '</div>'));
       });
       shots.forEach(function(m){
         /* A desk capture has no standing point, so drawing one -- and a line to it -- would
