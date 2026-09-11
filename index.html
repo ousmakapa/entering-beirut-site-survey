@@ -4,65 +4,84 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#FAFAF7">
+<meta name="theme-color" content="#F4F2ED">
 <title>Site Context &amp; Analysis — Entering Beirut</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>/* Leaflet 1.9.4 stylesheet, inlined so the page works with no network at all —
    which matters when you are standing on the site with one bar of signal. */
 .leaflet-image-layer,.leaflet-layer,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-pane,.leaflet-pane>canvas,.leaflet-pane>svg,.leaflet-tile,.leaflet-tile-container,.leaflet-zoom-box{position:absolute;left:0;top:0}.leaflet-container{overflow:hidden}.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile{-webkit-user-select:none;-moz-user-select:none;user-select:none;-webkit-user-drag:none}.leaflet-tile::selection{background:0 0}.leaflet-safari .leaflet-tile{image-rendering:-webkit-optimize-contrast}.leaflet-safari .leaflet-tile-container{width:1600px;height:1600px;-webkit-transform-origin:0 0}.leaflet-marker-icon,.leaflet-marker-shadow{display:block}.leaflet-container .leaflet-overlay-pane svg{max-width:none!important;max-height:none!important}.leaflet-container .leaflet-marker-pane img,.leaflet-container .leaflet-shadow-pane img,.leaflet-container .leaflet-tile,.leaflet-container .leaflet-tile-pane img,.leaflet-container img.leaflet-image-layer{max-width:none!important;max-height:none!important;width:auto;padding:0}.leaflet-container img.leaflet-tile{mix-blend-mode:plus-lighter}.leaflet-container.leaflet-touch-zoom{-ms-touch-action:pan-x pan-y;touch-action:pan-x pan-y}.leaflet-container.leaflet-touch-drag{-ms-touch-action:pinch-zoom;touch-action:none;touch-action:pinch-zoom}.leaflet-container.leaflet-touch-drag.leaflet-touch-zoom{-ms-touch-action:none;touch-action:none}.leaflet-container{-webkit-tap-highlight-color:transparent}.leaflet-container a{-webkit-tap-highlight-color:rgba(51,181,229,.4)}.leaflet-tile{filter:inherit;visibility:hidden}.leaflet-tile-loaded{visibility:inherit}.leaflet-zoom-box{width:0;height:0;-moz-box-sizing:border-box;box-sizing:border-box;z-index:800}.leaflet-overlay-pane svg{-moz-user-select:none}.leaflet-pane{z-index:400}.leaflet-tile-pane{z-index:200}.leaflet-overlay-pane{z-index:400}.leaflet-shadow-pane{z-index:500}.leaflet-marker-pane{z-index:600}.leaflet-tooltip-pane{z-index:650}.leaflet-popup-pane{z-index:700}.leaflet-map-pane canvas{z-index:100}.leaflet-map-pane svg{z-index:200}.leaflet-vml-shape{width:1px;height:1px}.lvml{behavior:url(#default#VML);display:inline-block;position:absolute}.leaflet-control{position:relative;z-index:800;pointer-events:visiblePainted;pointer-events:auto}.leaflet-bottom,.leaflet-top{position:absolute;z-index:1000;pointer-events:none}.leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}.leaflet-control{float:left;clear:both}.leaflet-right .leaflet-control{float:right}.leaflet-top .leaflet-control{margin-top:10px}.leaflet-bottom .leaflet-control{margin-bottom:10px}.leaflet-left .leaflet-control{margin-left:10px}.leaflet-right .leaflet-control{margin-right:10px}.leaflet-fade-anim .leaflet-popup{opacity:0;-webkit-transition:opacity .2s linear;-moz-transition:opacity .2s linear;transition:opacity .2s linear}.leaflet-fade-anim .leaflet-map-pane .leaflet-popup{opacity:1}.leaflet-zoom-animated{-webkit-transform-origin:0 0;-ms-transform-origin:0 0;transform-origin:0 0}svg.leaflet-zoom-animated{will-change:transform}.leaflet-zoom-anim .leaflet-zoom-animated{-webkit-transition:-webkit-transform .25s cubic-bezier(0,0,.25,1);-moz-transition:-moz-transform .25s cubic-bezier(0,0,.25,1);transition:transform .25s cubic-bezier(0,0,.25,1)}.leaflet-pan-anim .leaflet-tile,.leaflet-zoom-anim .leaflet-tile{-webkit-transition:none;-moz-transition:none;transition:none}.leaflet-zoom-anim .leaflet-zoom-hide{visibility:hidden}.leaflet-interactive{cursor:pointer}.leaflet-grab{cursor:-webkit-grab;cursor:-moz-grab;cursor:grab}.leaflet-crosshair,.leaflet-crosshair .leaflet-interactive{cursor:crosshair}.leaflet-control,.leaflet-popup-pane{cursor:auto}.leaflet-dragging .leaflet-grab,.leaflet-dragging .leaflet-grab .leaflet-interactive,.leaflet-dragging .leaflet-marker-draggable{cursor:move;cursor:-webkit-grabbing;cursor:-moz-grabbing;cursor:grabbing}.leaflet-image-layer,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-pane>svg path,.leaflet-tile-container{pointer-events:none}.leaflet-image-layer.leaflet-interactive,.leaflet-marker-icon.leaflet-interactive,.leaflet-pane>svg path.leaflet-interactive,svg.leaflet-image-layer.leaflet-interactive path{pointer-events:visiblePainted;pointer-events:auto}.leaflet-container{background:#ddd;outline-offset:1px}.leaflet-container a{color:#0078a8}.leaflet-zoom-box{border:2px dotted #38f;background:rgba(255,255,255,.5)}.leaflet-container{font-family:"Helvetica Neue",Arial,Helvetica,sans-serif;font-size:12px;font-size:.75rem;line-height:1.5}.leaflet-bar{box-shadow:0 1px 5px rgba(0,0,0,.65);border-radius:4px}.leaflet-bar a{background-color:#fff;border-bottom:1px solid #ccc;width:26px;height:26px;line-height:26px;display:block;text-align:center;text-decoration:none;color:#000}.leaflet-bar a,.leaflet-control-layers-toggle{background-position:50% 50%;background-repeat:no-repeat;display:block}.leaflet-bar a:focus,.leaflet-bar a:hover{background-color:#f4f4f4}.leaflet-bar a:first-child{border-top-left-radius:4px;border-top-right-radius:4px}.leaflet-bar a:last-child{border-bottom-left-radius:4px;border-bottom-right-radius:4px;border-bottom:none}.leaflet-bar a.leaflet-disabled{cursor:default;background-color:#f4f4f4;color:#bbb}.leaflet-touch .leaflet-bar a{width:30px;height:30px;line-height:30px}.leaflet-touch .leaflet-bar a:first-child{border-top-left-radius:2px;border-top-right-radius:2px}.leaflet-touch .leaflet-bar a:last-child{border-bottom-left-radius:2px;border-bottom-right-radius:2px}.leaflet-control-zoom-in,.leaflet-control-zoom-out{font:bold 18px 'Lucida Console',Monaco,monospace;text-indent:1px}.leaflet-touch .leaflet-control-zoom-in,.leaflet-touch .leaflet-control-zoom-out{font-size:22px}.leaflet-control-layers{box-shadow:0 1px 5px rgba(0,0,0,.4);background:#fff;border-radius:5px}.leaflet-control-layers-toggle{background-image:none;width:36px;height:36px}.leaflet-retina .leaflet-control-layers-toggle{background-image:none;background-size:26px 26px}.leaflet-touch .leaflet-control-layers-toggle{width:44px;height:44px}.leaflet-control-layers .leaflet-control-layers-list,.leaflet-control-layers-expanded .leaflet-control-layers-toggle{display:none}.leaflet-control-layers-expanded .leaflet-control-layers-list{display:block;position:relative}.leaflet-control-layers-expanded{padding:6px 10px 6px 6px;color:#333;background:#fff}.leaflet-control-layers-scrollbar{overflow-y:scroll;overflow-x:hidden;padding-right:5px}.leaflet-control-layers-selector{margin-top:2px;position:relative;top:1px}.leaflet-control-layers label{display:block;font-size:13px;font-size:1.08333em}.leaflet-control-layers-separator{height:0;border-top:1px solid #ddd;margin:5px -10px 5px -6px}.leaflet-default-icon-path{background-image:none}.leaflet-container .leaflet-control-attribution{background:#fff;background:rgba(255,255,255,.8);margin:0}.leaflet-control-attribution,.leaflet-control-scale-line{padding:0 5px;color:#333;line-height:1.4}.leaflet-control-attribution a{text-decoration:none}.leaflet-control-attribution a:focus,.leaflet-control-attribution a:hover{text-decoration:underline}.leaflet-attribution-flag{display:inline!important;vertical-align:baseline!important;width:1em;height:.6669em}.leaflet-left .leaflet-control-scale{margin-left:5px}.leaflet-bottom .leaflet-control-scale{margin-bottom:5px}.leaflet-control-scale-line{border:2px solid #777;border-top:none;line-height:1.1;padding:2px 5px 1px;white-space:nowrap;-moz-box-sizing:border-box;box-sizing:border-box;background:rgba(255,255,255,.8);text-shadow:1px 1px #fff}.leaflet-control-scale-line:not(:first-child){border-top:2px solid #777;border-bottom:none;margin-top:-2px}.leaflet-control-scale-line:not(:first-child):not(:last-child){border-bottom:2px solid #777}.leaflet-touch .leaflet-bar,.leaflet-touch .leaflet-control-attribution,.leaflet-touch .leaflet-control-layers{box-shadow:none}.leaflet-touch .leaflet-bar,.leaflet-touch .leaflet-control-layers{border:2px solid rgba(0,0,0,.2);background-clip:padding-box}.leaflet-popup{position:absolute;text-align:center;margin-bottom:20px}.leaflet-popup-content-wrapper{padding:1px;text-align:left;border-radius:12px}.leaflet-popup-content{margin:13px 24px 13px 20px;line-height:1.3;font-size:13px;font-size:1.08333em;min-height:1px}.leaflet-popup-content p{margin:17px 0;margin:1.3em 0}.leaflet-popup-tip-container{width:40px;height:20px;position:absolute;left:50%;margin-top:-1px;margin-left:-20px;overflow:hidden;pointer-events:none}.leaflet-popup-tip{width:17px;height:17px;padding:1px;margin:-10px auto 0;pointer-events:auto;-webkit-transform:rotate(45deg);-moz-transform:rotate(45deg);-ms-transform:rotate(45deg);transform:rotate(45deg)}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#fff;color:#333;box-shadow:0 3px 14px rgba(0,0,0,.4)}.leaflet-container a.leaflet-popup-close-button{position:absolute;top:0;right:0;border:none;text-align:center;width:24px;height:24px;font:16px/24px Tahoma,Verdana,sans-serif;color:#757575;text-decoration:none;background:0 0}.leaflet-container a.leaflet-popup-close-button:focus,.leaflet-container a.leaflet-popup-close-button:hover{color:#585858}.leaflet-popup-scrolled{overflow:auto}.leaflet-oldie .leaflet-popup-content-wrapper{-ms-zoom:1}.leaflet-oldie .leaflet-popup-tip{width:24px;margin:0 auto}.leaflet-oldie .leaflet-control-layers,.leaflet-oldie .leaflet-control-zoom,.leaflet-oldie .leaflet-popup-content-wrapper,.leaflet-oldie .leaflet-popup-tip{border:1px solid #999}.leaflet-div-icon{background:#fff;border:1px solid #666}.leaflet-tooltip{position:absolute;padding:6px;background-color:#fff;border:1px solid #fff;border-radius:3px;color:#222;white-space:nowrap;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,.4)}.leaflet-tooltip.leaflet-interactive{cursor:pointer;pointer-events:auto}.leaflet-tooltip-bottom:before,.leaflet-tooltip-left:before,.leaflet-tooltip-right:before,.leaflet-tooltip-top:before{position:absolute;pointer-events:none;border:6px solid transparent;background:0 0;content:""}.leaflet-tooltip-bottom{margin-top:6px}.leaflet-tooltip-top{margin-top:-6px}.leaflet-tooltip-bottom:before,.leaflet-tooltip-top:before{left:50%;margin-left:-6px}.leaflet-tooltip-top:before{bottom:0;margin-bottom:-12px;border-top-color:#fff}.leaflet-tooltip-bottom:before{top:0;margin-top:-12px;margin-left:-6px;border-bottom-color:#fff}.leaflet-tooltip-left{margin-left:-6px}.leaflet-tooltip-right{margin-left:6px}.leaflet-tooltip-left:before,.leaflet-tooltip-right:before{top:50%;margin-top:-6px}.leaflet-tooltip-left:before{right:0;margin-right:-12px;border-left-color:#fff}.leaflet-tooltip-right:before{left:0;margin-left:-12px;border-right-color:#fff}@media print{.leaflet-control{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style>
 <style>
   :root{
     color-scheme: light;
-    --paper:#F1F2EE; --surface:#FAFAF7; --surface-2:#FFFFFF;
-    --ink:#171B1D; --ink-soft:#52565A; --muted:#8B8F8A;
-    --line:#DBDCD5; --line-strong:#B9BBB2;
-    --accent:#2a78d6;
-    --layer-movement:#2a78d6;
-    --layer-traffic:#c85a29;
-    --layer-greenery:#12946a;
-    --layer-landuse:#b3790a;
-    --layer-environmental:#c14c79;
-    --layer-height:#8a5d17;
+    /* Oussama Daher identity: the five canonical colours remain exact. The extra tones
+       are working shades made from them so the maps feel branded without turning every
+       category into the same green. */
+    --brand-olive:#4A5A46; --brand-stone:#C8BCAC; --brand-charcoal:#151515;
+    --brand-offwhite:#F4F2ED; --brand-concrete:#8A8D90;
+    --olive-050:#EEF0EB; --olive-100:#DFE3DA; --olive-200:#C7CEC2;
+    --olive-300:#A8B3A2; --olive-400:#84917D; --olive-500:#62705D;
+    --olive-600:#4A5A46; --olive-700:#394536; --olive-800:#2B3529;
+    --olive-900:#20281F;
+    --stone-100:#EEE9E1; --stone-200:#DED5C8; --stone-300:#C8BCAC;
+    --stone-500:#9A856D; --stone-700:#725D47;
+    --concrete-700:#626568;
+    --use-residential:#4A5A46; --use-commercial:#7C664F;
+    --use-industrial:#2B3529; --use-mixed:#6F625B;
+    --use-institutional:#626568; --use-vacant:#8A8D90;
+    --use-construction:#C8BCAC;
+    --paper:#F4F2ED; --surface:#FAF9F6; --surface-2:#FFFFFF;
+    --ink:#151515; --ink-soft:#4E504D; --muted:#8A8D90;
+    --line:#DED8CF; --line-strong:#C8BCAC;
+    --accent:#4A5A46;
+    --layer-movement:#62705D;
+    --layer-traffic:#725D47;
+    --layer-greenery:#4A5A46;
+    --layer-landuse:#8A7358;
+    --layer-environmental:#A24C42;
+    --layer-height:#5C554B;
     /* Semantic tokens: ONE meaning each, used across every section, so a colour never has
        to be relearned from tab to tab. The layer-* names above stay for the survey base. */
-    --sem-plot:#171B1D;        /* the project plot, and nothing else */
-    --sem-base:#9DA09B;        /* the survey base */
-    --sem-built:#4A4F52;       /* built mass, industry, sheds */
-    --sem-veg:#12946a;         /* vegetation ONLY */
-    --sem-public:#2a78d6;      /* public space, movement, water */
-    --sem-problem:#c1443f;     /* the problem argued on this tab */
-    --sem-move:#7b52c9;        /* the project's own move */
+    --sem-plot:#151515;        /* the project plot, and nothing else */
+    --sem-base:#8A8D90;        /* the survey base */
+    --sem-built:#454845;       /* built mass, industry, sheds */
+    --sem-veg:#4A5A46;         /* vegetation ONLY */
+    --sem-public:#687B74;      /* public space, movement, water */
+    --sem-problem:#A64138;     /* warning/problem only; never a decorative accent */
+    --sem-move:#8A7358;        /* the project's own move */
     /* "Approximate" is NOT a hue. A fifth colour cannot be told from the other four
        under deuteranopia, and it made every inferred thing look like its own category.
        It is a TEXTURE instead: same hue as whatever it approximates, dashed, faded.
        Set by .approx / L.polygon dashArray -- see --sem-dash below. */
     --sem-dash:6 4;
-    --unsurveyed:#B9BBB2;
+    --unsurveyed:#C8BCAC;
     --radius: 3px;
-    --font-display:'Archivo', 'Helvetica Neue', system-ui, sans-serif;
-    --font-body:'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+    --font-display:'Inter', 'Helvetica Neue', system-ui, sans-serif;
+    --font-body:'Inter', system-ui, -apple-system, sans-serif;
     --font-mono:'IBM Plex Mono', ui-monospace, "SFMono-Regular", Consolas, monospace;
   }
   @media (prefers-color-scheme: dark){
     :root{
       color-scheme: dark;
-      --paper:#14181A; --surface:#1B2023; --surface-2:#20272A;
-      --ink:#F2F1EC; --ink-soft:#B9BCB6; --muted:#82857F;
-      --line:#2B3033; --line-strong:#3D4448;
-      --accent:#3987e5;
-      --layer-movement:#3987e5;
-      --layer-traffic:#e37a44;
-      --layer-greenery:#2bb989;
-      --layer-landuse:#d9a324;
-      --layer-environmental:#e0759b;
-      --layer-height:#caa053;
-      --sem-plot:#F2F1EC; --sem-base:#7D817C; --sem-built:#A8ADB0;
-      /* Dark is stepped from the same ramps and validated against #1B2023, not flipped. */
-      --sem-veg:#22ab7e; --sem-public:#3d84dd; --sem-problem:#d55d55;
-      --sem-move:#9570dd;
-      --unsurveyed:#3D4448;
+      --paper:#151515; --surface:#1D211C; --surface-2:#252923;
+      --ink:#F4F2ED; --ink-soft:#D6D1C8; --muted:#9C9E9F;
+      --line:#353930; --line-strong:#566252;
+      --accent:#A8B3A2;
+      --layer-movement:#93A18D;
+      --layer-traffic:#C8BCAC;
+      --layer-greenery:#A8B3A2;
+      --layer-landuse:#C8B394;
+      --layer-environmental:#D77A70;
+      --layer-height:#B2A694;
+      --sem-plot:#F4F2ED; --sem-base:#8A8D90; --sem-built:#B9BDB8;
+      --sem-veg:#A8B3A2; --sem-public:#9EB2AA; --sem-problem:#D77A70;
+      --sem-move:#C8B394;
+      --unsurveyed:#566252;
+      --use-residential:#A8B3A2; --use-commercial:#C8B394;
+      --use-industrial:#B9BDB8; --use-mixed:#B3A59A;
+      --use-institutional:#9C9E9F; --use-vacant:#707470;
+      --use-construction:#C8BCAC;
     }
   }
   *{box-sizing:border-box;}
@@ -95,7 +114,7 @@
     background:var(--surface-2); border:1px solid var(--line); border-radius:999px;
     padding:.25rem .7rem;}
   .tb-btn:hover{border-color:var(--line-strong); color:var(--ink);}
-  .tb-btn.on{background:var(--ink); border-color:var(--ink); color:var(--surface);}
+  .tb-btn.on{background:var(--brand-olive); border-color:var(--brand-olive); color:var(--brand-offwhite);}
   @media (max-width:1100px){ .tb-meta{display:none;} }
 
   /* the long note is hidden until you ask for it */
@@ -114,10 +133,10 @@
     padding:.22rem .5rem; cursor:pointer; display:flex; align-items:center; gap:.28rem; flex:none;
   }
   .tab-btn .dot{width:.4rem; height:.4rem; border-radius:50%; background:var(--tab-color, var(--muted)); flex:none;}
-  .tab-btn.active{color:var(--surface); background:var(--ink); border-color:var(--ink);}
+  .tab-btn.active{color:var(--brand-offwhite); background:var(--brand-olive); border-color:var(--brand-olive);}
   .tab-btn.active .dot{box-shadow:0 0 0 1.5px var(--surface);}
   .tab-btn:hover{background:var(--surface-2); color:var(--ink);}
-  .tab-btn.active:hover{background:var(--ink); color:var(--surface);}
+  .tab-btn.active:hover{background:var(--olive-700); color:var(--brand-offwhite);}
 
   .workspace{display:grid; grid-template-columns:1fr 300px; grid-template-areas:"map facts";
     gap:1px; background:var(--line); height:calc(100vh - var(--chrome, 92px));}
@@ -191,11 +210,11 @@
     background:color-mix(in srgb, var(--layer-environmental) 7%, var(--surface));
     font-size:.82rem; line-height:1.55; color:var(--ink-soft); margin:1.1rem 0;}
   .story-conclusion{margin-top:2.5rem; padding:clamp(1.2rem,3vw,2rem);
-    background:var(--ink); color:var(--surface); border-radius:10px;}
-  .story-conclusion .story-kicker{color:color-mix(in srgb, var(--surface) 70%, var(--accent));}
+    background:var(--brand-olive); color:var(--brand-offwhite); border-radius:10px;}
+  .story-conclusion .story-kicker{color:var(--stone-300);}
   .story-conclusion h2{font-family:var(--font-display); font-size:clamp(1.4rem,3vw,2.25rem);
     line-height:1.15; margin:0 0 .7rem; max-width:700px;}
-  .story-conclusion p{color:color-mix(in srgb, var(--surface) 78%, transparent); line-height:1.6;
+  .story-conclusion p{color:color-mix(in srgb, var(--brand-offwhite) 84%, transparent); line-height:1.6;
     margin:.45rem 0; max-width:760px;}
   .story-sources{margin-top:2rem; padding-top:1.1rem; border-top:1px solid var(--line);}
   .story-sources h2{font-family:var(--font-display); font-size:1rem; margin:0 0 .65rem;}
@@ -259,7 +278,7 @@
   #walk-panel[hidden]{ display:none; }
   body.wp-out #walk-panel{ display:none; }        /* it lives in the other window now */
   .wp-head{ display:flex; justify-content:space-between; align-items:baseline; gap:.5rem;
-    padding:.6rem .75rem; background:var(--ink); color:var(--paper);
+    padding:.6rem .75rem; background:var(--brand-olive); color:var(--brand-offwhite);
     font-family:var(--font-display); font-size:.95rem;}
   .wp-head span{ font-family:var(--font-mono); font-size:.68rem; opacity:.75;}
   .wp-body{ padding:.6rem .75rem; max-height:none; overflow-y:auto; flex:1 1 auto;}
@@ -313,7 +332,7 @@
   #wp-found.bad{ color:var(--sem-problem); }
   .wp-acts{ display:flex; gap:.4rem; padding:.6rem .75rem; border-top:1px solid var(--line);}
   .wp-acts button{ flex:1; font:inherit; font-size:.86rem; font-weight:600; padding:.5rem;
-    border:1px solid var(--ink); border-radius:5px; background:var(--ink); color:var(--paper);
+    border:1px solid var(--brand-olive); border-radius:5px; background:var(--brand-olive); color:var(--brand-offwhite);
     cursor:pointer;}
   .wp-acts button.wp-quiet{ flex:0 0 auto; background:none; color:var(--ink-soft);
     border-color:var(--line-strong); font-weight:400;}
@@ -336,7 +355,7 @@
     letter-spacing:.05em; padding:.45rem .3rem; cursor:pointer; border-radius:4px;
     border:1px solid var(--line-strong); background:var(--surface); color:var(--muted);
     text-align:center;}
-  .yn1[data-v="y"]{background:var(--sem-move); border-color:var(--sem-move); color:#fff;
+  .yn1[data-v="y"]{background:var(--brand-olive); border-color:var(--brand-olive); color:var(--brand-offwhite);
     font-weight:700;}
   .rec-tags{ pointer-events:none; background:none; border:0; }
   .rec-tags .rt-in{ position:absolute; left:0; top:0; transform:translate(-50%,-50%);
@@ -376,7 +395,7 @@
   body[data-z="2"] .plot-summary .ps-card span{display:none;}
   body[data-z="0"] .plot-summary{display:none;}
   /* the toolbar button's on-state */
-  .tb-btn.tb-on{background:var(--ink); color:var(--paper); border-color:var(--ink);}
+  .tb-btn.tb-on{background:var(--brand-olive); color:var(--brand-offwhite); border-color:var(--brand-olive);}
   /* over photography the thin survey greys disappear, so lift them while it is on */
   body.sat-on .leaflet-overlay-pane path{ paint-order:stroke; }
   body.sat-on .parcel-no, body.sat-on .ring-label{ text-shadow:0 0 3px var(--surface), 0 0 6px var(--surface); }
@@ -741,7 +760,7 @@
   .fb-btn{font-family:var(--font-body); font-size:.78rem; font-weight:500; cursor:pointer;
     background:var(--surface-2); color:var(--ink); border:1px solid var(--line-strong);
     border-radius:999px; padding:.42rem .85rem; min-height:34px;}
-  .fb-primary{background:var(--layer-traffic); border-color:var(--layer-traffic); color:#fff;}
+  .fb-primary{background:var(--brand-olive); border-color:var(--brand-olive); color:var(--brand-offwhite);}
   .fb-quiet{color:var(--muted);}
   .fb-btn.pic-filter-on{background:var(--sem-problem); border-color:var(--sem-problem); color:#fff;}
   .fb-gps{font-family:var(--font-mono); font-size:.68rem; color:var(--ink-soft); flex:1;
@@ -829,11 +848,33 @@
   .street-name{ font-family:var(--font-body); font-size:8.5px; font-style:italic; letter-spacing:.04em;
     text-align:center; color:var(--ink-soft); white-space:nowrap;
     text-shadow:0 0 3px var(--surface), 0 0 3px var(--surface), 0 0 3px var(--surface); }
+  @media print{
+    :root{
+      color-scheme:light;
+      --paper:#F4F2ED; --surface:#FAF9F6; --surface-2:#FFFFFF;
+      --ink:#151515; --ink-soft:#4E504D; --muted:#8A8D90;
+      --line:#DED8CF; --line-strong:#C8BCAC; --accent:#4A5A46;
+      --layer-movement:#62705D; --layer-traffic:#725D47;
+      --layer-greenery:#4A5A46; --layer-landuse:#8A7358;
+      --layer-environmental:#A24C42; --layer-height:#5C554B;
+      --sem-plot:#151515; --sem-base:#8A8D90; --sem-built:#454845;
+      --sem-veg:#4A5A46; --sem-public:#687B74; --sem-problem:#A64138;
+      --sem-move:#8A7358; --unsurveyed:#C8BCAC;
+      --use-residential:#4A5A46; --use-commercial:#7C664F;
+      --use-industrial:#2B3529; --use-mixed:#6F625B;
+      --use-institutional:#626568; --use-vacant:#8A8D90;
+      --use-construction:#C8BCAC;
+    }
+    *,*::before,*::after{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+    .map-legend,.colour-key,.map-north{backdrop-filter:none;box-shadow:none;
+      background:rgba(250,249,246,.97);}
+    .survey-field-badge span,.plot-summary .ps-card,.rec-tags .chip{box-shadow:none;}
+  }
 </style>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/plot-192.png">
   <link rel="apple-touch-icon" href="icons/plot-180.png">
-  <meta name="theme-color" content="#15171A">
+  <meta name="theme-color" content="#151515">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Entering Beirut">
 </head>
@@ -1094,6 +1135,16 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   var SITE = {lat:33.896595, lng:35.540095};
 
   function cssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  /* Tags sometimes use pale stone and sometimes deep olive. Pick the text colour from the
+     actual fill rather than assuming every category is dark enough for white lettering. */
+  function tagInk(color){
+    var h = String(color || '').trim().replace('#','');
+    if (h.length === 3) h = h.split('').map(function(x){ return x + x; }).join('');
+    if (!/^[0-9a-f]{6}$/i.test(h)) return cssVar('--brand-offwhite');
+    var r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16);
+    return (r * 299 + g * 587 + b * 114) / 1000 >= 145
+      ? cssVar('--brand-charcoal') : cssVar('--brand-offwhite');
+  }
 
   function inferOsmFunction(t){
     if (!t) return null;
@@ -1280,11 +1331,11 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   };
 
   var FUNCTION_TYPES = [
-    {key:'residential', label:'Residential', color:'var(--layer-movement)'},
-    {key:'commercial', label:'Commercial / Retail', color:'var(--layer-traffic)'},
-    {key:'workshop', label:'Workshop / Light-industrial', color:'var(--layer-landuse)'},
-    {key:'civic', label:'Civic / Religious', color:'var(--layer-environmental)'},
-    {key:'mixed', label:'Mixed-use', color:'var(--layer-greenery)'}
+    {key:'residential', label:'Residential', color:'var(--use-residential)'},
+    {key:'commercial', label:'Commercial / Retail', color:'var(--use-commercial)'},
+    {key:'workshop', label:'Workshop / Light-industrial', color:'var(--use-industrial)'},
+    {key:'civic', label:'Civic / Religious', color:'var(--use-institutional)'},
+    {key:'mixed', label:'Mixed-use', color:'var(--use-mixed)'}
   ];
 
   /* Real named businesses read off Google Maps (2026-09-03), positions estimated from the
@@ -1314,16 +1365,16 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
      to 14 cm. The evidence survives in the notes as a list, which is what it is. */
 
   var AGE_BRACKETS = [
-    {key:'pre1950', label:'Pre-1950s', color:'#b7d3f6', colorDark:'#5598e7'},
-    {key:'1950-1975', label:'1950s–1975', color:'#6da7ec', colorDark:'#2a78d6'},
-    {key:'1975-2000', label:'1975–2000 (Civil War / rebuild)', color:'#2a78d6', colorDark:'#184f95'},
-    {key:'post2000', label:'Post-2000', color:'#104281', colorDark:'#0d366b'}
+    {key:'pre1950', label:'Pre-1950s', color:'#2B3529', colorDark:'#C7CEC2'},
+    {key:'1950-1975', label:'1950s–1975', color:'#4A5A46', colorDark:'#A8B3A2'},
+    {key:'1975-2000', label:'1975–2000 (Civil War / rebuild)', color:'#84917D', colorDark:'#84917D'},
+    {key:'post2000', label:'Post-2000', color:'#C7CEC2', colorDark:'#62705D'}
   ];
   var HEIGHT_BRACKETS = [
-    {key:'lt10', label:'< 10 m (~1–3 floors)', color:'#fbe4b8', colorDark:'#c9a15a'},
-    {key:'10to17', label:'10–17 m (~4–5 floors)', color:'#e0af52', colorDark:'#a97a1c'},
-    {key:'17to30', label:'17–30 m (~6–9 floors)', color:'#b3790a', colorDark:'#7a5106'},
-    {key:'gt30', label:'> 30 m (10+ floors)', color:'#7a5106', colorDark:'#4d3300'}
+    {key:'lt10', label:'< 10 m (~1–3 floors)', color:'#DED5C8', colorDark:'#C8BCAC'},
+    {key:'10to17', label:'10–17 m (~4–5 floors)', color:'#C8BCAC', colorDark:'#AA977F'},
+    {key:'17to30', label:'17–30 m (~6–9 floors)', color:'#9A856D', colorDark:'#8B775F'},
+    {key:'gt30', label:'> 30 m (10+ floors)', color:'#725D47', colorDark:'#725D47'}
   ];
 
   function bbedFunctionCategory(use){
@@ -1519,7 +1570,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     if (['pedestrian','footway','path','steps'].indexOf(hwy) > -1) return 0.6;
     return 1; // residential, service, living_street
   }
-  var TIER_INK = {3:'#0d366b', 2:'#2a78d6', 1.4:'#6da7ec', 1:'#9ec5f4', 0.6:'#c3c2b7'};
+  var TIER_INK = {3:'#2B3529', 2:'#4A5A46', 1.4:'#84917D', 1:'#A8B3A2', 0.6:'#C8BCAC'};
 
   function loadFromSnapshot(){
     var status = document.getElementById('map-status');
@@ -2058,13 +2109,13 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     if (SHOW.streets && typeof STREET_NET !== 'undefined' && STREET_NET){
       var g = groups.streets;
       /* the void itself, kept as a faint ground so the network reads as figure on it */
-      cadStreets('streets', {primary:'#dfe8f4', secondary:'#e6edf7', local:'#eef2f8', lane:'#f4f7fb'}, null);
+      cadStreets('streets', {primary:'#C7CEC2', secondary:'#D7DDD2', local:'#E5E8E1', lane:'#F1F2EE'}, null);
 
       function wClass(w){
-        return w >= 26 ? {c:'#0d366b', wt:6.5, l:'26 m and over'}
-             : w >= 16 ? {c:'#2a78d6', wt:5.0, l:'16 – 26 m'}
-             : w >= 9  ? {c:'#5f9de8', wt:3.6, l:'9 – 16 m'}
-             :           {c:'#9dbfe8', wt:2.2, l:'under 9 m'};
+        return w >= 26 ? {c:'#2B3529', wt:6.5, l:'26 m and over'}
+             : w >= 16 ? {c:'#4A5A46', wt:5.0, l:'16 – 26 m'}
+             : w >= 9  ? {c:'#84917D', wt:3.6, l:'9 – 16 m'}
+             :           {c:'#B7C0B2', wt:2.2, l:'under 9 m'};
       }
       STREET_NET.forEach(function(seg){
         var k = wClass(seg.w);
@@ -2183,8 +2234,8 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
            legend says THE PLOT is here, so the drawing must show it there. 1,488.5 m2
            falls in the 886-2,329 band, the top quartile but not the top decile. */
         var gr = (k === 'grain');
-        var halo = L.polygon(SITE_PLOT, {color:'#FFFFFF', weight:7, opacity:.95,
-          fillColor: gr ? '#C4AE83' : cssVar(fg ? '--surface' : '--layer-traffic'),
+        var halo = L.polygon(SITE_PLOT, {color:cssVar('--brand-offwhite'), weight:7, opacity:.95,
+          fillColor: gr ? '#B7A58E' : cssVar(fg ? '--surface' : '--layer-traffic'),
           fillOpacity: (fg || gr) ? 1 : .30, interactive:false});
         groups[k].addLayer(halo); kept.push(halo);
       }
@@ -2360,14 +2411,14 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
          was chosen, and the plot at 1,488.5 m² lands where the data puts it — inside the top
          quartile, outside the top decile. */
       function band(a){
-        return a < 285  ? {c:'#EDE7DC', l:'in the smaller half — under the 285 m² median'}
-             : a < 886  ? {c:'#DCCFB4', l:'between the median and the upper quartile (886 m²)'}
-             : a < 2329 ? {c:'#C4AE83', l:'in the top quartile, below the 2,329 m² top decile'}
-             :            {c:'#9E844F', l:'in the largest 10% of parcels here'};
+        return a < 285  ? {c:'#EEE9E1', l:'in the smaller half — under the 285 m² median'}
+             : a < 886  ? {c:'#DED5C8', l:'between the median and the upper quartile (886 m²)'}
+             : a < 2329 ? {c:'#C8BCAC', l:'in the top quartile, below the 2,329 m² top decile'}
+             :            {c:'#9A856D', l:'in the largest 10% of parcels here'};
       }
       PARCEL_FACES.forEach(function(f){
         var b = band(f.a);
-        g.addLayer(L.polygon(f.g, {color:'#FAFAF7', weight:0.6, fillColor:b.c, fillOpacity:.92})
+        g.addLayer(L.polygon(f.g, {color:cssVar('--surface'), weight:0.6, fillColor:b.c, fillOpacity:.92})
           .bindPopup('<h4>Cadastral parcel</h4>Surveyed area <b>' + f.a.toLocaleString() + ' m²</b> — ' + b.l +
             '.<br>The project plot is <b>1,488.5 m²</b>, so this one is <b>' +
             (f.a > 1488.6 ? (f.a / 1488.6).toFixed(1) + '× larger' : (1488.6 / f.a).toFixed(1) + '× smaller') + '</b>.' +
@@ -2976,9 +3027,9 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       if (!SHOW.wind) return;
       var g = groups.wind;
       if (!g) return;
-      [{b:218, n:'Dec–Apr', d:'SW ~210–225°', col:'#2A6FC4'},
-       {b:257, n:'May–Oct', d:'WSW→W ~245–270°', col:'#3987e5'},
-       {b:337, n:'Oct reversal', d:'NNW ~337°', col:'#8AB6EE'}].forEach(function(w){
+      [{b:218, n:'Dec–Apr', d:'SW ~210–225°', col:'#394536'},
+       {b:257, n:'May–Oct', d:'WSW→W ~245–270°', col:'#62705D'},
+       {b:337, n:'Oct reversal', d:'NNW ~337°', col:'#A8B3A2'}].forEach(function(w){
         /* An arrowhead at the inner end. Without one the label says "from SW" while the line
            itself says nothing, and which way the air travels is the whole point. */
         g.addLayer(L.polyline([ll(w.b + 7, 54), ll(w.b, 40), ll(w.b - 7, 54)],
@@ -3134,11 +3185,11 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       if (!g) return;
       // solar geometry for lat 33.90 N (declination +23.44 / -23.44)
       var SUN = [
-        {n:'21 June — summer solstice', rise:62, set:298, alt:79.5, r:210, lb:216, col:'#D9A324',
+        {n:'21 June — summer solstice', rise:62, set:298, alt:79.5, r:210, lb:216, col:'#C8BCAC',
          note:'Rises well north of east and sets north of west, so the sun swings <b>behind</b> the plot in the early morning and late afternoon. At noon it is nearly overhead — 79.5° — which is easy to shade with a horizontal overhang.'},
-        {n:'21 December — winter solstice', rise:118, set:242, alt:32.6, r:140, lb:144, col:'#B0810E',
+        {n:'21 December — winter solstice', rise:118, set:242, alt:32.6, r:140, lb:144, col:'#725D47',
          note:'A short, low arc entirely in the southern sky. At noon the sun is only <b>32.6°</b> up, so it drives deep into any south-facing opening — welcome heat in January, and the reason the south end should not simply be closed off.'},
-        {n:'21 March / 23 September — equinox', rise:90, set:270, alt:56.1, r:176, lb:180, col:'#C9931B',
+        {n:'21 March / 23 September — equinox', rise:90, set:270, alt:56.1, r:176, lb:180, col:'#9A856D',
          note:'Due east to due west, 56.1° at noon. The middle case — use it to size shading, not the extremes.'}
       ];
       SUN.forEach(function(su){
@@ -3158,7 +3209,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
           iconSize:[92, 26], iconAnchor:[46, 13]})}));
       });
       // noon direction
-      g.addLayer(L.polyline([[SITE.lat, SITE.lng], ll(180, 120)], {color:'#B0810E', weight:2.5, opacity:.85})
+      g.addLayer(L.polyline([[SITE.lat, SITE.lng], ll(180, 120)], {color:'#725D47', weight:2.5, opacity:.85})
         .bindPopup('<h4>Solar noon is always due south</h4>At this latitude the sun is south of vertical every day of the year. The plot’s short 22 m face is the one turned that way — <b>and it is the same direction the highway noise comes from</b>.'));
       // what each face of the plot gets
       var FACE = [
@@ -3383,40 +3434,40 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   }
 
   var GROUND_STYLE = {
-    'Shops':                      {color:'#B57B0B', short:'shops', order:1},
-    'Workshops / light industry': {color:'#B84F2B', short:'workshop', order:2},
-    'Storage / warehouse':        {color:'#846746', short:'storage', order:3},
-    'Parking':                    {color:'#2A78D6', short:'parking', order:4},
-    'Residential entrance':       {color:'#2E8873', short:'entrance', order:5},
-    'Blank wall / shutters':      {color:'#70757A', short:'blank wall', order:6},
-    'Café / restaurant':          {color:'#A34E78', short:'café', order:7},
-    'Under construction':         {color:'#7651A8', short:'building', order:8},
-    'Other':                      {color:'#92958F', short:'other', order:9}
+    'Shops':                      {color:'#7C664F', short:'shops', order:1},
+    'Workshops / light industry': {color:'#394536', short:'workshop', order:2},
+    'Storage / warehouse':        {color:'#725D47', short:'storage', order:3},
+    'Parking':                    {color:'#626568', short:'parking', order:4},
+    'Residential entrance':       {color:'#4A5A46', short:'entrance', order:5},
+    'Blank wall / shutters':      {color:'#8A8D90', short:'blank wall', order:6},
+    'Café / restaurant':          {color:'#9A856D', short:'café', order:7},
+    'Under construction':         {color:'#C8BCAC', short:'building', order:8},
+    'Other':                      {color:'#686B68', short:'other', order:9}
   };
   var ERA_STYLE = {
-    'before 1940':  {color:'#564439', short:'<1940', order:1},
-    '1940–1959':    {color:'#79583E', short:'40–59', order:2},
-    '1960–1979':    {color:'#9C7045', short:'60–79', order:3},
-    '1980–1999':    {color:'#BF8751', short:'80–99', order:4},
-    '2000–2010':    {color:'#D19A2D', short:'00–10', order:5},
-    '2011–2020':    {color:'#9A68A6', short:'11–20', order:6},
-    '2021–present': {color:'#68529B', short:'21–now', order:7}
+    'before 1940':  {color:'#20281F', short:'<1940', order:1},
+    '1940–1959':    {color:'#2B3529', short:'40–59', order:2},
+    '1960–1979':    {color:'#394536', short:'60–79', order:3},
+    '1980–1999':    {color:'#4A5A46', short:'80–99', order:4},
+    '2000–2010':    {color:'#71806B', short:'00–10', order:5},
+    '2011–2020':    {color:'#A8B3A2', short:'11–20', order:6},
+    '2021–present': {color:'#D4DAD0', short:'21–now', order:7}
   };
   var GREEN_STYLE = {
-    none:   {color:'#858984', short:'none', order:1},
-    potted: {color:'#83A76E', short:'potted', order:2},
-    shrubs: {color:'#4C9862', short:'shrubs', order:3},
-    trees:  {color:'#209A74', short:'young tree', order:4},
-    mature: {color:'#087A59', short:'mature tree', order:5}
+    none:   {color:'#8A8D90', short:'none', order:1},
+    potted: {color:'#A8B3A2', short:'potted', order:2},
+    shrubs: {color:'#84917D', short:'shrubs', order:3},
+    trees:  {color:'#62705D', short:'young tree', order:4},
+    mature: {color:'#394536', short:'mature tree', order:5}
   };
   var CHANGE_STYLE = {
-    none:  {label:'Assessed — no visible change', color:'#7D827F', short:'assessed · none', order:1},
-    added: {label:'Added floor visible', color:'#D36B2F', short:'floor added', order:2},
-    ready: {label:'Columns left for another floor', color:'#7651A8', short:'columns up', order:3},
-    both:  {label:'Added floor + columns left', color:'#B33B5D', short:'both visible', order:4}
+    none:  {label:'Assessed — no visible change', color:'#8A8D90', short:'assessed · none', order:1},
+    added: {label:'Added floor visible', color:'#725D47', short:'floor added', order:2},
+    ready: {label:'Columns left for another floor', color:'#4A5A46', short:'columns up', order:3},
+    both:  {label:'Added floor + columns left', color:'#151515', short:'both visible', order:4}
   };
-  var STOREY_COLORS = ['#B9D4F2','#93BCE9','#6F9FDC','#537FC4','#655FB3','#7651A8',
-                       '#884A91','#9A447B','#A84764','#B4494B','#9A3F3F','#793838'];
+  var STOREY_COLORS = ['#E1E5DD','#D4DAD0','#C7CEC2','#B8C1B3','#A8B3A2','#96A28F',
+                       '#84917D','#71806B','#62705D','#4A5A46','#394536','#2B3529'];
 
   function combinedUseCategory(r){
     var overall = useOf(r.use), floors = parseInt(r.storeys, 10);
@@ -3424,9 +3475,9 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     var above = r.use === 'mixed' ? useOf('residential') :
                 (overall && isFinite(floors) && floors > 1 ? overall : null);
     var gs = r.ground ? (GROUND_STYLE[r.ground] ||
-             {color:'#92958F', short:String(r.ground), order:99}) : null;
+             {color:'#8A8D90', short:String(r.ground), order:99}) : null;
     var overallColor = overall ? cssVar(overall.c) : null;
-    var groundColor = gs ? gs.color : (overallColor || '#92958F');
+    var groundColor = gs ? gs.color : (overallColor || '#8A8D90');
     var shortUse = {residential:'homes', commercial:'retail', industrial:'industry',
                     institutional:'public', vacant:'vacant', construction:'building'};
     var upperShort = above ? (shortUse[above.k] || above.lab.toLowerCase()) :
@@ -3453,7 +3504,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
               short:r.storeys + 'F', color:STOREY_COLORS[si], order:isFinite(n) ? n : 99};
     }
     if (key === 'surveyera'){
-      var es = ERA_STYLE[r.era] || {color:'#92958F', short:String(r.era), order:99};
+      var es = ERA_STYLE[r.era] || {color:'#8A8D90', short:String(r.era), order:99};
       return {id:r.era, label:r.era + ' · VERIFY', short:es.short, color:es.color, order:es.order};
     }
     if (key === 'surveygreen'){
@@ -3584,7 +3635,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       surveyFieldRecords(key).forEach(function(r){
         if (r.ground && !groundSeen[r.ground]){
           groundSeen[r.ground] = true;
-          var gs = GROUND_STYLE[r.ground] || {color:'#92958F', order:99};
+          var gs = GROUND_STYLE[r.ground] || {color:'#8A8D90', order:99};
           rows.push({sw:'block', literal:gs.color, label:'GROUND FLOOR · ' + r.ground, order:gs.order});
         }
         var u = r.use === 'mixed' ? useOf('residential') : useOf(r.use);
@@ -4266,21 +4317,21 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     if (key === 'landuse') rows = [{sw:'block', color:'--layer-landuse', label:'Structure over 1,000 m² — 6 of them, 75% of the built area'},{sw:'line', color:'--ink-soft', label:'All other surveyed wall line — use unknown'},{sw:'outline', color:'--layer-landuse', label:'Brownfield (OpenStreetMap annotation)'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m²'}];
     if (key === 'age') rows = AGE_BRACKETS.map(function(a){ return {sw:'block', literal:a.color, label:a.label}; }).concat([{sw:'outline', color:'--unsurveyed', label:'Unsurveyed / no data'}]);
     if (key === 'cadastral') rows = [{sw:'line', color:'--ink-soft', label:'Parcel boundary (legal)'},{sw:'line', color:'--layer-traffic', label:'Surveyed building footprint'},{sw:'line', color:'--layer-greenery', label:'Easement'},{sw:'line', color:'--layer-environmental', label:'Encroached wall'},{sw:'block', color:'--ink', label:'Parcel number (click)'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m²'}];
-    if (key === 'streets') rows = [{sw:'line', color:'--ink', label:'Street centreline — 111 segments, 5,322 m'},{sw:'block', literal:'#0d366b', label:'26 m and over — 15% of segments'},{sw:'block', literal:'#2a78d6', label:'16 – 26 m — 11%'},{sw:'block', literal:'#5f9de8', label:'9 – 16 m — 25%'},{sw:'block', literal:'#9dbfe8', label:'under 9 m — 49%'},{sw:'block', literal:'#dfe8f4', label:'the open space the network was cut from'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m²'}];
+    if (key === 'streets') rows = [{sw:'line', color:'--ink', label:'Street centreline — 111 segments, 5,322 m'},{sw:'block', literal:'#2B3529', label:'26 m and over — 15% of segments'},{sw:'block', literal:'#4A5A46', label:'16 – 26 m — 11%'},{sw:'block', literal:'#84917D', label:'9 – 16 m — 25%'},{sw:'block', literal:'#B7C0B2', label:'under 9 m — 49%'},{sw:'block', literal:'#E5E8E1', label:'the open space the network was cut from'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m²'}];
     if (key === 'traffic') rows = [{sw:'line', color:'--layer-traffic', label:'High inferred volume'},{sw:'line', literal:'#d98a5e', label:'Medium-high'},{sw:'line', literal:'#e8b190', label:'Medium / local'},{sw:'line', color:'--layer-movement', label:'Pedestrian bridge'},{sw:'outline', color:'--layer-traffic', label:'Surface parking (OSM — clips the plot corner)'},{sw:'outline', color:'--muted', label:'Other surface parking'}];
     if (key === 'siteplot') rows = [{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m²'},{sw:'line', color:'--layer-traffic', label:'Side on the legal cadastral boundary'},{sw:'line', color:'--layer-landuse', label:'Side approximate (no line under it)'},{sw:'line', color:'--layer-environmental', label:'The professor’s own cut line'},{sw:'outline', color:'--layer-traffic', label:'Host parcel 2478 (5,581 m²)'},{sw:'line', color:'--ink', label:'The shed 2.9 m off the north edge'},{sw:'line', color:'--ink-soft', label:'Other surveyed structure'},{sw:'outline', color:'--line-strong', label:'Neighbouring parcel'}];
-    if (key === 'grain') rows = [{sw:'block', literal:'#EDE7DC', label:'under 285 m² (the median) — 108 parcels, 7.5% of the land'},{sw:'block', literal:'#DCCFB4', label:'285 – 886 m² — 54 parcels'},{sw:'block', literal:'#C4AE83', label:'886 – 2,329 m² — 32 parcels · THE PLOT is here'},{sw:'block', literal:'#9E844F', label:'over 2,329 m² — 22 parcels, 58% of the land'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m², 33rd of 216'}];
+    if (key === 'grain') rows = [{sw:'block', literal:'#EEE9E1', label:'under 285 m² (the median) — 108 parcels, 7.5% of the land'},{sw:'block', literal:'#DED5C8', label:'285 – 886 m² — 54 parcels'},{sw:'block', literal:'#C8BCAC', label:'886 – 2,329 m² — 32 parcels · THE PLOT is here'},{sw:'block', literal:'#9A856D', label:'over 2,329 m² — 22 parcels, 58% of the land'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m², 33rd of 216'}];
     if (key === 'edges') rows = [{sw:'line', color:'--layer-traffic', label:'Side on the legal cadastral boundary'},{sw:'line', color:'--layer-landuse', label:'Side approximate (2.35 m off)'},{sw:'line', color:'--layer-environmental', label:'The professor’s own cut line'},{sw:'line', color:'--ink', label:'The shed 2.9 m off the north edge'},{sw:'line', color:'--ink-soft', label:'Other surveyed structure'},{sw:'outline', color:'--line-strong', label:'Neighbouring parcel'}];
     if (key === 'access') rows = [{sw:'block', color:'--layer-movement', label:'Arrival point that lands in public space'},{sw:'block', color:'--layer-environmental', label:'Arrival point that does not — 29.2 m from any'},{sw:'line', color:'--layer-traffic', label:'Straight line to the plot'},{sw:'line', color:'--muted', label:'50 / 100 / 200 m from the plot centre'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m²'}];
-    if (key === 'sun') rows = [{sw:'line', literal:'#D9A324', label:'21 June — noon 79.5°'},{sw:'line', literal:'#C9931B', label:'Equinox — noon 56.1°'},{sw:'line', literal:'#B0810E', label:'21 December — noon 32.6°'},{sw:'line', color:'--layer-greenery', label:'Plot face: workable sun'},{sw:'line', color:'--layer-environmental', label:'Plot face: hardest to shade'},{sw:'line', color:'--muted', label:'Plot face: least direct sun — midsummer only'}];
+    if (key === 'sun') rows = [{sw:'line', literal:'#C8BCAC', label:'21 June — noon 79.5°'},{sw:'line', literal:'#9A856D', label:'Equinox — noon 56.1°'},{sw:'line', literal:'#725D47', label:'21 December — noon 32.6°'},{sw:'line', color:'--layer-greenery', label:'Plot face: workable sun'},{sw:'line', color:'--layer-environmental', label:'Plot face: hardest to shade'},{sw:'line', color:'--muted', label:'Plot face: least direct sun — midsummer only'}];
     if (key === 'noise') rows = [{sw:'block', color:'--sem-public', label:'The corridor — 32,853 m², up to 54.5 m wide'},{sw:'block', color:'--sem-problem', label:'Parcels 0–25 m from it — 50 of them, incl. the plot'},{sw:'block', color:'--sem-problem', label:'25–50 m — 16 parcels'},{sw:'block', color:'--sem-problem', label:'50–100 m — 43 parcels'},{sw:'line', color:'--sem-problem', label:'The exposed 22.07 m south side — 100% of it'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m²'}];
-    if (key === 'wind') rows = [{sw:'line', literal:'#2A6FC4', label:'Dec–Apr  ·  SW ~210–225°'},{sw:'line', literal:'#3987e5', label:'May–Oct  ·  WSW→W ~245–270°'},{sw:'line', literal:'#8AB6EE', label:'Oct reversal  ·  NNW ~337°'},{sw:'line', color:'--layer-greenery', label:'Cross-ventilation line'}];
+    if (key === 'wind') rows = [{sw:'line', literal:'#394536', label:'Dec–Apr  ·  SW ~210–225°'},{sw:'line', literal:'#62705D', label:'May–Oct  ·  WSW→W ~245–270°'},{sw:'line', literal:'#A8B3A2', label:'Oct reversal  ·  NNW ~337°'},{sw:'line', color:'--layer-greenery', label:'Cross-ventilation line'}];
     if (key === 'section') rows = [{sw:'line', color:'--ink', label:'Section A–A′ — 300 m on the plot’s own axis'},{sw:'line', color:'--sem-public', label:'the corridor — 49.5 m of the cut'},{sw:'line', color:'--sem-plot', label:'THE PLOT — 51.0 m of the cut'},{sw:'line', color:'--sem-built', label:'the shed — 31.0 m, across a 2.5 m gap'}];
     if (key === 'vision') rows = [{sw:'block', color:'--sem-move', label:'GIVE — 67 m² setback, 4.5% of the plot'},{sw:'line', color:'--sem-move', label:'CROSS — 39 m, lane to corridor'},{sw:'line', color:'--sem-move', label:'BUFFER — 27.64 m of solid north wall'},{sw:'block', color:'--sem-public', label:'reachable public realm (faint)'},{sw:'block', color:'--sem-problem', label:'cut off (faint)'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m²'}];
     if (key === 'pseam') rows = [{sw:'block', color:'--sem-built', label:'Parcels 886 m² and over — 54 of them'},{sw:'block', color:'--sem-built', label:'The large sheds — nearest house plot 0.0 to 16.4 m'},{sw:'line', color:'--sem-problem', label:'The seam — 2,582 m of shared parcel edge, nothing on it'},{sw:'line', color:'--ink', label:'THE PLOT — 39.6 m from the seam'}];
     if (key === 'p1green') rows = [{sw:'block', color:'--sem-veg', label:'The surveyed parcel the mapped green sits on — 1,955 m²'},{sw:'outline', color:'--sem-veg', label:'The green itself — 341 + 361 m², dashed: OSM, 11 m off'},{sw:'outline', color:'--sem-veg', label:'The canopy — 5 parcels, 3,170 m², private and walled'},{sw:'outline', color:'--muted', label:'Tagged greenfield — development land, struck through'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m², 2.12× all the green'}];
     if (key === 'history') rows = [{sw:'block', color:'--layer-landuse', label:'The 1930s gridiron — 108 parcels under the 285 m² median'},{sw:'block', color:'--layer-environmental', label:'1958 — Charles Helou Avenue, the corridor'},{sw:'line', color:'--layer-movement', label:'1968 — the Beirut River, channelised'},{sw:'block', color:'--ink', label:'The industrial layer — 6 sheds, 75% of built ground'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m²'}];
-    if (key === 'pictures') rows = [{sw:'block', color:'--layer-movement', label:'Residential — recorded on the walk'},{sw:'block', color:'--layer-landuse', label:'Commercial / retail'},{sw:'block', color:'--layer-height', label:'Industrial / workshop'},{sw:'block', color:'--layer-environmental', label:'Mixed use'},{sw:'block', color:'--accent', label:'Recordings, use not yet given — the badge is storeys'},{sw:'block', color:'--layer-traffic', label:'Pinned where it was recorded — not about a plot'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m²'}];
+    if (key === 'pictures') rows = [{sw:'block', color:'--use-residential', label:'Residential — recorded on the walk'},{sw:'block', color:'--use-commercial', label:'Commercial / retail'},{sw:'block', color:'--use-industrial', label:'Industrial / workshop'},{sw:'block', color:'--use-mixed', label:'Mixed use'},{sw:'block', color:'--accent', label:'Recordings, use not yet given — the badge is storeys'},{sw:'block', color:'--layer-traffic', label:'Pinned where it was recorded — not about a plot'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m²'}];
     if (isSurveyFieldKey(key)) rows = surveyFieldLegendRows(key);
     if (key === 'views') rows = [{sw:'block', color:'--ink-soft', label:'How far you can see — 360 rays, capped at 300 m'},{sw:'line', color:'--sem-problem', label:'Closed 322–36° — 75°, all of it one shed'},{sw:'line', color:'--sem-public', label:'Open arcs — 86–147° and 228–280°'},{sw:'block', color:'--sem-problem', label:'The footprints that block — darker = more of the sector'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m²'}];
     if (key === 'green') rows = [{sw:'block', color:'--layer-greenery', label:'Mapped green — 341 m² + 361 m², 702 m² in all'},{sw:'block', color:'--layer-greenery', label:'Unbuilt parcels under the canopy — surveyed, 4,571 m²'},{sw:'outline', color:'--layer-greenery', label:'Canopy extent read from imagery — not surveyed'},{sw:'block', color:'--muted', label:'Tagged greenfield — land awaiting development, not green'},{sw:'line', color:'--layer-movement', label:'Beirut River — nearest segment 232 m'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m², 2.12× all the mapped green'}];
@@ -5500,13 +5551,13 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     return best;
   }
   var USES = [
-    {k:'residential',   lab:'Residential',            c:'--layer-movement'},
-    {k:'commercial',    lab:'Commercial / retail',    c:'--layer-landuse'},
-    {k:'industrial',    lab:'Industrial / workshop',  c:'--layer-height'},
-    {k:'mixed',         lab:'Mixed use',              c:'--layer-environmental'},
-    {k:'institutional', lab:'Institutional / public', c:'--layer-greenery'},
-    {k:'vacant',        lab:'Vacant / empty ground',  c:'--muted'},
-    {k:'construction',  lab:'Under construction',     c:'--line-strong'}
+    {k:'residential',   lab:'Residential',            c:'--use-residential'},
+    {k:'commercial',    lab:'Commercial / retail',    c:'--use-commercial'},
+    {k:'industrial',    lab:'Industrial / workshop',  c:'--use-industrial'},
+    {k:'mixed',         lab:'Mixed use',              c:'--use-mixed'},
+    {k:'institutional', lab:'Institutional / public', c:'--use-institutional'},
+    {k:'vacant',        lab:'Vacant / empty ground',  c:'--use-vacant'},
+    {k:'construction',  lab:'Under construction',     c:'--use-construction'}
   ];
   function useOf(k){
     for (var i = 0; i < USES.length; i++) if (USES[i].k === k) return USES[i];
@@ -5666,7 +5717,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     recs.forEach(function(r){
       var u = useOf(r.use);
       if (u) add('t-use', USE_SHORT[r.use] || u.lab, u.lab,
-                 'background:' + cssVar(u.c));
+                 'background:' + cssVar(u.c) + ';color:' + tagInk(cssVar(u.c)));
     });
     recs.forEach(function(r){
       if (r.era) add('t-soft', r.era + ' est.',
@@ -6686,7 +6737,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         var rw = 23 + Math.max(0, rt.length - 2) * 8;
         g.addLayer(L.marker(p, {zIndexOffset:2200,
           icon:L.divIcon({className:'plot-pin' + (picturesMissingOnly ? ' missing-shot' : ''),
-            html:'<span style="background:' + rc + '">' + rt + '</span>',
+            html:'<span style="background:' + rc + ';color:' + tagInk(rc) + '">' + rt + '</span>',
             iconSize:[rw, 23], iconAnchor:[rw / 2, 11.5]})})
           .bindPopup('<h4>' + parcelLabel(i) + '</h4><div class="plot-data">' +
             plotCardHTML(r, plotsIn(i).indexOf(r), plotsIn(i).length, screenshotLinks()) + '</div>'));
