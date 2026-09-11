@@ -123,6 +123,8 @@
     gap:1px; background:var(--line); height:calc(100vh - var(--chrome, 92px));}
   .workspace.wide{grid-template-columns:1fr;   grid-template-areas:"map";}
   .workspace.wide .facts-panel{display:none;}
+  .workspace.story-mode{grid-template-columns:1fr; grid-template-areas:"map";}
+  .workspace.story-mode .facts-panel{display:none;}
   @media (max-width: 900px){.workspace{grid-template-columns:1fr; grid-template-areas:"map" "facts";}}
   .map-shell{grid-area:map; position:relative; background:var(--surface);}
   .facts-panel{grid-area:facts; background:var(--surface); padding:.9rem; display:flex;
@@ -156,6 +158,57 @@
 
   #map{position:absolute; inset:0; background:var(--surface-2);}
   .map-shell{min-height:0;}
+  .story-view{position:absolute; inset:0; z-index:2100; overflow-y:auto; overscroll-behavior:contain;
+    background:var(--surface-2); color:var(--ink); padding:clamp(1rem,3vw,3rem);}
+  .story-view[hidden]{display:none!important;}
+  .map-shell.story-open > :not(.story-view){visibility:hidden; pointer-events:none;}
+  .story-page{width:min(980px,100%); margin:0 auto; padding-bottom:3rem;}
+  .story-kicker{font-family:var(--font-mono); font-size:.68rem; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--accent); margin-bottom:.7rem;}
+  .story-title{font-family:var(--font-display); font-size:clamp(2.2rem,6vw,5rem);
+    line-height:.92; letter-spacing:-.035em; margin:0 0 1rem; max-width:10ch;}
+  .story-lede{font-size:clamp(1rem,2vw,1.3rem); line-height:1.5; color:var(--ink-soft);
+    max-width:720px; margin:0 0 2.2rem;}
+  .story-rule{border:0; border-top:1px solid var(--line-strong); margin:0 0 2.2rem;}
+  .story-timeline{display:grid; gap:0; border-top:1px solid var(--line);}
+  .story-step{display:grid; grid-template-columns:minmax(110px,170px) 1fr; gap:1.2rem;
+    padding:1.2rem 0; border-bottom:1px solid var(--line);}
+  .story-date{font-family:var(--font-mono); font-size:.72rem; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--muted); padding-top:.15rem;}
+  .story-step h2{font-family:var(--font-display); font-size:1.06rem; margin:0 0 .35rem;}
+  .story-step p{margin:0; color:var(--ink-soft); line-height:1.6; max-width:720px;}
+  .story-block{margin-top:2.4rem;}
+  .story-block h2{font-family:var(--font-display); font-size:1.25rem; margin:0 0 .75rem;}
+  .story-block > p{max-width:780px; line-height:1.65; color:var(--ink-soft);}
+  .story-evidence{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.7rem;
+    margin:1rem 0;}
+  .story-evidence article{border:1px solid var(--line); border-radius:8px; background:var(--surface);
+    padding:1rem;}
+  .story-number{display:block; font-family:var(--font-display); font-size:1.65rem;
+    line-height:1; margin-bottom:.45rem;}
+  .story-evidence p{font-size:.78rem; line-height:1.45; color:var(--ink-soft); margin:0;}
+  .story-caution{border-left:3px solid var(--layer-environmental); padding:.85rem 1rem;
+    background:color-mix(in srgb, var(--layer-environmental) 7%, var(--surface));
+    font-size:.82rem; line-height:1.55; color:var(--ink-soft); margin:1.1rem 0;}
+  .story-conclusion{margin-top:2.5rem; padding:clamp(1.2rem,3vw,2rem);
+    background:var(--ink); color:var(--surface); border-radius:10px;}
+  .story-conclusion .story-kicker{color:color-mix(in srgb, var(--surface) 70%, var(--accent));}
+  .story-conclusion h2{font-family:var(--font-display); font-size:clamp(1.4rem,3vw,2.25rem);
+    line-height:1.15; margin:0 0 .7rem; max-width:700px;}
+  .story-conclusion p{color:color-mix(in srgb, var(--surface) 78%, transparent); line-height:1.6;
+    margin:.45rem 0; max-width:760px;}
+  .story-sources{margin-top:2rem; padding-top:1.1rem; border-top:1px solid var(--line);}
+  .story-sources h2{font-family:var(--font-display); font-size:1rem; margin:0 0 .65rem;}
+  .story-sources ul{margin:0; padding-left:1.15rem; columns:2; column-gap:2rem;}
+  .story-sources li{break-inside:avoid; font-size:.76rem; line-height:1.45; margin:0 0 .55rem;
+    color:var(--ink-soft);}
+  .story-sources a{color:var(--accent); text-underline-offset:2px;}
+  @media (max-width:700px){
+    .story-view{padding:1.1rem .9rem 2rem;}
+    .story-step{grid-template-columns:1fr; gap:.35rem;}
+    .story-evidence{grid-template-columns:1fr;}
+    .story-sources ul{columns:1;}
+  }
   @media (max-width:900px){.workspace{height:auto; grid-template-columns:1fr; grid-template-areas:"map" "facts";}
     .map-shell{min-height:72vh;}}
   .leaflet-container{font-family:var(--font-body); background:var(--surface-2);}
@@ -853,7 +906,7 @@
 
 <div class="tabstrip" id="tabstrip"></div>
 
-<div class="workspace">
+<div class="workspace" id="workspace">
   <main class="map-shell">
     <div id="map"></div>
     <div class="map-legend" id="map-legend"></div>
@@ -971,6 +1024,74 @@
     <div class="map-status" id="map-status" hidden>
       <p>Loading the embedded cadastral survey…</p>
     </div>
+
+    <section class="story-view" id="story-view" aria-labelledby="story-title" hidden>
+      <div class="story-page">
+        <div class="story-kicker">The project story</div>
+        <h1 class="story-title" id="story-title">Add to Connect</h1>
+        <p class="story-lede">Bourj Hammoud developed through repeated arrival, construction and adaptation. Its additions helped people make space; the project asks how a new addition can also repair urban disconnection.</p>
+        <hr class="story-rule">
+
+        <div class="story-timeline" aria-label="Bourj Hammoud development timeline">
+          <article class="story-step">
+            <div class="story-date">1920s–1930s</div>
+            <div><h2>Arrival became neighbourhood</h2><p>After the First World War and the Armenian genocide, Armenian refugees arrived in Lebanon. Families gradually transformed temporary settlement into a permanent neighbourhood of houses, workshops, schools, churches and businesses.</p></div>
+          </article>
+          <article class="story-step">
+            <div class="story-date">1940s–1950s</div>
+            <div><h2>Industry and housing grew together</h2><p>Industrialisation attracted workers and additional migrants. Early shelters and one-storey houses were progressively replaced or extended into multistorey buildings, while production and everyday life occupied the same dense district.</p></div>
+          </article>
+          <article class="story-step">
+            <div class="story-date">From the 1960s</div>
+            <div><h2>Growth continued under formal rules</h2><p>Building regulation became more formal, but the neighbourhood continued to change incrementally. Research describes rooms, stairs and floors that did not always follow those regulations.</p></div>
+          </article>
+          <article class="story-step">
+            <div class="story-date">1975–1990 and after</div>
+            <div><h2>War, displacement and occupation changed</h2><p>The Lebanese Civil War caused destruction and displacement. Afterward, work and relatively affordable rents attracted returning residents, migrant workers and lower-income households; housing pressure encouraged subdivision and further additions.</p></div>
+          </article>
+          <article class="story-step">
+            <div class="story-date">After 2011</div>
+            <div><h2>Affordable space came under greater pressure</h2><p>Research in Nabaa records apartments being subdivided, shops becoming housing and rooms being added on roofs after the arrival of Syrian refugees. This documents a district pattern, not the cause of any one building in the survey.</p></div>
+          </article>
+        </div>
+
+        <section class="story-block">
+          <div class="story-kicker">What the field survey adds</div>
+          <h2>The visible fabric still carries addition</h2>
+          <div class="story-evidence">
+            <article><span class="story-number">18 / 58</span><p>assessed building-part records show an added floor, columns left for another floor, or both.</p></article>
+            <article><span class="story-number">11 / 22</span><p>assessed records with an apparent pre-1980 range show visible vertical change, compared with 0 / 10 apparent post-1980 records.</p></article>
+            <article><span class="story-number">14 / 25</span><p>assessed mixed-use records show visible vertical change, compared with 3 / 27 other assessed named-use records.</p></article>
+          </div>
+          <div class="story-caution"><b>Evidence limit.</b> These are observations, not causes. The apparent construction ranges are screenshot-based visual estimates marked <b>VERIFY</b>. The survey cannot prove when an addition was built or who built it.</div>
+        </section>
+
+        <section class="story-block">
+          <div class="story-kicker">The urban issue</div>
+          <h2>Addition increased private capacity, but did not repair collective connection</h2>
+          <p>The district grew by adding space building by building, while major urban separations remained: housing and industry meet without a buffer, the corridor cuts the public realm, the bridge lands away from public space, and usable public green is scarce. The problem is therefore not addition itself. It is that many additions answer an individual need without connecting the larger urban fabric.</p>
+        </section>
+
+        <section class="story-conclusion">
+          <div class="story-kicker">Design direction</div>
+          <h2>They added to accommodate. I add to connect.</h2>
+          <p>The project continues Bourj Hammoud’s logic of adaptation, but gives each addition a shared urban task: connect neighbourhood to movement, residence to industry, private activity to collective space, and dense fabric to public green.</p>
+          <p>The final architectural form is still to be designed; the evidence supports the operation—<b>adding as connection</b>—not a predetermined structural language.</p>
+        </section>
+
+        <section class="story-sources">
+          <h2>Sources and evidence</h2>
+          <ul>
+            <li><a href="https://www.bourjhammoud.gov.lb/?q=ar%2F%D8%A7%D9%84%D9%86%D8%B4%D8%A3%D8%A9-%D9%88%D8%AA%D9%83%D9%88%D9%8A%D9%86%D9%87%D8%A7-%D8%A7%D9%84%D8%A5%D8%AC%D8%AA%D9%85%D8%A7%D8%B9%D9%8A" target="_blank" rel="noopener">Bourj Hammoud Municipality — formation and social history</a></li>
+            <li><a href="https://www.aub.edu.lb/ifi/Documents/publications/working_papers/2015-2016/20160822_nabaa.pdf" target="_blank" rel="noopener">AUB — Rethinking Shared Space: The Case of Nabaa</a></li>
+            <li><a href="https://scholarworks.aub.edu.lb/bitstreams/f9390857-bdde-41af-b789-e4508fe878e5/download" target="_blank" rel="noopener">IIED / UN-Habitat study — informal housing responses in Nabaa</a></li>
+            <li><a href="https://link.springer.com/article/10.1007/s10389-010-0368-0" target="_blank" rel="noopener">Peer-reviewed study — migration and housing in Bourj Hammoud</a></li>
+            <li><a href="https://academic.oup.com/jrs/article/34/1/422/6103158" target="_blank" rel="noopener">Journal of Refugee Studies — displacement and urban change</a></li>
+            <li>On-site field survey: 71 building-part records and 59 exact linked screenshots, 2026-09-11.</li>
+          </ul>
+        </section>
+      </div>
+    </section>
   </main>
 
   <aside class="facts-panel" id="facts-panel"></aside>
@@ -1294,7 +1415,8 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     {key:'sun', label:'Sun & Shadow', short:'Sun', group:'ANALYSIS', color:'var(--layer-landuse)', blurb:'Solar geometry computed for this site\u2019s latitude (33.90\u00b0 N) and drawn against the plot\u2019s own surveyed bearings. Nothing here comes from another map \u2014 it is the sun and the plot.'},
     {key:'wind', label:'Wind & Air', short:'Wind', group:'ANALYSIS', color:'var(--layer-movement)', blurb:'Prevailing wind by season, plotted against the plot\u2019s own surveyed axis to find the cross-ventilation line. The directions are station data for Beirut, not a site measurement \u2014 the geometry they are drawn against is the survey.'},
     {key:'green', label:'Green & Water', short:'Green', group:'ANALYSIS', color:'var(--layer-greenery)', blurb:'Every green area and water edge within 600 m, over the survey. Two numbers carry it. Of the three areas OpenStreetMap tags as green here, one is <b>landuse=greenfield</b> — development land, not vegetation — so the real mapped green within 600 m is <b>702 m²</b>, and the plot alone is <b>2.12×</b> that. The one real canopy is <b>94.2 m</b> away and <b>walled</b>; the nearest public park is 1.5–2 km. The constraint is access, not growth.'},
-    {key:'views', label:'Views & Skyline', short:'Views', group:'ANALYSIS', color:'var(--layer-greenery)', blurb:'What can be seen from the plot, measured from its centroid against the surveyed structure lines around it. Blocked arcs, open arcs, and the distant views the lecture asks us to frame.'}
+    {key:'views', label:'Views & Skyline', short:'Views', group:'ANALYSIS', color:'var(--layer-greenery)', blurb:'What can be seen from the plot, measured from its centroid against the surveyed structure lines around it. Blocked arcs, open arcs, and the distant views the lecture asks us to frame.'},
+    {key:'story', label:'Add to Connect', short:'Story', group:'ANALYSIS', color:'var(--accent)', blurb:'The project story, read as a narrative rather than another map.'}
   ];
   var TAG_OPTIONS_NOTES = ['General','Traffic','Greenery','Land use','Movement','Environmental'];
 
@@ -4227,6 +4349,23 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
 
   function renderTab(key){
     var t = TABS.filter(function(x){ return x.key === key; })[0];
+    var storyOn = key === 'story';
+    var workspace = document.getElementById('workspace');
+    var mapShell = document.querySelector('.map-shell');
+    var storyView = document.getElementById('story-view');
+    workspace.classList.toggle('story-mode', storyOn);
+    mapShell.classList.toggle('story-open', storyOn);
+    storyView.hidden = !storyOn;
+    if (storyOn){
+      lastTab = key;
+      setPicturesMode(false);
+      document.body.classList.remove('cut-on');
+      if (window.isoClear) window.isoClear();
+      try { map.closePopup(); } catch(e) {}
+      Object.keys(groups).forEach(function(k){ map.removeLayer(groups[k]); });
+      storyView.scrollTop = 0;
+      return;
+    }
 
     // the measured drawing needs survey scale; every other tab reads at neighbourhood scale
     /* Every tab opens at a predictable, comparable view — the drawings are meant to be read
@@ -7529,7 +7668,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   var refitT = null;
   window.addEventListener('resize', function(){
     clearTimeout(refitT);
-    refitT = setTimeout(function(){ if (lastTab) fitFor(lastTab); layoutBars(); }, 180);
+    refitT = setTimeout(function(){ if (lastTab && lastTab !== 'story') fitFor(lastTab); layoutBars(); }, 180);
   });
 
   /* The bar belongs to the Pictures section only, and the fix starts the moment you open it
