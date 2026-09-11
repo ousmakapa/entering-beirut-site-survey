@@ -222,10 +222,30 @@
   .story-sources li{break-inside:avoid; font-size:.76rem; line-height:1.45; margin:0 0 .55rem;
     color:var(--ink-soft);}
   .story-sources a{color:var(--accent); text-underline-offset:2px;}
+  .story-operation{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.7rem;
+    margin:1rem 0 0;}
+  .story-operation article{min-height:150px; border:1px solid var(--line); border-radius:8px;
+    padding:1rem; background:var(--surface); display:flex; flex-direction:column; justify-content:space-between;}
+  .story-operation article:last-child{background:var(--olive-700); color:var(--brand-offwhite);}
+  .story-operation svg{width:100%; height:88px; margin-bottom:.8rem;}
+  .story-operation b{font-family:var(--font-mono); font-size:.7rem; letter-spacing:.1em; text-transform:uppercase;}
+  .story-operation p{font-size:.76rem; line-height:1.4; color:var(--ink-soft); margin:.45rem 0 0;}
+  .story-operation article:last-child p{color:color-mix(in srgb,var(--brand-offwhite) 78%,transparent);}
+  .story-layers{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:2px; margin-top:1rem;}
+  .story-layer{padding:1rem; min-height:116px; color:var(--brand-offwhite); display:flex;
+    flex-direction:column; justify-content:space-between;}
+  .story-layer:nth-child(1){background:#343a36}.story-layer:nth-child(2){background:#5f7068}
+  .story-layer:nth-child(3){background:#9c8e79}.story-layer:nth-child(4){background:#70806a}
+  .story-layer b{font-family:var(--font-mono); font-size:.68rem; letter-spacing:.09em; text-transform:uppercase;}
+  .story-layer span{font-size:.75rem; line-height:1.35;}
+  .story-deck-link{display:inline-block; margin-top:.9rem; padding:.65rem .85rem; border:1px solid currentColor;
+    border-radius:3px; color:var(--brand-offwhite); font-family:var(--font-mono); font-size:.68rem;
+    letter-spacing:.08em; text-transform:uppercase; text-decoration:none;}
   @media (max-width:700px){
     .story-view{padding:1.1rem .9rem 2rem;}
     .story-step{grid-template-columns:1fr; gap:.35rem;}
     .story-evidence{grid-template-columns:1fr;}
+    .story-operation,.story-layers{grid-template-columns:1fr 1fr;}
     .story-sources ul{columns:1;}
   }
   @media (max-width:900px){.workspace{height:auto; grid-template-columns:1fr; grid-template-areas:"map" "facts";}
@@ -1039,67 +1059,59 @@
 
     <section class="story-view" id="story-view" aria-labelledby="story-title" hidden>
       <div class="story-page">
-        <div class="story-kicker">The project story</div>
-        <h1 class="story-title" id="story-title">Add to Connect</h1>
-        <p class="story-lede">Bourj Hammoud developed through repeated arrival, construction and adaptation. Its additions helped people make space; the project asks how a new addition can also repair urban disconnection.</p>
+        <div class="story-kicker">Selected concept · 2026-09-11</div>
+        <h1 class="story-title" id="story-title">Nesting</h1>
+        <p class="story-lede"><b>The Sheltered Heart.</b> Because the plot has no naturally protected end, the building creates its own shelter: robust functions form the outer layers, public life occupies a changing inner heart, and the nest opens toward the eastern arrival before rising into an ecological upper layer.</p>
         <hr class="story-rule">
 
-        <div class="story-timeline" aria-label="Bourj Hammoud development timeline">
-          <article class="story-step">
-            <div class="story-date">1920s–1930s</div>
-            <div><h2>Arrival became neighbourhood</h2><p>After the First World War and the Armenian genocide, Armenian refugees arrived in Lebanon. Families gradually transformed temporary settlement into a permanent neighbourhood of houses, workshops, schools, churches and businesses.</p></div>
-          </article>
-          <article class="story-step">
-            <div class="story-date">1940s–1950s</div>
-            <div><h2>Industry and housing grew together</h2><p>Industrialisation attracted workers and additional migrants. Early shelters and one-storey houses were progressively replaced or extended into multistorey buildings, while production and everyday life occupied the same dense district.</p></div>
-          </article>
-          <article class="story-step">
-            <div class="story-date">From the 1960s</div>
-            <div><h2>Growth continued under formal rules</h2><p>Building regulation became more formal, but the neighbourhood continued to change incrementally. Research describes rooms, stairs and floors that did not always follow those regulations.</p></div>
-          </article>
-          <article class="story-step">
-            <div class="story-date">1975–1990 and after</div>
-            <div><h2>War, displacement and occupation changed</h2><p>The Lebanese Civil War caused destruction and displacement. Afterward, work and relatively affordable rents attracted returning residents, migrant workers and lower-income households; housing pressure encouraged subdivision and further additions.</p></div>
-          </article>
-          <article class="story-step">
-            <div class="story-date">After 2011</div>
-            <div><h2>Affordable space came under greater pressure</h2><p>Research in Nabaa records apartments being subdivided, shops becoming housing and rooms being added on roofs after the arrival of Syrian refugees. This documents a district pattern, not the cause of any one building in the survey.</p></div>
-          </article>
-        </div>
-
         <section class="story-block">
-          <div class="story-kicker">What the field survey adds</div>
-          <h2>The visible fabric still carries addition</h2>
+          <div class="story-kicker">What the site tells us</div>
+          <h2>Pressure surrounds the clearing; release concentrates on the east</h2>
           <div class="story-evidence">
-            <article><span class="story-number">18 / 58</span><p>assessed building-part records show an added floor, columns left for another floor, or both.</p></article>
-            <article><span class="story-number">11 / 22</span><p>assessed records with an apparent pre-1980 range show visible vertical change, compared with 0 / 10 apparent post-1980 records.</p></article>
-            <article><span class="story-number">14 / 25</span><p>assessed mixed-use records show visible vertical change, compared with 3 / 27 other assessed named-use records.</p></article>
+            <article><span class="story-number">Pressure</span><p>The highway condition reaches almost the whole open plot; the northern industrial edge closes the opposite side, and neighbours provide little useful shade.</p></article>
+            <article><span class="story-number">Release</span><p>The east is the only side where confirmed walkable frontage, public arrival, the living fabric and the clearest open view converge.</p></article>
+            <article><span class="story-number">Need</span><p>Nearby canopy is private and walled. The project cannot borrow shelter or accessible green; it has to manufacture both.</p></article>
           </div>
-          <div class="story-caution"><b>Evidence limit.</b> These are observations, not causes. The apparent construction ranges are screenshot-based visual estimates marked <b>VERIFY</b>. The survey cannot prove when an addition was built or who built it.</div>
+          <div class="story-caution"><b>Important distinction.</b> The concept is not a courtyard copied from the neighbourhood. No local courtyard pattern was measured. Nesting is a site response developed through edge depth, program and section.</div>
         </section>
 
         <section class="story-block">
-          <div class="story-kicker">The urban issue</div>
-          <h2>Addition increased private capacity, but did not repair collective connection</h2>
-          <p>The district grew by adding space building by building, while major urban separations remained: housing and industry meet without a buffer, the corridor cuts the public realm, the bridge lands away from public space, and usable public green is scarce. The problem is therefore not addition itself. It is that many additions answer an individual need without connecting the larger urban fabric.</p>
+          <div class="story-kicker">Analysis becomes architecture</div>
+          <h2>Four operations, in one direction</h2>
+          <div class="story-operation">
+            <article><svg viewBox="0 0 150 90"><polygon points="43,10 111,17 128,61 101,79 39,70 22,43" fill="#eee4db" stroke="#c94f18" stroke-width="2"/><path d="M12 84L38 69M55 88L63 73M110 86L103 76M142 71L126 61" stroke="#c94f18" stroke-width="3"/></svg><div><b>1 · Exposed</b><p>Read the whole clearing as a pressure field.</p></div></article>
+            <article><svg viewBox="0 0 150 90"><polygon points="43,10 111,17 128,61 101,79 39,70 22,43" fill="#4a5a46"/><polygon points="50,28 105,31 110,57 95,68 48,61 37,44" fill="#c8bcac"/></svg><div><b>2 · Thicken</b><p>Place robust uses on the hard edges.</p></div></article>
+            <article><svg viewBox="0 0 150 90"><polygon points="43,10 111,17 118,34 107,34 119,58 101,79 39,70 22,43" fill="#4a5a46"/><polygon points="50,28 106,32 119,58 96,68 48,61 37,44" fill="#c8bcac"/><path d="M106 44H145" stroke="#c94f18" stroke-width="4"/></svg><div><b>3 · Open east</b><p>Make the protected heart the public address.</p></div></article>
+            <article><svg viewBox="0 0 150 90"><polygon points="28,65 95,78 130,60 61,49" fill="#2f3830"/><polygon points="37,49 96,60 123,47 63,38" fill="#596a56"/><polygon points="48,35 96,43 116,33 67,26" fill="#84927e"/><polygon points="62,21 97,27 110,20 74,15" fill="#c8bcac"/><path d="M113 74C138 56 135 35 118 22" stroke="#c94f18" stroke-width="3" fill="none"/></svg><div><b>4 · Lift the heart</b><p>Entry becomes forum, overlook, terrace and garden.</p></div></article>
+          </div>
+        </section>
+
+        <section class="story-block">
+          <div class="story-kicker">How the program nests</div>
+          <h2>The hard functions protect the soft ones</h2>
+          <div class="story-layers">
+            <div class="story-layer"><b>Robust ground</b><span>workshop · service · parking</span></div>
+            <div class="story-layer"><b>Public heart</b><span>entry · exhibition · café · community</span></div>
+            <div class="story-layer"><b>Quiet work</b><span>co-working · learning · meeting</span></div>
+            <div class="story-layer"><b>Ecological top</b><span>greenhouse · productive garden · terrace</span></div>
+          </div>
+          <p>The heart is not one full-height hole. It changes through the section—entrance cut, double-height forum, occupied overlook, terrace, then ecological room—so the shared space remains generous without consuming the complete floor plate.</p>
         </section>
 
         <section class="story-conclusion">
           <div class="story-kicker">Design direction</div>
-          <h2>They added to accommodate. I add to connect.</h2>
-          <p>The project continues Bourj Hammoud’s logic of adaptation, but gives each addition a shared urban task: connect neighbourhood to movement, residence to industry, private activity to collective space, and dense fabric to public green.</p>
-          <p>The final architectural form is still to be designed; the evidence supports the operation—<b>adding as connection</b>—not a predetermined structural language.</p>
+          <h2>Protect → open → gather → rise</h2>
+          <p>South buffers the corridor. North-west becomes the serviced back. West is deeply shaded and filtered. East opens through a public loggia. One compact structural frame holds the changing heart while lower large-span rooms divide into smaller spaces above.</p>
+          <a class="story-deck-link" href="presentation.html" target="_blank" rel="noopener">Open the 9-slide visual presentation ↗</a>
         </section>
 
         <section class="story-sources">
-          <h2>Sources and evidence</h2>
+          <h2>Evidence base</h2>
           <ul>
-            <li><a href="https://www.bourjhammoud.gov.lb/?q=ar%2F%D8%A7%D9%84%D9%86%D8%B4%D8%A3%D8%A9-%D9%88%D8%AA%D9%83%D9%88%D9%8A%D9%86%D9%87%D8%A7-%D8%A7%D9%84%D8%A5%D8%AC%D8%AA%D9%85%D8%A7%D8%B9%D9%8A" target="_blank" rel="noopener">Bourj Hammoud Municipality — formation and social history</a></li>
-            <li><a href="https://www.aub.edu.lb/ifi/Documents/publications/working_papers/2015-2016/20160822_nabaa.pdf" target="_blank" rel="noopener">AUB — Rethinking Shared Space: The Case of Nabaa</a></li>
-            <li><a href="https://scholarworks.aub.edu.lb/bitstreams/f9390857-bdde-41af-b789-e4508fe878e5/download" target="_blank" rel="noopener">IIED / UN-Habitat study — informal housing responses in Nabaa</a></li>
-            <li><a href="https://link.springer.com/article/10.1007/s10389-010-0368-0" target="_blank" rel="noopener">Peer-reviewed study — migration and housing in Bourj Hammoud</a></li>
-            <li><a href="https://academic.oup.com/jrs/article/34/1/422/6103158" target="_blank" rel="noopener">Journal of Refugee Studies — displacement and urban change</a></li>
-            <li>On-site field survey: 71 building-part records and 59 exact linked screenshots, 2026-09-11.</li>
+            <li>Professor's cadastral survey: exact plot, surrounding structures, boundaries and distances.</li>
+            <li>Site drawings: figure-ground, grain, four edges, access, environmental conditions and program relationships.</li>
+            <li>Field survey: 71 building-part records and 59 exact linked screen captures, current 2026-09-11.</li>
+            <li>Program and regulatory envelope remain design constraints; detailed massing, structure and environmental systems are the next tests.</li>
           </ul>
         </section>
       </div>
@@ -1428,7 +1440,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     {key:'noise', label:'The Corridor', short:'Corridor', group:'MOVEMENT', color:'var(--layer-environmental)', blurb:'The widest continuous public space in the survey — one connected 32,853 m² piece, up to 54.5 m across. The plot’s south side lies along 100% of its length. The survey gives it no name; that it is the Charles Helou axis comes from the brief, not from this drawing. Distance bands are a geometric model from the surveyed edge, not a measured noise reading.'},
     {key:'sun', label:'Sun & Shadow', short:'Sun', group:'ANALYSIS', color:'var(--layer-landuse)', blurb:'Solar geometry computed for this site\u2019s latitude (33.90\u00b0 N) and drawn against the plot\u2019s own surveyed bearings. Nothing here comes from another map \u2014 it is the sun and the plot.'},
     {key:'wind', label:'Wind & Air', short:'Wind', group:'ANALYSIS', color:'var(--layer-movement)', blurb:'Prevailing wind by season, plotted against the plot\u2019s own surveyed axis to find the cross-ventilation line. The directions are station data for Beirut, not a site measurement \u2014 the geometry they are drawn against is the survey.'},
-    {key:'story', label:'Add to Connect', short:'Story', group:'ANALYSIS', color:'var(--accent)', blurb:'The project story, read as a narrative rather than another map.'}
+    {key:'story', label:'Nesting', short:'Story', group:'ANALYSIS', color:'var(--accent)', blurb:'The selected site-to-building concept, read as a narrative rather than another map.'}
   ];
   var TAG_OPTIONS_NOTES = ['General','Traffic','Greenery','Land use','Movement','Environmental'];
 
