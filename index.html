@@ -1282,8 +1282,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     {key:'edges', label:'The Five Edges', short:'Edges', group:'FABRIC', color:'var(--layer-traffic)', blurb:'The plot read one side at a time. Each edge has a different neighbour, a different legal status and a different job. Click a side for its brief.'},
     {key:'landuse', label:'Building Functions', short:'Functions', group:'FABRIC', color:'var(--layer-landuse)', blurb:'The survey records no use for any structure. What it records is extent — and extent settles one thing: the <b>six</b> pieces of enclosed built ground over 1,000 m² hold <b>75%</b> of all of it, including the 2,794 m² shed against the plot’s north edge. Nothing smaller is drawn, because footprint size cannot tell a house from a workshop. The 77 named businesses are in the notes as a list — their positions are not accurate enough to plot on this survey.'},
     {key:'age', label:'Field Survey', short:'Field Survey', group:'FIELD DATA', color:'var(--layer-movement)', blurb:'A blank recording sheet on the survey base. No age or function data for Bourj Hammoud exists in this DWG or in any free dataset \u2014 click a structure to record what you see on site. Your tags are saved in this browser.'},
-    {key:'surveyuse', label:'Building Use + Ground', short:'Use + Ground', group:'FIELD DATA', color:'var(--layer-landuse)', blurb:'The recorded overall building use and ground floor read together. The parcel fill and lower half of each badge show the ground-floor condition; the outline and top half show the recorded overall use. <b>Mixed use remains mixed</b>: the data does not specify which use occupies each upper floor. Every linked screenshot stays on the exact building-part card.'},
-    {key:'surveyground', label:'Ground Floor', short:'Ground Floor', group:'FIELD DATA', color:'var(--layer-traffic)', blurb:'Only the street-level condition recorded for each building part: shops, workshops, storage, parking, entrance, café, other, or under construction. It does not infer what happens above.'},
+    {key:'surveyuse', label:'Ground + Upper Use', short:'Use: Ground + Above', group:'FIELD DATA', color:'var(--layer-landuse)', blurb:'Ground floor and building use read together because they describe one vertical condition. The parcel fill and lower half of each badge show the recorded ground floor; the outline and upper half show the use above or the recorded building use. In this field vocabulary, <b>mixed</b> means a non-residential ground floor with <b>homes above</b>. Every linked screenshot stays on the exact building-part card.'},
     {key:'surveystoreys', label:'Storeys', short:'Storeys', group:'FIELD DATA', color:'var(--layer-height)', blurb:'Only exact storey counts you entered. The labels are the recorded counts above ground; no height in metres and no missing count is estimated.'},
     {key:'surveyera', label:'Apparent Construction', short:'Construction', group:'FIELD DATA', color:'var(--layer-environmental)', blurb:'Only the construction ranges you recorded from linked screenshots. These are visual hypotheses marked <b>VERIFY</b>, not documentary construction dates and never Google imagery dates.'},
     {key:'surveygreen', label:'Survey Greenery', short:'Greenery', group:'FIELD DATA', color:'var(--layer-greenery)', blurb:'Only the greenery you recorded. Coverage and accessibility appear only where you filled them; missing observations remain missing rather than being inferred.'},
@@ -1885,7 +1884,6 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     addBase('figureground', {fadeStructures:true});   // the built/vacant parcels are the figure here
     addBase('age',          {fadeStructures:true});  // ditto
     addBase('surveyuse',    {quietParcels:true, fadeStructures:true});
-    addBase('surveyground', {quietParcels:true, fadeStructures:true});
     addBase('surveystoreys',{quietParcels:true, fadeStructures:true});
     addBase('surveyera',    {quietParcels:true, fadeStructures:true});
     addBase('surveygreen',  {quietParcels:true, fadeStructures:true});
@@ -2092,7 +2090,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     if (typeof drawFieldRecords === 'function') drawFieldRecords();
     if (SHOW.corridor && groups.noise) groups.noise.addLayer(L.polyline([SITE_PLOT[0], SITE_PLOT[1]], {color:cssVar('--sem-problem'), weight:5, opacity:.95})
       .bindPopup('<h4>The exposed end — 22.07 m</h4>The shortest side of the plot, facing 197° SSW toward the corridor — the smallest face the geometry offers it.'));
-    ['cadastral','figureground','age','surveyuse','surveyground','surveystoreys','surveyera',
+    ['cadastral','figureground','age','surveyuse','surveystoreys','surveyera',
      'surveygreen','surveychange','streets','siteplot','edges','grain','sun','noise','views',
      'landuse','access','wind','green','pictures','history','p1green','pcut','pseam','vision','section'].forEach(function(k){
       if (!groups[k]) return;
@@ -3289,7 +3287,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     });
   }
 
-  var SURVEY_FIELD_KEYS = ['surveyuse','surveyground','surveystoreys','surveyera',
+  var SURVEY_FIELD_KEYS = ['surveyuse','surveystoreys','surveyera',
                            'surveygreen','surveychange'];
   function isSurveyFieldKey(key){ return SURVEY_FIELD_KEYS.indexOf(key) > -1; }
   var surveyCompareChange = true;
@@ -3301,7 +3299,6 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     var links = key === 'surveyera' ? screenshotLinks() : null;
     return plots.filter(function(r){
       if (key === 'surveyuse') return !!r.use || !!r.ground;
-      if (key === 'surveyground') return !!r.ground;
       if (key === 'surveystoreys') return !!r.storeys;
       if (key === 'surveyera') return !!r.era && !!links[r.id];
       if (key === 'surveygreen') return !!r.green;
@@ -3365,32 +3362,34 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   }
 
   function combinedUseCategory(r){
-    var overall = useOf(r.use);
+    var overall = useOf(r.use), floors = parseInt(r.storeys, 10);
+    /* The student's field vocabulary defines mixed as active ground floor with homes above. */
+    var above = r.use === 'mixed' ? useOf('residential') :
+                (overall && isFinite(floors) && floors > 1 ? overall : null);
     var gs = r.ground ? (GROUND_STYLE[r.ground] ||
              {color:'#92958F', short:String(r.ground), order:99}) : null;
     var overallColor = overall ? cssVar(overall.c) : null;
     var groundColor = gs ? gs.color : (overallColor || '#92958F');
     var shortUse = {residential:'homes', commercial:'retail', industrial:'industry',
                     institutional:'public', vacant:'vacant', construction:'building'};
-    var upperShort = overall ? (shortUse[overall.k] || overall.lab.toLowerCase()) : 'use ?';
+    var upperShort = above ? (shortUse[above.k] || above.lab.toLowerCase()) :
+                     (overall ? (shortUse[overall.k] || overall.lab.toLowerCase()) : 'use ?');
     var groundShort = gs ? gs.short : 'ground ?';
-    var levelText = overall ? 'overall building use ' + overall.lab : 'building use not recorded';
+    var levelText = above ? 'above ' + above.lab :
+                    (overall ? 'recorded building use ' + overall.lab : 'use above not recorded');
     return {
-      id:(r.ground || '?') + '|' + (r.use || '?'),
+      id:(r.ground || '?') + '|' + (above ? above.k : (r.use || '?')),
       label:(r.ground ? 'GF ' + r.ground : 'Ground floor not recorded') + ' · ' + levelText,
-      short:upperShort + ' / ' + groundShort + ' GF',
-      color:groundColor, groundColor:groundColor, upperColor:overallColor || groundColor,
+      short:upperShort + ' ↑ / ' + groundShort + ' GF',
+      color:groundColor, groundColor:groundColor, upperColor:(above ? cssVar(above.c) : overallColor) || groundColor,
       groundShort:groundShort, upperShort:upperShort,
+      aboveLabel:above ? above.lab + (r.use === 'mixed' ? ' (from recorded mixed use)' : '') : '',
       overallLabel:overall ? overall.lab : '', order:gs ? gs.order : 99
     };
   }
 
   function surveyFieldCategory(key, r){
     if (key === 'surveyuse') return combinedUseCategory(r);
-    if (key === 'surveyground'){
-      var gs = GROUND_STYLE[r.ground] || {color:'#92958F', short:String(r.ground), order:99};
-      return {id:r.ground, label:r.ground, short:gs.short, color:gs.color, order:gs.order};
-    }
     if (key === 'surveystoreys'){
       var n = parseInt(r.storeys, 10), si = Math.max(0, Math.min(STOREY_COLORS.length - 1, n - 1));
       return {id:String(r.storeys), label:r.storeys + ' storey' + (String(r.storeys) === '1' ? '' : 's'),
@@ -3421,10 +3420,10 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     if (key === 'surveyuse'){
       var uc = combinedUseCategory(r);
       return row('Ground floor', r.ground) +
-             row('Overall building use', uc.overallLabel) +
-             '<span class="survey-field-note">No upper-floor use is inferred from “mixed use”.</span>';
+             row('Use above ground', uc.aboveLabel) +
+             row('Recorded building use', uc.overallLabel) +
+             (r.use === 'mixed' ? '<span class="survey-field-note">Recorded meaning: non-residential ground floor with homes above.</span>' : '');
     }
-    if (key === 'surveyground') return row('Ground floor', r.ground);
     if (key === 'surveystoreys') return row('Storeys above ground', r.storeys);
     if (key === 'surveyera') return row('Apparent construction', r.era) +
       '<span class="survey-field-note">Visual estimate from this record’s linked screenshot · VERIFY</span>';
@@ -3540,16 +3539,16 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
           var gs = GROUND_STYLE[r.ground] || {color:'#92958F', order:99};
           rows.push({sw:'block', literal:gs.color, label:'GROUND FLOOR · ' + r.ground, order:gs.order});
         }
-        var u = useOf(r.use);
+        var u = r.use === 'mixed' ? useOf('residential') : useOf(r.use);
         if (u && !upperSeen[u.k]){
           upperSeen[u.k] = true;
-          rows.push({sw:'outline', literal:cssVar(u.c), label:'OVERALL BUILDING USE · ' + u.lab,
+          rows.push({sw:'outline', literal:cssVar(u.c), label:'UPPER / BUILDING USE · ' + u.lab,
                      order:100 + USES.indexOf(u)});
         }
       });
       rows.sort(function(a,b){ return a.order - b.order; });
       rows.forEach(function(r){ delete r.order; });
-      rows.push({sw:'outline', color:'--accent', label:'Badge = overall use / ground-floor condition'});
+      rows.push({sw:'outline', color:'--accent', label:'Badge = upper half / ground-floor half'});
       addSurveyCompareLegend(rows, key);
       rows.push({sw:'outline', color:'--line-strong', label:'Blank level = not recorded, not assumed'});
       rows.push({sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m²'});
@@ -3589,10 +3588,9 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       var links = screenshotLinks();
       var pictured = recs.filter(function(r){ return !!links[r.id]; }).length;
       return base + ' · <b>' + ground + '</b> ground floors · <b>' + overall +
-        '</b> building uses · <b>' + mixed + '</b> recorded mixed use · <b>' +
+        '</b> building uses · <b>' + mixed + '</b> mixed (active ground + homes above) · <b>' +
         pictured + '</b> exact linked screenshots';
     }
-    if (key === 'surveyground') return base + ' · <b>' + blank + '</b> have no ground-floor condition recorded';
     if (key === 'surveystoreys') return base + ' · exact counts only · <b>' + blank + '</b> remain blank';
     if (key === 'surveyera'){
       var allEra = plots.filter(function(r){ return !!r.era; }).length;
