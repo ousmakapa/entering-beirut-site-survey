@@ -493,7 +493,7 @@ $SKPOLY
   9
 $TDCREATE
  40
-2461295.508773148
+2461295.5153587963
   9
 $TDUCREATE
  40
@@ -501,7 +501,7 @@ $TDUCREATE
   9
 $TDUPDATE
  40
-2461295.508773148
+2461295.5153703704
   9
 $TDUUPDATE
  40
@@ -933,11 +933,11 @@ $PSTYLEMODE
   9
 $FINGERPRINTGUID
   2
-{EB9774DF-CA14-4380-9701-1CB41DDCBD52}
+{522D2570-26FF-4CC4-9BB9-A09DE61E321E}
   9
 $VERSIONGUID
   2
-{C64C3138-D878-4B24-B5C2-D6DE45664D9F}
+{B796F64A-531B-4F1E-81B6-BA4D2ECEEF08}
   9
 $EXTNAMES
 290
@@ -1327,9 +1327,9 @@ ISM
   0
 CLASS
   1
-LAYOUT
+ACDBPLACEHOLDER
   2
-AcDbLayout
+AcDbPlaceHolder
   3
 ObjectDBX Classes
  90
@@ -1343,9 +1343,9 @@ ObjectDBX Classes
   0
 CLASS
   1
-ACDBPLACEHOLDER
+LAYOUT
   2
-AcDbPlaceHolder
+AcDbLayout
   3
 ObjectDBX Classes
  90
@@ -79905,7 +79905,7 @@ AcDbText
  40
 1.2
   1
-UP·?
+UP:?
   7
 OD-INTER
  72
@@ -80041,7 +80041,7 @@ AcDbText
  40
 1.2
   1
-GF·PARK
+GF:PARK
   7
 OD-INTER
  72
@@ -80177,7 +80177,7 @@ AcDbText
  40
 1.2
   1
-UP·?
+UP:?
   7
 OD-INTER
  72
@@ -80313,7 +80313,7 @@ AcDbText
  40
 1.2
   1
-GF·PARK
+GF:PARK
   7
 OD-INTER
  72
@@ -80449,7 +80449,7 @@ AcDbText
  40
 1.2
   1
-UP·RET
+UP:RET
   7
 OD-INTER
  72
@@ -80585,7 +80585,7 @@ AcDbText
  40
 1.2
   1
-GF·WORK
+GF:WORK
   7
 OD-INTER
  72
@@ -80721,7 +80721,7 @@ AcDbText
  40
 1.2
   1
-UP·?
+UP:?
   7
 OD-INTER
  72
@@ -80857,7 +80857,7 @@ AcDbText
  40
 1.2
   1
-GF·WORK
+GF:WORK
   7
 OD-INTER
  72
@@ -80993,7 +80993,7 @@ AcDbText
  40
 1.2
   1
-UP·RET
+UP:RET
   7
 OD-INTER
  72
@@ -81129,7 +81129,7 @@ AcDbText
  40
 1.2
   1
-GF·SHOP
+GF:SHOP
   7
 OD-INTER
  72
@@ -81265,7 +81265,7 @@ AcDbText
  40
 1.2
   1
-UP·IND
+UP:IND
   7
 OD-INTER
  72
@@ -81401,7 +81401,7 @@ AcDbText
  40
 1.2
   1
-GF·WORK
+GF:WORK
   7
 OD-INTER
  72
@@ -81537,7 +81537,7 @@ AcDbText
  40
 1.2
   1
-UP·RET
+UP:RET
   7
 OD-INTER
  72
@@ -81673,7 +81673,7 @@ AcDbText
  40
 1.2
   1
-GF·CAFE
+GF:CAFE
   7
 OD-INTER
  72
@@ -81809,7 +81809,7 @@ AcDbText
  40
 1.2
   1
-UP·IND
+UP:IND
   7
 OD-INTER
  72
@@ -81945,7 +81945,7 @@ AcDbText
  40
 1.2
   1
-GF·WORK
+GF:WORK
   7
 OD-INTER
  72
@@ -82081,7 +82081,7 @@ AcDbText
  40
 1.2
   1
-UP·IND
+UP:IND
   7
 OD-INTER
  72
@@ -82217,7 +82217,7 @@ AcDbText
  40
 1.2
   1
-GF·WORK
+GF:WORK
   7
 OD-INTER
  72
@@ -82353,7 +82353,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -82489,7 +82489,7 @@ AcDbText
  40
 1.2
   1
-GF·ENTRY
+GF:ENTRY
   7
 OD-INTER
  72
@@ -82625,7 +82625,7 @@ AcDbText
  40
 1.2
   1
-UP·PUB
+UP:PUB
   7
 OD-INTER
  72
@@ -82761,7 +82761,7 @@ AcDbText
  40
 1.2
   1
-GF·OTHER
+GF:OTHER
   7
 OD-INTER
  72
@@ -82897,7 +82897,7 @@ AcDbText
  40
 1.2
   1
-UP·RET
+UP:RET
   7
 OD-INTER
  72
@@ -83033,7 +83033,7 @@ AcDbText
  40
 1.2
   1
-GF·SHOP
+GF:SHOP
   7
 OD-INTER
  72
@@ -83169,7 +83169,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -83305,7 +83305,7 @@ AcDbText
  40
 1.2
   1
-GF·SHOP
+GF:SHOP
   7
 OD-INTER
  72
@@ -83441,7 +83441,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -83577,7 +83577,7 @@ AcDbText
  40
 1.2
   1
-GF·SHOP
+GF:SHOP
   7
 OD-INTER
  72
@@ -83713,7 +83713,7 @@ AcDbText
  40
 1.2
   1
-UP·?
+UP:?
   7
 OD-INTER
  72
@@ -83849,7 +83849,7 @@ AcDbText
  40
 1.2
   1
-GF·PARK
+GF:PARK
   7
 OD-INTER
  72
@@ -83985,7 +83985,7 @@ AcDbText
  40
 1.2
   1
-UP·?
+UP:?
   7
 OD-INTER
  72
@@ -84121,7 +84121,7 @@ AcDbText
  40
 1.2
   1
-GF·PARK
+GF:PARK
   7
 OD-INTER
  72
@@ -84257,7 +84257,7 @@ AcDbText
  40
 1.2
   1
-UP·RET
+UP:RET
   7
 OD-INTER
  72
@@ -84393,7 +84393,7 @@ AcDbText
  40
 1.2
   1
-GF·SHOP
+GF:SHOP
   7
 OD-INTER
  72
@@ -84529,7 +84529,7 @@ AcDbText
  40
 1.2
   1
-UP·RET
+UP:RET
   7
 OD-INTER
  72
@@ -84665,7 +84665,7 @@ AcDbText
  40
 1.2
   1
-GF·OTHER
+GF:OTHER
   7
 OD-INTER
  72
@@ -84801,7 +84801,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -84937,7 +84937,7 @@ AcDbText
  40
 1.2
   1
-GF·WORK
+GF:WORK
   7
 OD-INTER
  72
@@ -85073,7 +85073,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -85209,7 +85209,7 @@ AcDbText
  40
 1.2
   1
-GF·WORK
+GF:WORK
   7
 OD-INTER
  72
@@ -85345,7 +85345,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -85481,7 +85481,7 @@ AcDbText
  40
 1.2
   1
-GF·WORK
+GF:WORK
   7
 OD-INTER
  72
@@ -85617,7 +85617,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -85753,7 +85753,7 @@ AcDbText
  40
 1.2
   1
-GF·WORK
+GF:WORK
   7
 OD-INTER
  72
@@ -85889,7 +85889,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -86025,7 +86025,7 @@ AcDbText
  40
 1.2
   1
-GF·SHOP
+GF:SHOP
   7
 OD-INTER
  72
@@ -86161,7 +86161,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -86297,7 +86297,7 @@ AcDbText
  40
 1.2
   1
-GF·WORK
+GF:WORK
   7
 OD-INTER
  72
@@ -86433,7 +86433,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -86569,7 +86569,7 @@ AcDbText
  40
 1.2
   1
-GF·SHOP
+GF:SHOP
   7
 OD-INTER
  72
@@ -86705,7 +86705,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -86841,7 +86841,7 @@ AcDbText
  40
 1.2
   1
-GF·WORK
+GF:WORK
   7
 OD-INTER
  72
@@ -86977,7 +86977,7 @@ AcDbText
  40
 1.2
   1
-UP·PUB
+UP:PUB
   7
 OD-INTER
  72
@@ -87113,7 +87113,7 @@ AcDbText
  40
 1.2
   1
-GF·OTHER
+GF:OTHER
   7
 OD-INTER
  72
@@ -87249,7 +87249,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -87385,7 +87385,7 @@ AcDbText
  40
 1.2
   1
-GF·WORK
+GF:WORK
   7
 OD-INTER
  72
@@ -87521,7 +87521,7 @@ AcDbText
  40
 1.2
   1
-UP·RET
+UP:RET
   7
 OD-INTER
  72
@@ -87657,7 +87657,7 @@ AcDbText
  40
 1.2
   1
-GF·SHOP
+GF:SHOP
   7
 OD-INTER
  72
@@ -87793,7 +87793,7 @@ AcDbText
  40
 1.2
   1
-UP·RET
+UP:RET
   7
 OD-INTER
  72
@@ -87929,7 +87929,7 @@ AcDbText
  40
 1.2
   1
-GF·SHOP
+GF:SHOP
   7
 OD-INTER
  72
@@ -88065,7 +88065,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -88201,7 +88201,7 @@ AcDbText
  40
 1.2
   1
-GF·WORK
+GF:WORK
   7
 OD-INTER
  72
@@ -88337,7 +88337,7 @@ AcDbText
  40
 1.2
   1
-UP·IND
+UP:IND
   7
 OD-INTER
  72
@@ -88473,7 +88473,7 @@ AcDbText
  40
 1.2
   1
-GF·WORK
+GF:WORK
   7
 OD-INTER
  72
@@ -88609,7 +88609,7 @@ AcDbText
  40
 1.2
   1
-UP·IND
+UP:IND
   7
 OD-INTER
  72
@@ -88745,7 +88745,7 @@ AcDbText
  40
 1.2
   1
-GF·WORK
+GF:WORK
   7
 OD-INTER
  72
@@ -88881,7 +88881,7 @@ AcDbText
  40
 1.2
   1
-UP·IND
+UP:IND
   7
 OD-INTER
  72
@@ -89017,7 +89017,7 @@ AcDbText
  40
 1.2
   1
-GF·WORK
+GF:WORK
   7
 OD-INTER
  72
@@ -89153,7 +89153,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -89289,7 +89289,7 @@ AcDbText
  40
 1.2
   1
-GF·WORK
+GF:WORK
   7
 OD-INTER
  72
@@ -89425,7 +89425,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -89561,7 +89561,7 @@ AcDbText
  40
 1.2
   1
-GF·WORK
+GF:WORK
   7
 OD-INTER
  72
@@ -89697,7 +89697,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -89833,7 +89833,7 @@ AcDbText
  40
 1.2
   1
-GF·WORK
+GF:WORK
   7
 OD-INTER
  72
@@ -89969,7 +89969,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -90105,7 +90105,7 @@ AcDbText
  40
 1.2
   1
-GF·ENTRY
+GF:ENTRY
   7
 OD-INTER
  72
@@ -90241,7 +90241,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -90377,7 +90377,7 @@ AcDbText
  40
 1.2
   1
-GF·SHOP
+GF:SHOP
   7
 OD-INTER
  72
@@ -90513,7 +90513,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -90649,7 +90649,7 @@ AcDbText
  40
 1.2
   1
-GF·SHOP
+GF:SHOP
   7
 OD-INTER
  72
@@ -90785,7 +90785,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -90921,7 +90921,7 @@ AcDbText
  40
 1.2
   1
-GF·STORE
+GF:STORE
   7
 OD-INTER
  72
@@ -91057,7 +91057,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -91193,7 +91193,7 @@ AcDbText
  40
 1.2
   1
-GF·SHOP
+GF:SHOP
   7
 OD-INTER
  72
@@ -91329,7 +91329,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -91465,7 +91465,7 @@ AcDbText
  40
 1.2
   1
-GF·STORE
+GF:STORE
   7
 OD-INTER
  72
@@ -91601,7 +91601,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -91737,7 +91737,7 @@ AcDbText
  40
 1.2
   1
-GF·?
+GF:?
   7
 OD-INTER
  72
@@ -91873,7 +91873,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -92009,7 +92009,7 @@ AcDbText
  40
 1.2
   1
-GF·SHOP
+GF:SHOP
   7
 OD-INTER
  72
@@ -92145,7 +92145,7 @@ AcDbText
  40
 1.2
   1
-UP·RET
+UP:RET
   7
 OD-INTER
  72
@@ -92281,7 +92281,7 @@ AcDbText
  40
 1.2
   1
-GF·OTHER
+GF:OTHER
   7
 OD-INTER
  72
@@ -92417,7 +92417,7 @@ AcDbText
  40
 1.2
   1
-UP·PUB
+UP:PUB
   7
 OD-INTER
  72
@@ -92553,7 +92553,7 @@ AcDbText
  40
 1.2
   1
-GF·SHOP
+GF:SHOP
   7
 OD-INTER
  72
@@ -92689,7 +92689,7 @@ AcDbText
  40
 1.2
   1
-UP·BLD
+UP:BLD
   7
 OD-INTER
  72
@@ -92825,7 +92825,7 @@ AcDbText
  40
 1.2
   1
-GF·?
+GF:?
   7
 OD-INTER
  72
@@ -92961,7 +92961,7 @@ AcDbText
  40
 1.2
   1
-UP·?
+UP:?
   7
 OD-INTER
  72
@@ -93097,7 +93097,7 @@ AcDbText
  40
 1.2
   1
-GF·PARK
+GF:PARK
   7
 OD-INTER
  72
@@ -93233,7 +93233,7 @@ AcDbText
  40
 1.2
   1
-UP·?
+UP:?
   7
 OD-INTER
  72
@@ -93369,7 +93369,7 @@ AcDbText
  40
 1.2
   1
-GF·PARK
+GF:PARK
   7
 OD-INTER
  72
@@ -93505,7 +93505,7 @@ AcDbText
  40
 1.2
   1
-UP·PUB
+UP:PUB
   7
 OD-INTER
  72
@@ -93641,7 +93641,7 @@ AcDbText
  40
 1.2
   1
-GF·SHOP
+GF:SHOP
   7
 OD-INTER
  72
@@ -93777,7 +93777,7 @@ AcDbText
  40
 1.2
   1
-UP·PUB
+UP:PUB
   7
 OD-INTER
  72
@@ -93913,7 +93913,7 @@ AcDbText
  40
 1.2
   1
-GF·SHOP
+GF:SHOP
   7
 OD-INTER
  72
@@ -94049,7 +94049,7 @@ AcDbText
  40
 1.2
   1
-UP·PUB
+UP:PUB
   7
 OD-INTER
  72
@@ -94185,7 +94185,7 @@ AcDbText
  40
 1.2
   1
-GF·STORE
+GF:STORE
   7
 OD-INTER
  72
@@ -94321,7 +94321,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -94457,7 +94457,7 @@ AcDbText
  40
 1.2
   1
-GF·SHOP
+GF:SHOP
   7
 OD-INTER
  72
@@ -94593,7 +94593,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -94729,7 +94729,7 @@ AcDbText
  40
 1.2
   1
-GF·SHOP
+GF:SHOP
   7
 OD-INTER
  72
@@ -94865,7 +94865,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -95001,7 +95001,7 @@ AcDbText
  40
 1.2
   1
-GF·SHOP
+GF:SHOP
   7
 OD-INTER
  72
@@ -95137,7 +95137,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -95273,7 +95273,7 @@ AcDbText
  40
 1.2
   1
-GF·SHOP
+GF:SHOP
   7
 OD-INTER
  72
@@ -95409,7 +95409,7 @@ AcDbText
  40
 1.2
   1
-UP·RET
+UP:RET
   7
 OD-INTER
  72
@@ -95545,7 +95545,7 @@ AcDbText
  40
 1.2
   1
-GF·SHOP
+GF:SHOP
   7
 OD-INTER
  72
@@ -95681,7 +95681,7 @@ AcDbText
  40
 1.2
   1
-UP·H
+UP:H
   7
 OD-INTER
  72
@@ -95817,7 +95817,7 @@ AcDbText
  40
 1.2
   1
-GF·SHOP
+GF:SHOP
   7
 OD-INTER
  72
@@ -95953,7 +95953,7 @@ AcDbText
  40
 1.2
   1
-UP·RET
+UP:RET
   7
 OD-INTER
  72
@@ -96089,7 +96089,7 @@ AcDbText
  40
 1.2
   1
-GF·SHOP
+GF:SHOP
   7
 OD-INTER
  72
@@ -96225,7 +96225,7 @@ AcDbText
  40
 1.2
   1
-UP·PUB
+UP:PUB
   7
 OD-INTER
  72
@@ -96361,7 +96361,7 @@ AcDbText
  40
 1.2
   1
-GF·SHOP
+GF:SHOP
   7
 OD-INTER
  72
@@ -96497,7 +96497,7 @@ AcDbText
  40
 1.2
   1
-UP·?
+UP:?
   7
 OD-INTER
  72
@@ -96633,7 +96633,7 @@ AcDbText
  40
 1.2
   1
-GF·SHOP
+GF:SHOP
   7
 OD-INTER
  72
@@ -96769,7 +96769,7 @@ AcDbText
  40
 1.2
   1
-UP·PUB
+UP:PUB
   7
 OD-INTER
  72
@@ -96905,7 +96905,7 @@ AcDbText
  40
 1.2
   1
-GF·SHOP
+GF:SHOP
   7
 OD-INTER
  72
@@ -97041,7 +97041,7 @@ AcDbText
  40
 1.2
   1
-UP·PUB
+UP:PUB
   7
 OD-INTER
  72
@@ -97177,7 +97177,7 @@ AcDbText
  40
 1.2
   1
-GF·SHOP
+GF:SHOP
   7
 OD-INTER
  72
@@ -101805,7 +101805,7 @@ DictionaryVariables
 280
 0
   1
-1.4.4 @ 2026-09-11T09:12:38.112597+00:00
+1.4.4 @ 2026-09-11T09:22:07.808277+00:00
   0
 VISUALSTYLE
   5
@@ -108367,7 +108367,7 @@ DictionaryVariables
 280
 0
   1
-1.4.4 @ 2026-09-11T09:12:38.970545+00:00
+1.4.4 @ 2026-09-11T09:22:08.268222+00:00
   0
 ENDSEC
   0

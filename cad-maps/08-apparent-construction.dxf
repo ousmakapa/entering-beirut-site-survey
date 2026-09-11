@@ -493,7 +493,7 @@ $SKPOLY
   9
 $TDCREATE
  40
-2461295.508796296
+2461295.5153819444
   9
 $TDUCREATE
  40
@@ -501,7 +501,7 @@ $TDUCREATE
   9
 $TDUPDATE
  40
-2461295.508796296
+2461295.5153819444
   9
 $TDUUPDATE
  40
@@ -933,11 +933,11 @@ $PSTYLEMODE
   9
 $FINGERPRINTGUID
   2
-{996DEBFA-AF2A-4E4D-9DD2-7DA68BA73A5D}
+{87EE74F7-6ED8-4940-B62A-ABEDA9CA4AE5}
   9
 $VERSIONGUID
   2
-{973C41BA-E633-4746-92D1-BDFBDB3F420D}
+{AB756974-FE59-4775-AF50-EF02609486D2}
   9
 $EXTNAMES
 290
@@ -1327,9 +1327,9 @@ ISM
   0
 CLASS
   1
-LAYOUT
+ACDBPLACEHOLDER
   2
-AcDbLayout
+AcDbPlaceHolder
   3
 ObjectDBX Classes
  90
@@ -1343,9 +1343,9 @@ ObjectDBX Classes
   0
 CLASS
   1
-ACDBPLACEHOLDER
+LAYOUT
   2
-AcDbPlaceHolder
+AcDbLayout
   3
 ObjectDBX Classes
  90
@@ -74299,7 +74299,7 @@ AcDbText
  40
 1.15
   1
-40–59 V
+40-59 V
   7
 OD-INTER
  72
@@ -74435,7 +74435,7 @@ AcDbText
  40
 1.15
   1
-00–10 V
+00-10 V
   7
 OD-INTER
  72
@@ -74571,7 +74571,7 @@ AcDbText
  40
 1.15
   1
-40–59 V
+40-59 V
   7
 OD-INTER
  72
@@ -74707,7 +74707,7 @@ AcDbText
  40
 1.15
   1
-00–10 V
+00-10 V
   7
 OD-INTER
  72
@@ -74843,7 +74843,7 @@ AcDbText
  40
 1.15
   1
-00–10 V
+00-10 V
   7
 OD-INTER
  72
@@ -74979,7 +74979,7 @@ AcDbText
  40
 1.15
   1
-40–59 V
+40-59 V
   7
 OD-INTER
  72
@@ -75115,7 +75115,7 @@ AcDbText
  40
 1.15
   1
-60–79 V
+60-79 V
   7
 OD-INTER
  72
@@ -75251,7 +75251,7 @@ AcDbText
  40
 1.15
   1
-60–79 V
+60-79 V
   7
 OD-INTER
  72
@@ -75387,7 +75387,7 @@ AcDbText
  40
 1.15
   1
-60–79 V
+60-79 V
   7
 OD-INTER
  72
@@ -75523,7 +75523,7 @@ AcDbText
  40
 1.15
   1
-60–79 V
+60-79 V
   7
 OD-INTER
  72
@@ -75659,7 +75659,7 @@ AcDbText
  40
 1.15
   1
-40–59 V
+40-59 V
   7
 OD-INTER
  72
@@ -75795,7 +75795,7 @@ AcDbText
  40
 1.15
   1
-60–79 V
+60-79 V
   7
 OD-INTER
  72
@@ -75931,7 +75931,7 @@ AcDbText
  40
 1.15
   1
-60–79 V
+60-79 V
   7
 OD-INTER
  72
@@ -76067,7 +76067,7 @@ AcDbText
  40
 1.15
   1
-60–79 V
+60-79 V
   7
 OD-INTER
  72
@@ -76203,7 +76203,7 @@ AcDbText
  40
 1.15
   1
-40–59 V
+40-59 V
   7
 OD-INTER
  72
@@ -76339,7 +76339,7 @@ AcDbText
  40
 1.15
   1
-60–79 V
+60-79 V
   7
 OD-INTER
  72
@@ -76475,7 +76475,7 @@ AcDbText
  40
 1.15
   1
-40–59 V
+40-59 V
   7
 OD-INTER
  72
@@ -76611,7 +76611,7 @@ AcDbText
  40
 1.15
   1
-00–10 V
+00-10 V
   7
 OD-INTER
  72
@@ -76747,7 +76747,7 @@ AcDbText
  40
 1.15
   1
-40–59 V
+40-59 V
   7
 OD-INTER
  72
@@ -76883,7 +76883,7 @@ AcDbText
  40
 1.15
   1
-80–99 V
+80-99 V
   7
 OD-INTER
  72
@@ -77019,7 +77019,7 @@ AcDbText
  40
 1.15
   1
-80–99 V
+80-99 V
   7
 OD-INTER
  72
@@ -77155,7 +77155,7 @@ AcDbText
  40
 1.15
   1
-40–59 V
+40-59 V
   7
 OD-INTER
  72
@@ -77291,7 +77291,7 @@ AcDbText
  40
 1.15
   1
-60–79 V
+60-79 V
   7
 OD-INTER
  72
@@ -77427,7 +77427,7 @@ AcDbText
  40
 1.15
   1
-40–59 V
+40-59 V
   7
 OD-INTER
  72
@@ -77563,7 +77563,7 @@ AcDbText
  40
 1.15
   1
-40–59 V
+40-59 V
   7
 OD-INTER
  72
@@ -77699,7 +77699,7 @@ AcDbText
  40
 1.15
   1
-60–79 V
+60-79 V
   7
 OD-INTER
  72
@@ -77835,7 +77835,7 @@ AcDbText
  40
 1.15
   1
-11–20 V
+11-20 V
   7
 OD-INTER
  72
@@ -77971,7 +77971,7 @@ AcDbText
  40
 1.15
   1
-60–79 V
+60-79 V
   7
 OD-INTER
  72
@@ -78107,7 +78107,7 @@ AcDbText
  40
 1.15
   1
-60–79 V
+60-79 V
   7
 OD-INTER
  72
@@ -78243,7 +78243,7 @@ AcDbText
  40
 1.15
   1
-60–79 V
+60-79 V
   7
 OD-INTER
  72
@@ -78379,7 +78379,7 @@ AcDbText
  40
 1.15
   1
-80–99 V
+80-99 V
   7
 OD-INTER
  72
@@ -78515,7 +78515,7 @@ AcDbText
  40
 1.15
   1
-00–10 V
+00-10 V
   7
 OD-INTER
  72
@@ -78651,7 +78651,7 @@ AcDbText
  40
 1.15
   1
-80–99 V
+80-99 V
   7
 OD-INTER
  72
@@ -78787,7 +78787,7 @@ AcDbText
  40
 1.15
   1
-80–99 V
+80-99 V
   7
 OD-INTER
  72
@@ -79115,7 +79115,7 @@ AcDbText
  40
 2.25
   1
-40–59 V = 1940–1959 · VERIFY — 10 records
+40-59 V = 1940–1959 · VERIFY — 10 records
   7
 OD-INTER
  11
@@ -79245,7 +79245,7 @@ AcDbText
  40
 2.25
   1
-60–79 V = 1960–1979 · VERIFY — 13 records
+60-79 V = 1960–1979 · VERIFY — 13 records
   7
 OD-INTER
  11
@@ -79375,7 +79375,7 @@ AcDbText
  40
 2.25
   1
-80–99 V = 1980–1999 · VERIFY — 5 records
+80-99 V = 1980–1999 · VERIFY — 5 records
   7
 OD-INTER
  11
@@ -79505,7 +79505,7 @@ AcDbText
  40
 2.25
   1
-00–10 V = 2000–2010 · VERIFY — 5 records
+00-10 V = 2000–2010 · VERIFY — 5 records
   7
 OD-INTER
  11
@@ -79635,7 +79635,7 @@ AcDbText
  40
 2.25
   1
-11–20 V = 2011–2020 · VERIFY — 1 records
+11-20 V = 2011–2020 · VERIFY — 1 records
   7
 OD-INTER
  11
@@ -82477,7 +82477,7 @@ DictionaryVariables
 280
 0
   1
-1.4.4 @ 2026-09-11T09:12:40.239986+00:00
+1.4.4 @ 2026-09-11T09:22:09.205254+00:00
   0
 VISUALSTYLE
   5
@@ -89039,7 +89039,7 @@ DictionaryVariables
 280
 0
   1
-1.4.4 @ 2026-09-11T09:12:40.525608+00:00
+1.4.4 @ 2026-09-11T09:22:09.402315+00:00
   0
 ENDSEC
   0
