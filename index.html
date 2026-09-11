@@ -564,14 +564,32 @@
      screenshots inside a field-only popup. No analytical map inherits these cards. */
   .survey-field-badge{background:none!important; border:0!important; display:flex!important;
     align-items:center; justify-content:center;}
+  .survey-field-anchor{position:relative; display:block;}
   .survey-field-badge span{display:block; max-width:92px; overflow:hidden; text-overflow:ellipsis;
     white-space:nowrap; padding:.18rem .38rem; border:1px solid color-mix(in srgb,var(--sf) 78%,#000);
     border-radius:5px; background:color-mix(in srgb,var(--surface) 88%,var(--sf)); color:var(--ink);
     box-shadow:0 1px 4px rgba(0,0,0,.17); font-family:var(--font-mono); font-size:.58rem;
     font-weight:700; line-height:1.1; text-align:center;}
+  .survey-change-mark{position:absolute; right:-10px; top:-13px; z-index:2; display:block;
+    min-width:19px; box-sizing:border-box; padding:.12rem .22rem; border:1px solid #fff;
+    border-radius:999px; background:var(--vc); color:#fff; box-shadow:0 1px 4px rgba(0,0,0,.34);
+    font-family:var(--font-mono); font-size:.49rem; font-style:normal; font-weight:800;
+    line-height:1.05; text-align:center; white-space:nowrap;}
+  body.survey-compare-off .survey-change-mark{display:none;}
+  .survey-use-badge .survey-use-stack{width:104px; max-width:104px; padding:0; display:grid;
+    grid-template-rows:1fr 1fr; overflow:hidden; white-space:nowrap; border-color:var(--su);
+    background:var(--surface);}
+  .survey-use-stack b,.survey-use-stack i{display:block; min-width:0; overflow:hidden;
+    text-overflow:ellipsis; padding:.12rem .34rem; font:700 .54rem/1.08 var(--font-mono);
+    font-style:normal; color:var(--ink);}
+  .survey-use-stack b{background:color-mix(in srgb,var(--surface) 82%,var(--su));
+    border-bottom:1px solid color-mix(in srgb,var(--su) 70%,#000);}
+  .survey-use-stack i{background:color-mix(in srgb,var(--surface) 82%,var(--sf));}
   .survey-field-list{display:grid; gap:.5rem; width:min(270px,calc(100vw - 86px));}
   .survey-field-card{border:1px solid var(--line); border-left:4px solid var(--sf,var(--accent));
     border-radius:8px; background:var(--surface); padding:.5rem .58rem;}
+  .survey-field-card.survey-use-card{border-left-color:var(--sg,var(--accent));
+    border-top:3px solid var(--su,var(--accent));}
   .survey-field-card>small{display:block; font-family:var(--font-mono); font-size:.55rem;
     letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin-bottom:.25rem;}
   .survey-field-value{font-family:var(--font-display); font-size:.9rem; font-weight:650;
@@ -587,12 +605,34 @@
     font-family:var(--font-mono); font-size:.58rem; line-height:1.35;}
   .survey-field-proof{margin-top:.42rem; padding-top:.38rem; border-top:1px dashed var(--line-strong);}
   .survey-field-proof>span{display:block; margin-bottom:.28rem; font-size:.66rem; color:var(--ink-soft);}
+  .survey-compare{border-color:color-mix(in srgb,var(--layer-environmental) 45%,var(--line));}
+  .survey-compare-head{display:flex; gap:.5rem; align-items:center; justify-content:space-between;
+    margin-bottom:.35rem;}
+  .survey-compare-head b{font-family:var(--font-display); font-size:.82rem;}
+  .survey-compare-head button{flex:none; border:1px solid var(--line-strong); border-radius:999px;
+    background:var(--surface); color:var(--ink); padding:.2rem .45rem; cursor:pointer;
+    font-family:var(--font-mono); font-size:.57rem;}
+  .survey-compare-lead{margin:0 0 .4rem; font-size:.66rem; line-height:1.4; color:var(--ink-soft);}
+  .survey-compare-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1px;
+    border:1px solid var(--line); border-radius:5px; overflow:hidden; background:var(--line);}
+  .survey-compare-cell{min-width:0; padding:.3rem .35rem; background:var(--surface);}
+  .survey-compare-cell span{display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    font-size:.56rem; color:var(--muted);}
+  .survey-compare-cell b{display:block; margin-top:.08rem; font-size:.64rem; color:var(--ink);}
+  .survey-compare-note{display:block; margin-top:.35rem; font-size:.56rem; line-height:1.35;
+    color:var(--muted);}
   /* At the whole-survey view, category colour matters more than sixty overlapping words.
      Zooming one step restores the exact labels. */
   body[data-z="0"] .survey-field-badge span,
   body[data-z="2"] .survey-field-badge span,
   body[data-z="3"] .survey-field-badge span{width:8px; height:8px; padding:0; border-radius:50%;
     font-size:0; box-shadow:0 0 0 1px var(--surface),0 1px 3px rgba(0,0,0,.2);}
+  body[data-z="0"] .survey-use-stack,
+  body[data-z="2"] .survey-use-stack,
+  body[data-z="3"] .survey-use-stack{background:linear-gradient(to bottom,var(--su) 0 50%,var(--sf) 50% 100%);}
+  body[data-z="0"] .survey-use-stack b,body[data-z="0"] .survey-use-stack i,
+  body[data-z="2"] .survey-use-stack b,body[data-z="2"] .survey-use-stack i,
+  body[data-z="3"] .survey-use-stack b,body[data-z="3"] .survey-use-stack i{display:none;}
   .pf-edit{font-size:.62rem; color:var(--accent); background:none; border:0; cursor:pointer;}
   .pf-others{font-size:.7rem; color:var(--muted); background:var(--surface-2);
     border-radius:6px; padding:.3rem .4rem; margin-bottom:.2rem;}
@@ -1242,7 +1282,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     {key:'edges', label:'The Five Edges', short:'Edges', group:'FABRIC', color:'var(--layer-traffic)', blurb:'The plot read one side at a time. Each edge has a different neighbour, a different legal status and a different job. Click a side for its brief.'},
     {key:'landuse', label:'Building Functions', short:'Functions', group:'FABRIC', color:'var(--layer-landuse)', blurb:'The survey records no use for any structure. What it records is extent — and extent settles one thing: the <b>six</b> pieces of enclosed built ground over 1,000 m² hold <b>75%</b> of all of it, including the 2,794 m² shed against the plot’s north edge. Nothing smaller is drawn, because footprint size cannot tell a house from a workshop. The 77 named businesses are in the notes as a list — their positions are not accurate enough to plot on this survey.'},
     {key:'age', label:'Field Survey', short:'Field Survey', group:'FIELD DATA', color:'var(--layer-movement)', blurb:'A blank recording sheet on the survey base. No age or function data for Bourj Hammoud exists in this DWG or in any free dataset \u2014 click a structure to record what you see on site. Your tags are saved in this browser.'},
-    {key:'surveyuse', label:'Building Use', short:'Use', group:'FIELD DATA', color:'var(--layer-landuse)', blurb:'Only the overall building uses you recorded on the walk. A coloured parcel and each badge represent a filled survey record; blanks remain uncoloured and unclassified.'},
+    {key:'surveyuse', label:'Building Use + Ground', short:'Use + Ground', group:'FIELD DATA', color:'var(--layer-landuse)', blurb:'The recorded overall building use and ground floor read together. The parcel fill and lower half of each badge show the ground-floor condition; the outline and top half show the recorded overall use. <b>Mixed use remains mixed</b>: the data does not specify which use occupies each upper floor. Every linked screenshot stays on the exact building-part card.'},
     {key:'surveyground', label:'Ground Floor', short:'Ground Floor', group:'FIELD DATA', color:'var(--layer-traffic)', blurb:'Only the street-level condition recorded for each building part: shops, workshops, storage, parking, entrance, café, other, or under construction. It does not infer what happens above.'},
     {key:'surveystoreys', label:'Storeys', short:'Storeys', group:'FIELD DATA', color:'var(--layer-height)', blurb:'Only exact storey counts you entered. The labels are the recorded counts above ground; no height in metres and no missing count is estimated.'},
     {key:'surveyera', label:'Apparent Construction', short:'Construction', group:'FIELD DATA', color:'var(--layer-environmental)', blurb:'Only the construction ranges you recorded from linked screenshots. These are visual hypotheses marked <b>VERIFY</b>, not documentary construction dates and never Google imagery dates.'},
@@ -3170,8 +3210,8 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
 
     // The Survey tab uses the same shared base as every other section — see addBase().
 
-    /* The six field maps are deliberately separate. Analytical maps retain their own evidence
-       and never inherit the all-fields survey card; Pictures remains the complete record. */
+    /* The five field maps are deliberately focused. Ground and upper use form one vertical
+       reading; analytical maps keep their own evidence and Pictures remains the complete record. */
     SURVEY_FIELD_KEYS.forEach(function(key){ drawSurveyFieldMap(key); });
   }
 
@@ -3252,6 +3292,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   var SURVEY_FIELD_KEYS = ['surveyuse','surveyground','surveystoreys','surveyera',
                            'surveygreen','surveychange'];
   function isSurveyFieldKey(key){ return SURVEY_FIELD_KEYS.indexOf(key) > -1; }
+  var surveyCompareChange = true;
 
   /* Apparent construction is the one field that requires evidence to appear: the exact
      building-part record must have a linked screenshot. */
@@ -3259,7 +3300,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     if (typeof plots === 'undefined') return [];
     var links = key === 'surveyera' ? screenshotLinks() : null;
     return plots.filter(function(r){
-      if (key === 'surveyuse') return !!r.use;
+      if (key === 'surveyuse') return !!r.use || !!r.ground;
       if (key === 'surveyground') return !!r.ground;
       if (key === 'surveystoreys') return !!r.storeys;
       if (key === 'surveyera') return !!r.era && !!links[r.id];
@@ -3306,14 +3347,46 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   var STOREY_COLORS = ['#B9D4F2','#93BCE9','#6F9FDC','#537FC4','#655FB3','#7651A8',
                        '#884A91','#9A447B','#A84764','#B4494B','#9A3F3F','#793838'];
 
+  /* Vertical change is a secondary comparison symbol, never a second map fill. Only
+     positive observations get a symbol; exact assessed denominators live in the notes
+     panel so a blank can never be misread as a negative observation. */
+  function surveyChangeCategory(r){
+    var ck = r.added === 'y' && r.ready === 'y' ? 'both' :
+             r.added === 'y' ? 'added' : r.ready === 'y' ? 'ready' : null;
+    return ck ? {id:ck, style:CHANGE_STYLE[ck], mark:ck === 'added' ? '+F' :
+      ck === 'ready' ? 'COL' : '+F·COL'} : null;
+  }
+  function surveyChangeMarkHTML(key, r){
+    if (key === 'surveychange') return '';
+    var vc = surveyChangeCategory(r);
+    if (!vc) return '';
+    return '<i class="survey-change-mark" style="--vc:' + vc.style.color + '" title="' +
+      plotEsc(vc.style.label) + '">' + plotEsc(vc.mark) + '</i>';
+  }
+
+  function combinedUseCategory(r){
+    var overall = useOf(r.use);
+    var gs = r.ground ? (GROUND_STYLE[r.ground] ||
+             {color:'#92958F', short:String(r.ground), order:99}) : null;
+    var overallColor = overall ? cssVar(overall.c) : null;
+    var groundColor = gs ? gs.color : (overallColor || '#92958F');
+    var shortUse = {residential:'homes', commercial:'retail', industrial:'industry',
+                    institutional:'public', vacant:'vacant', construction:'building'};
+    var upperShort = overall ? (shortUse[overall.k] || overall.lab.toLowerCase()) : 'use ?';
+    var groundShort = gs ? gs.short : 'ground ?';
+    var levelText = overall ? 'overall building use ' + overall.lab : 'building use not recorded';
+    return {
+      id:(r.ground || '?') + '|' + (r.use || '?'),
+      label:(r.ground ? 'GF ' + r.ground : 'Ground floor not recorded') + ' · ' + levelText,
+      short:upperShort + ' / ' + groundShort + ' GF',
+      color:groundColor, groundColor:groundColor, upperColor:overallColor || groundColor,
+      groundShort:groundShort, upperShort:upperShort,
+      overallLabel:overall ? overall.lab : '', order:gs ? gs.order : 99
+    };
+  }
+
   function surveyFieldCategory(key, r){
-    if (key === 'surveyuse'){
-      var u = useOf(r.use);
-      var us = {residential:'homes', commercial:'retail', industrial:'industry', mixed:'mixed use',
-                institutional:'public', vacant:'vacant', construction:'building'};
-      return u ? {id:u.k, label:u.lab, short:us[u.k] || u.lab.toLowerCase(), color:cssVar(u.c),
-                  order:USES.indexOf(u)} : null;
-    }
+    if (key === 'surveyuse') return combinedUseCategory(r);
     if (key === 'surveyground'){
       var gs = GROUND_STYLE[r.ground] || {color:'#92958F', short:String(r.ground), order:99};
       return {id:r.ground, label:r.ground, short:gs.short, color:gs.color, order:gs.order};
@@ -3345,7 +3418,12 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       return '<div class="survey-field-row"><span>' + plotEsc(label) + '</span><b>' +
              plotEsc(value || 'Not recorded') + '</b></div>';
     }
-    if (key === 'surveyuse') return row('Overall use', (useOf(r.use) || {}).lab);
+    if (key === 'surveyuse'){
+      var uc = combinedUseCategory(r);
+      return row('Ground floor', r.ground) +
+             row('Overall building use', uc.overallLabel) +
+             '<span class="survey-field-note">No upper-floor use is inferred from “mixed use”.</span>';
+    }
     if (key === 'surveyground') return row('Ground floor', r.ground);
     if (key === 'surveystoreys') return row('Storeys above ground', r.storeys);
     if (key === 'surveyera') return row('Apparent construction', r.era) +
@@ -3370,7 +3448,10 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       '<div class="survey-field-list">' + recs.map(function(r, n){
         var cat = surveyFieldCategory(key, r), shots = links[r.id] || [];
         var dom = 'sfproof-' + key + '-' + String(r.id).replace(/[^a-z0-9_-]/gi, '-');
-        return '<section class="survey-field-card" style="--sf:' + (cat ? cat.color : cssVar('--accent')) + '">' +
+        var cardClass = key === 'surveyuse' ? 'survey-field-card survey-use-card' : 'survey-field-card';
+        var cardStyle = key === 'surveyuse' && cat ? '--sf:' + cat.color + ';--sg:' + cat.groundColor +
+                        ';--su:' + cat.upperColor : '--sf:' + (cat ? cat.color : cssVar('--accent'));
+        return '<section class="' + cardClass + '" style="' + cardStyle + '">' +
           '<small>' + (recs.length > 1 ? 'Building part ' + (n + 1) + ' of ' + recs.length : 'Survey record') + '</small>' +
           '<div class="survey-field-value">' + plotEsc(cat ? cat.label : 'Recorded') + '</div>' +
           '<div class="survey-field-rows">' + surveyFieldRows(key, r) + '</div>' +
@@ -3410,8 +3491,10 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       });
       var one = cats.length === 1 ? cats[0] : null;
       var col = one ? one.color : cssVar('--ink-soft');
-      var lay = L.polygon(f.g, {color:col, weight:2, opacity:.98,
-        dashArray:one ? null : '5 4', fillColor:col, fillOpacity:one ? .30 : .10});
+      var stroke = key === 'surveyuse' && one ? one.upperColor : col;
+      var fill = key === 'surveyuse' && one ? one.groundColor : col;
+      var lay = L.polygon(f.g, {color:stroke, weight:key === 'surveyuse' ? 3 : 2, opacity:.98,
+        dashArray:one ? null : '5 4', fillColor:fill, fillOpacity:one ? .30 : .10});
       lay.bindPopup(function(){ return surveyFieldPopup(key, parcel, onParcel, links); });
       wireSurveyFieldPopup(lay, key, onParcel, links);
       g.addLayer(lay);
@@ -3421,9 +3504,17 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         if (!cat) return;
         var p = r.at && r.at.length === 2 ? plotAt(r) : spreadPoint(parcel, n);
         if (!p) return;
-        var icon = L.divIcon({className:'survey-field-badge',
-          html:'<span style="--sf:' + cat.color + '" title="' + plotEsc(cat.label) + '">' +
-               plotEsc(cat.short) + '</span>', iconSize:[84,20], iconAnchor:[42,10], popupAnchor:[0,-9]});
+        var useBadge = key === 'surveyuse';
+        var badgeCore = useBadge ? '<span class="survey-use-stack' + (r.use === 'mixed' ? ' is-mixed' : '') +
+               '" style="--sf:' + cat.groundColor + ';--su:' +
+               cat.upperColor + '" title="' + plotEsc(cat.label) + '"><b>' +
+               plotEsc(cat.upperShort) + ' · USE</b><i>' + plotEsc(cat.groundShort) + ' · GF</i></span>' :
+               '<span style="--sf:' + cat.color + '" title="' + plotEsc(cat.label) + '">' +
+               plotEsc(cat.short) + '</span>';
+        var icon = L.divIcon({className:'survey-field-badge' + (useBadge ? ' survey-use-badge' : ''),
+          html:'<div class="survey-field-anchor">' + badgeCore +
+               surveyChangeMarkHTML(key, r) + '</div>',
+          iconSize:useBadge ? [104,34] : [84,20], iconAnchor:useBadge ? [52,17] : [42,10], popupAnchor:[0,-9]});
         var mark = L.marker(p, {icon:icon, zIndexOffset:1300});
         mark.bindPopup(function(){ return surveyFieldPopup(key, parcel, onParcel, links); });
         wireSurveyFieldPopup(mark, key, onParcel, links);
@@ -3432,7 +3523,38 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     });
   }
 
+  function addSurveyCompareLegend(rows, key){
+    if (key === 'surveychange') return rows;
+    rows.push({sw:'block', literal:CHANGE_STYLE.added.color, label:'+F — added floor (comparison)'});
+    rows.push({sw:'block', literal:CHANGE_STYLE.ready.color, label:'COL — columns left (comparison)'});
+    rows.push({sw:'block', literal:CHANGE_STYLE.both.color, label:'+F·COL — both visible'});
+    return rows;
+  }
+
   function surveyFieldLegendRows(key){
+    if (key === 'surveyuse'){
+      var groundSeen = {}, upperSeen = {}, rows = [];
+      surveyFieldRecords(key).forEach(function(r){
+        if (r.ground && !groundSeen[r.ground]){
+          groundSeen[r.ground] = true;
+          var gs = GROUND_STYLE[r.ground] || {color:'#92958F', order:99};
+          rows.push({sw:'block', literal:gs.color, label:'GROUND FLOOR · ' + r.ground, order:gs.order});
+        }
+        var u = useOf(r.use);
+        if (u && !upperSeen[u.k]){
+          upperSeen[u.k] = true;
+          rows.push({sw:'outline', literal:cssVar(u.c), label:'OVERALL BUILDING USE · ' + u.lab,
+                     order:100 + USES.indexOf(u)});
+        }
+      });
+      rows.sort(function(a,b){ return a.order - b.order; });
+      rows.forEach(function(r){ delete r.order; });
+      rows.push({sw:'outline', color:'--accent', label:'Badge = overall use / ground-floor condition'});
+      addSurveyCompareLegend(rows, key);
+      rows.push({sw:'outline', color:'--line-strong', label:'Blank level = not recorded, not assumed'});
+      rows.push({sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m²'});
+      return rows;
+    }
     var seen = {}, cats = [];
     surveyFieldRecords(key).forEach(function(r){
       var c = surveyFieldCategory(key, r);
@@ -3451,6 +3573,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     });
     Object.keys(multi).forEach(function(p){ if (Object.keys(multi[p]).length > 1) hasMulti = true; });
     if (hasMulti) rows.push({sw:'outline', color:'--ink-soft', label:'Several recorded parts — read the badges'});
+    addSurveyCompareLegend(rows, key);
     rows.push({sw:'outline', color:'--line-strong', label:'Blank — not recorded, not assumed'});
     rows.push({sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m²'});
     return rows;
@@ -3459,7 +3582,16 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   function surveyFieldStatsHTML(key){
     var recs = surveyFieldRecords(key), total = plots.length, blank = total - recs.length;
     var base = '<b>' + recs.length + ' of ' + total + '</b> building-part records mapped';
-    if (key === 'surveyuse') return base + ' · <b>' + blank + '</b> have no overall use recorded';
+    if (key === 'surveyuse'){
+      var ground = recs.filter(function(r){ return !!r.ground; }).length;
+      var overall = recs.filter(function(r){ return !!r.use; }).length;
+      var mixed = recs.filter(function(r){ return r.use === 'mixed'; }).length;
+      var links = screenshotLinks();
+      var pictured = recs.filter(function(r){ return !!links[r.id]; }).length;
+      return base + ' · <b>' + ground + '</b> ground floors · <b>' + overall +
+        '</b> building uses · <b>' + mixed + '</b> recorded mixed use · <b>' +
+        pictured + '</b> exact linked screenshots';
+    }
     if (key === 'surveyground') return base + ' · <b>' + blank + '</b> have no ground-floor condition recorded';
     if (key === 'surveystoreys') return base + ' · exact counts only · <b>' + blank + '</b> remain blank';
     if (key === 'surveyera'){
@@ -3483,8 +3615,62 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     }
     return base;
   }
+
+  function surveyCompareDimensions(key, r){
+    if (key === 'surveyuse'){
+      var dims = [], u = useOf(r.use), gs = r.ground ?
+        (GROUND_STYLE[r.ground] || {order:99}) : null;
+      if (u) dims.push({id:'use:' + u.k, label:'USE · ' + u.lab,
+                        order:USES.indexOf(u)});
+      if (r.ground) dims.push({id:'ground:' + r.ground, label:'GF · ' + r.ground,
+                               order:100 + gs.order});
+      return dims;
+    }
+    var c = surveyFieldCategory(key, r);
+    return c ? [{id:c.id, label:c.label, order:c.order}] : [];
+  }
+
+  function surveyCompareStatsHTML(key){
+    if (key === 'surveychange') return '';
+    var recs = surveyFieldRecords(key);
+    var assessed = recs.filter(function(r){
+      return r.added === 'y' || r.added === 'n' || r.ready === 'y' || r.ready === 'n';
+    });
+    var positive = assessed.filter(function(r){ return !!surveyChangeCategory(r); });
+    var bins = {};
+    assessed.forEach(function(r){
+      surveyCompareDimensions(key, r).forEach(function(c){
+        if (!bins[c.id]) bins[c.id] = {cat:c, assessed:0, positive:0};
+        bins[c.id].assessed += 1;
+        if (surveyChangeCategory(r)) bins[c.id].positive += 1;
+      });
+    });
+    var cells = Object.keys(bins).map(function(id){ return bins[id]; })
+      .sort(function(a,b){ return a.cat.order - b.cat.order || a.cat.label.localeCompare(b.cat.label); })
+      .map(function(b){
+        var pct = b.assessed ? Math.round(100 * b.positive / b.assessed) : 0;
+        return '<div class="survey-compare-cell"><span title="' + plotEsc(b.cat.label) + '">' +
+          plotEsc(b.cat.label) + '</span><b>' + b.positive + ' / ' + b.assessed + ' · ' + pct + '%</b></div>';
+      }).join('');
+    var lead = assessed.length
+      ? '<b>' + positive.length + ' of ' + assessed.length + '</b> overlapping assessed records show an added floor, columns left, or both.'
+      : 'No records on this map also have vertical change assessed.';
+    var caution = assessed.length < 3
+      ? 'Too little overlap for a conclusion on this map.'
+      : 'Each denominator includes only records where vertical change was assessed. This is an observed sample, not every building in Bourj Hammoud.';
+    if (key === 'surveyera') caution += ' Every construction range remains VERIFY.';
+    if (key === 'surveyuse') caution += ' USE and GF rows are two breakdowns of the same records.';
+    return '<div class="survey-compare-head"><b>Vertical change comparison</b>' +
+      '<button type="button" id="survey-compare-toggle" aria-pressed="' + surveyCompareChange + '">' +
+      (surveyCompareChange ? 'Hide symbols' : 'Show symbols') + '</button></div>' +
+      '<p class="survey-compare-lead">' + lead + '</p>' +
+      (cells ? '<div class="survey-compare-grid">' + cells + '</div>' : '') +
+      '<span class="survey-compare-note"><b>+F</b> = added floor · <b>COL</b> = columns left. ' +
+      'No symbol may mean assessed “no” or not assessed. ' + caution + '</span>';
+  }
   window.SURVEY_FIELD_KEYS = SURVEY_FIELD_KEYS;
   window.surveyFieldRecords = surveyFieldRecords;
+  window.surveyCompareStatsHTML = surveyCompareStatsHTML;
 
   /* ================== WALK MODE ==================
      A panel that floats above Google Earth, so the street can be walked on one screen and
@@ -4149,6 +4335,19 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       fieldStat.className = 'survey-stat';
       fieldStat.innerHTML = surveyFieldStatsHTML(key);
       panel.appendChild(fieldStat);
+      if (key !== 'surveychange'){
+        var compareStat = document.createElement('div');
+        compareStat.className = 'survey-stat survey-compare';
+        compareStat.innerHTML = surveyCompareStatsHTML(key);
+        panel.appendChild(compareStat);
+        var compareBtn = compareStat.querySelector('#survey-compare-toggle');
+        if (compareBtn) compareBtn.addEventListener('click', function(){
+          surveyCompareChange = !surveyCompareChange;
+          document.body.classList.toggle('survey-compare-off', !surveyCompareChange);
+          compareBtn.setAttribute('aria-pressed', String(surveyCompareChange));
+          compareBtn.textContent = surveyCompareChange ? 'Hide symbols' : 'Show symbols';
+        });
+      }
     }
 
     var STRIP = {
