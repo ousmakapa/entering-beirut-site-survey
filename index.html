@@ -112,7 +112,7 @@
   .tb-meta i{font-style:normal; color:var(--muted); letter-spacing:.06em; margin-right:.3rem;}
   .tb-btn{font-family:var(--font-body); font-size:.72rem; color:var(--ink-soft); cursor:pointer;
     background:var(--surface-2); border:1px solid var(--line); border-radius:999px;
-    padding:.25rem .7rem;}
+    padding:.25rem .7rem; text-decoration:none; line-height:1.5; white-space:nowrap;}
   .tb-btn:hover{border-color:var(--line-strong); color:var(--ink);}
   .tb-btn.on{background:var(--brand-olive); border-color:var(--brand-olive); color:var(--brand-offwhite);}
   @media (max-width:1100px){ .tb-meta{display:none;} }
@@ -893,6 +893,9 @@
     <button class="tb-btn" id="key-toggle" title="What the colours mean">Key</button>
     <button class="tb-btn" id="sat-toggle" title="Aerial photography under the survey lines">Satellite</button>
     <button class="tb-btn" id="walk-toggle" title="Float a recording panel above Google Earth">Walk</button>
+    <a class="tb-btn" id="cad-maps-link"
+       href="https://github.com/ousmakapa/entering-beirut-site-survey/tree/main/cad-maps"
+       target="_blank" rel="noopener" title="Open the individual AutoCAD map files">CAD Maps &#8599;</a>
   <button class="tb-btn" id="notes-toggle" title="Show or hide the notes column">Notes</button>
     <button class="tb-btn tb-field" id="field-toggle" title="Record what you see on site">Field</button>
   </div>
