@@ -491,14 +491,6 @@
     border:1px solid var(--accent); border-radius:8px; padding:.5rem .6rem;
     box-shadow:0 3px 16px rgba(0,0,0,.12); align-items:center; gap:.5rem; flex-wrap:wrap;}
   body.pictures-on .pic-bar{display:flex;}
-  /* the walk control, only on Problem 1 */
-  .iso-bar{display:none; position:absolute; left:.6rem; right:.6rem; z-index:1200;
-    bottom:calc(.6rem + env(safe-area-inset-bottom));
-    background:color-mix(in srgb, var(--surface) 95%, transparent); backdrop-filter:blur(10px);
-    border:1px solid var(--accent); border-radius:8px; padding:.5rem .6rem;
-    box-shadow:0 3px 16px rgba(0,0,0,.12); align-items:center; gap:.6rem;}
-  body.cut-on .iso-bar{display:flex;}
-  .iso-read{font-family:var(--font-mono); font-size:.72rem; color:var(--ink-soft);}
   /* Both bars can be on at once -- on site you keep Field mode running for the brief and the
      locator while you shoot. They used to sit on the same line, so the capture bar covered
      Export. The field bar now rides above whatever height the capture bar actually is. */
@@ -998,10 +990,6 @@
     </div>
     <div class="pic-alarm" id="pic-alarm" hidden></div>
     <div class="pic-sheet" id="pic-sheet"></div>
-    <div class="iso-bar" id="iso-bar">
-      <button class="fb-btn fb-primary" id="iso-play">Watch the walk</button>
-      <span class="iso-read" id="iso-read">five minutes on foot from the plot, and where it stops</span>
-    </div>
     <div class="rec-overlay" id="rec-overlay">
       <div class="rec-card">
         <div class="rec-dot"></div>
@@ -1390,7 +1378,6 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   }
 
   var TABS = [
-    {key:'pcut', label:'Problem 1 · Cut off', short:'Cut off', group:'THE PROBLEM', color:'var(--layer-environmental)', blurb:'A pedestrian cannot cross 54 m of carriageway at will, so the corridor is taken out of the walkable network — and half the public realm goes with it. <b>19,914 m²</b> is reachable from the plot as <b>one connected piece</b>; <b>19,765 m²</b> is cut off across <b>sixty-seven street spaces</b>. Of the public space beyond the corridor, <b>none</b> is reachable, and putting the bridge into the model unlocks <b>nothing</b>.'},
     {key:'pseam', label:'Problem 2 · No buffer', short:'No buffer', group:'THE PROBLEM', color:'var(--layer-landuse)', blurb:'Industry and housing meet with nothing in between. <b>54</b> parcels of 886 m² or more stand against <b>162</b> smaller ones along <b>2,582 m</b> of shared boundary, and the gap between a shed and the nearest house plot runs from <b>16.4 m</b> down to <b>0.0 m</b> — one of them touches. The plot sits <b>39.6 m</b> from that seam, on the industrial side of it.'},
     {key:'p1green', label:'Problem 3 · No green', short:'No green', group:'THE PROBLEM', color:'var(--layer-greenery)', blurb:'The square on the plot is <b>702 m²</b> — <b>all</b> the mapped public green within 600 m, drawn at true size. It covers <b>47%</b> of the plot. That is the problem in one picture: this building sits on more ground than the entire green provision of its neighbourhood, in one of the densest districts in the region.'},
     {key:'vision', label:'The vision', short:'The vision', group:'THE PROBLEM', color:'var(--accent)', blurb:'Where the three problems converge. This plot is the only ground in the frame that touches all of them at once, so the position is not a style — it is a consequence. <b>GIVE</b> 67 m² on the east and it is the largest green space within 600 m. <b>CROSS</b> 39 m through the building and it is the missing half of a bridge that lands nowhere. <b>BUFFER</b> 27.64 m of solid north wall and it is the transition the district never made in 2,582 m of seam.'},
@@ -1968,7 +1955,6 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     access:       false,   // arrival points + walk lines
     green:        false,   // green + water  -> replaced by what you record on site
     views:        false,   // view profile + sectors
-    pcut:         false,   // Problem 1 - Cut off
     p1green:      false,   // Problem 3 - No green
     vision:       false,   // The vision
     section:      false,   // the section line
@@ -2025,8 +2011,6 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     drawSectionLine();
     addBase('vision',       {quietParcels:true, fadeStructures:true});
     drawVision();
-    addBase('pcut',         {quietParcels:true, fadeStructures:true});
-    drawPCut();
     addBase('pseam',        {quietParcels:true});
     drawPSeam();
     addBase('p1green',      {quietParcels:true, fadeStructures:true});
@@ -2214,7 +2198,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       .bindPopup('<h4>The exposed end — 22.07 m</h4>The shortest side of the plot, facing 197° SSW toward the corridor — the smallest face the geometry offers it.'));
     ['cadastral','figureground','age','surveyuse','surveystoreys','surveyera',
      'surveygreen','surveychange','streets','siteplot','edges','grain','sun','noise','views',
-     'landuse','access','wind','green','pictures','history','p1green','pcut','pseam','vision','section'].forEach(function(k){
+     'landuse','access','wind','green','pictures','history','p1green','pseam','vision','section'].forEach(function(k){
       if (!groups[k]) return;
       /* A white halo under a heavy ink line, so the plot is legible over any thematic fill.
          EXCEPT on the two sections whose whole subject IS the plot's own edges — there a
@@ -4359,8 +4343,6 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     if (storyOn){
       lastTab = key;
       setPicturesMode(false);
-      document.body.classList.remove('cut-on');
-      if (window.isoClear) window.isoClear();
       try { map.closePopup(); } catch(e) {}
       Object.keys(groups).forEach(function(k){ map.removeLayer(groups[k]); });
       storyView.scrollTop = 0;
@@ -4381,9 +4363,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     fitFor(key);
     lastTab = key;
     setPicturesMode(key === 'pictures');
-    document.body.classList.toggle('cut-on', key === 'pcut');
     if (typeof layoutBars === 'function') layoutBars();
-    if (key !== 'pcut' && window.isoClear) window.isoClear();
 
     // swap map layer groups
     Object.keys(groups).forEach(function(k){ map.removeLayer(groups[k]); });
@@ -4410,7 +4390,6 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     if (key === 'wind') rows = [{sw:'line', literal:'#2A6FC4', label:'Dec–Apr  ·  SW ~210–225°'},{sw:'line', literal:'#3987e5', label:'May–Oct  ·  WSW→W ~245–270°'},{sw:'line', literal:'#8AB6EE', label:'Oct reversal  ·  NNW ~337°'},{sw:'line', color:'--layer-greenery', label:'Cross-ventilation line'}];
     if (key === 'section') rows = [{sw:'line', color:'--ink', label:'Section A–A′ — 300 m on the plot’s own axis'},{sw:'line', color:'--sem-public', label:'the corridor — 49.5 m of the cut'},{sw:'line', color:'--sem-plot', label:'THE PLOT — 51.0 m of the cut'},{sw:'line', color:'--sem-built', label:'the shed — 31.0 m, across a 2.5 m gap'}];
     if (key === 'vision') rows = [{sw:'block', color:'--sem-move', label:'GIVE — 67 m² setback, 4.5% of the plot'},{sw:'line', color:'--sem-move', label:'CROSS — 39 m, lane to corridor'},{sw:'line', color:'--sem-move', label:'BUFFER — 27.64 m of solid north wall'},{sw:'block', color:'--sem-public', label:'reachable public realm (faint)'},{sw:'block', color:'--sem-problem', label:'cut off (faint)'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m²'}];
-    if (key === 'pcut') rows = [{sw:'block', color:'--sem-public', label:'Reachable on foot — 19,914 m², ONE connected piece'},{sw:'block', color:'--sem-problem', label:'Cut off — 19,765 m², 67 street spaces'},{sw:'line', color:'--ink', label:'THE PLOT'}];
     if (key === 'pseam') rows = [{sw:'block', color:'--sem-built', label:'Parcels 886 m² and over — 54 of them'},{sw:'block', color:'--sem-built', label:'The large sheds — nearest house plot 0.0 to 16.4 m'},{sw:'line', color:'--sem-problem', label:'The seam — 2,582 m of shared parcel edge, nothing on it'},{sw:'line', color:'--ink', label:'THE PLOT — 39.6 m from the seam'}];
     if (key === 'p1green') rows = [{sw:'block', color:'--sem-veg', label:'The surveyed parcel the mapped green sits on — 1,955 m²'},{sw:'outline', color:'--sem-veg', label:'The green itself — 341 + 361 m², dashed: OSM, 11 m off'},{sw:'outline', color:'--sem-veg', label:'The canopy — 5 parcels, 3,170 m², private and walled'},{sw:'outline', color:'--muted', label:'Tagged greenfield — development land, struck through'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m², 2.12× all the green'}];
     if (key === 'history') rows = [{sw:'block', color:'--layer-landuse', label:'The 1930s gridiron — 108 parcels under the 285 m² median'},{sw:'block', color:'--layer-environmental', label:'1958 — Charles Helou Avenue, the corridor'},{sw:'line', color:'--layer-movement', label:'1968 — the Beirut River, channelised'},{sw:'block', color:'--ink', label:'The industrial layer — 6 sheds, 75% of built ground'},{sw:'line', color:'--ink', label:'THE PLOT — 1,488.5 m²'}];
@@ -4424,7 +4403,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
                       streets:'streets', noise:'corridor', landuse:'landuse', access:'access',
                       wind:'wind', green:'green', sun:'sun', views:'views', age:'fieldsurvey',
                       /* the argued sections, gated the same way as of 2026-09-09 */
-                      pcut:'pcut', pseam:'pseam', p1green:'p1green', vision:'vision',
+                      pseam:'pseam', p1green:'p1green', vision:'vision',
                       section:'section', history:'history'};
     var ov = OVERLAY_OF[key];
     var empty = !!(ov && !SHOW[ov]);
@@ -4494,7 +4473,6 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       edges:    '<b>6 of 7</b> sides are legal boundary (0.00–0.72 m) &middot; the <b>52.37 m west side</b> is <b>14.6 m</b> from any cadastral line',
       section:  'A–A′ on the plot’s axis &middot; corridor <b>49.5 m</b> &middot; plot <b>51.0 m</b> &middot; gap to the shed <b>2.5 m</b> &middot; shed <b>31.0 m</b> &middot; heights <b>unknown</b>',
       vision:   '<b>GIVE</b> 67 m² &rarr; the largest green space within 600 m &middot; <b>CROSS</b> 39 m &rarr; the missing half of the bridge &middot; <b>BUFFER</b> 27.64 m &rarr; the transition 2,582 m of seam never made',
-      pcut:     '<b>50%</b> of the walkable public realm is reachable &middot; <b>19,765 m²</b> cut off across <b>67</b> street spaces &middot; beyond the corridor <b>0%</b> &middot; the bridge unlocks <b>0 m²</b>',
       pseam:    '<b>54</b> large parcels against <b>162</b> small &middot; <b>2,582 m</b> of shared boundary &middot; shed to nearest house plot: median <b>11.5 m</b>, minimum <b>0.0 m</b>',
       p1green:  'all the public green within 600 m is <b>702 m²</b> &middot; the plot alone is <b>2.12×</b> that &middot; about <b>0.010 m²</b> of green per person &middot; nearest public park <b>1.5–2 km</b>',
       history:  'the grid was laid out from <b>1930</b> &middot; the corridor was cut through it in <b>1958</b> &middot; the river was buried in concrete in <b>1968</b> &middot; the settlement is a <b>generation older than the road</b>',
@@ -6731,10 +6709,6 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
        above the whole stack rather than underneath it. */
     var total = h + (h ? 6 : 0);
     if (fb && document.body.classList.contains('field-on')) total += fb.offsetHeight + 6;
-    /* The walk bar is in the same bottom-left stack and was the one bar nobody counted,
-       so on Cut off it sat straight on top of the legend. */
-    var ib = document.getElementById('iso-bar');
-    if (ib && document.body.classList.contains('cut-on')) total += ib.offsetHeight + 6;
     document.documentElement.style.setProperty('--bars', total + 'px');
   }
   function paintCounts(){
@@ -7077,7 +7051,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
      how:'Storeys, any windows or doors on our side, and what is actually in the 2.9 m gap. Use This plot and record it as its own part.'},
     {id:'crossing', p:2, t:'Does anyone cross the corridor on foot? Where?',
      w:'The whole severance argument rests on a pedestrian not being able to cross 54.5 m of carriageway at will. If people do cross, where they choose to is the strongest evidence on this site.',
-     m:'Corridor \u00b7 Cut off \u00b7 Access',
+     m:'Corridor \u00b7 Access',
      how:'Stand at the south edge for a few minutes. Photograph anyone crossing where there is no crossing, and note how long they wait. A video is better than a note here.'},
     {id:'insurance', p:2, t:'All four frontages photographed square-on, and one video round the perimeter',
      w:'If the east lane turns out to be private, GIVE and CROSS lose their frontage and the public move has to go to another side \u2014 and you will not be coming back. This is what lets the argument be rebuilt in a day instead of a week.',
@@ -7085,7 +7059,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
      how:'From across the street where you can: north, east, south, west, whole and square-on. Then one video walking the whole perimeter, saying out loud what each side faces.'},
     {id:'walkbridge', p:3, t:'Time the walk from the bridge landing to the plot',
      w:'Access says the bridge unlocks 0 m\u00b2 because its landings sit ~44 m from anything walkable. A timed walk is what turns that computed claim into something a jury cannot argue with.',
-     m:'Access \u00b7 Cut off',
+     m:'Access',
      how:'Start the clock at the landing, walk to the plot the way a person actually would, and say the time into a voice note at the end \u2014 with what you had to cross to do it.'},
     {id:'swtower', p:2, k:true, t:'How many storeys is the building 108 m south-west?',
      w:'It is the ONLY structure near enough and placed right to shade the plot, and it would need 24.2 m \u2014 about 8 storeys \u2014 to do it. Under that, the plot is unshaded all year.',
@@ -7796,11 +7770,6 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
          a tap on the street means nothing and should do nothing. */
       if (c.length && c[0].inside) openFacts(c[0].i, e.latlng);
     });
-  })();
-
-  (function(){
-    var b = document.getElementById('iso-play');
-    if (b) b.addEventListener('click', function(){ if (window.isoPlay) window.isoPlay(); });
   })();
 
   (function(){
