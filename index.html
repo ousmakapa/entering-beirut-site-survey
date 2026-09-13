@@ -897,6 +897,9 @@
   <meta name="theme-color" content="#151515">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Entering Beirut">
+<link rel="stylesheet" href="pictures-new.css?v=20260913-1">
+  <script src="pictures-new-data.js?v=20260913-2"></script>
+  <script src="pictures-new.js?v=20260913-2"></script>
 </head>
 <body>
 
@@ -1442,6 +1445,9 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     {key:'wind', label:'Wind & Air', short:'Wind', group:'ANALYSIS', color:'var(--layer-movement)', blurb:'Prevailing wind by season, plotted against the plot\u2019s own surveyed axis to find the cross-ventilation line. The directions are station data for Beirut, not a site measurement \u2014 the geometry they are drawn against is the survey.'},
     {key:'story', label:'Nesting', short:'Story', group:'ANALYSIS', color:'var(--accent)', blurb:'The selected site-to-building concept, read as a narrative rather than another map.'}
   ];
+  TABS.splice(TABS.findIndex(function(t){return t.key==='pictures';})+1,0,
+    {key:'picturesnew',label:'Pictures New',short:'Pictures New',group:'FIELD DATA',color:'var(--accent)',
+     blurb:'Your existing cards and exact linked pictures on the clearer OSM base. Dashed shapes are provisional or approximate. Large buildings may be divided into separate recorded parts; missing outlines use schematic squares. Check a card’s picture before confirming its location.'});
   var TAG_OPTIONS_NOTES = ['General','Traffic','Greenery','Land use','Movement','Environmental'];
 
   /* ---------- map (diagram only — no image tiles) ---------- */
@@ -2056,6 +2062,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     drawHistory();
     addBase('pictures',     {quietParcels:true});   // the parcels are what you assign photos to
     if (typeof drawPictures === 'function') drawPictures();
+    if (window.picturesNew) window.picturesNew.draw();
 
     /* Figure-ground from BUILT vs VACANT parcels.
        A true footprint poché is not available: the survey gives wall lines, not closed outlines
@@ -4249,6 +4256,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
      than rebuilding every layer on the map. */
   function fitFor(key){
     map.invalidateSize({animate:false});
+    if(key==='picturesnew' && window.picturesNew){window.picturesNew.fit();return;}
     /* Padding has to scale with the frame. The desktop numbers are a large share of a 430 px
        phone, which pushed the drawing off the bottom on their own. */
     var mw = map.getSize().x, mh = map.getSize().y;
@@ -4287,6 +4295,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   }
 
   function renderTab(key){
+    if(window.picturesNew) window.picturesNew.show(key==='picturesnew');
     var t = TABS.filter(function(x){ return x.key === key; })[0];
     var storyOn = key === 'story';
     var workspace = document.getElementById('workspace');
@@ -6252,7 +6261,8 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       return order.map(function(id){ return by[id]; });
     }
     var np = merge(plots, d.plots), nm = merge(picMeta, d.media);
-    var changed = np.length !== plots.length || nm.length !== picMeta.length;
+    /* Geometry edits retain record counts; refresh their shapes on another device too. */
+    var changed = JSON.stringify(np) !== JSON.stringify(plots) || JSON.stringify(nm) !== JSON.stringify(picMeta);
     var wasP = plots, wasM = picMeta;
     plots = np; picMeta = nm;
     /* seeding suppresses the automatic backup: this runs on load, with no click behind it */
@@ -7577,7 +7587,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
      for the brief and the locator, then switch to Pictures -- and a tap there has to assign a
      photograph, not open a field record form. */
   map.on('click', function(e){
-    if (field.on && currentTab !== 'pictures') openFieldForm(e.latlng);
+    if (field.on && currentTab !== 'pictures' && currentTab !== 'picturesnew') openFieldForm(e.latlng);
   });
   /* A phone rotates, and a desktop window resizes. Either changes the frame the drawing was
      fitted to, so fit it again -- debounced, because resize fires continuously. */
@@ -7745,6 +7755,33 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   });
   updateFieldBar();
 
+  if(window.createPicturesNew && window.PICTURES_NEW_DATA){
+    window.picturesNew=window.createPicturesNew({map:map,group:groups.picturesnew,canvas:L.canvas({padding:.4}),faces:PARCEL_FACES,
+      records:function(){return plots;},record:plotById,
+      shots:function(id){return screenshotLinks()[id]||[];},
+      card:function(r){return plotCardHTML(r,plotsIn(r.parcel).indexOf(r),plotsIn(r.parcel).length,screenshotLinks());},
+      gallery:fillGallery,
+      saveAssignments:function(updates){
+        var originals=[];
+        try{
+          updates.forEach(function(u){
+            var r=plotById(u.id);if(!r)throw new Error('Record no longer exists; refresh the list.');
+            if(u.value){
+              if(!Array.isArray(u.value.parts)||!u.value.parts.length)throw new Error('Shape is empty.');
+              u.value.parts.forEach(function(poly){poly.forEach(function(ring){
+                if(ring.length<4||ring.length>5000)throw new Error('Invalid shape.');
+                ring.forEach(function(p){if(p.length!==2||!p.every(Number.isFinite)||Math.abs(p[0])>90||Math.abs(p[1])>180)throw new Error('Invalid map coordinates.');});
+              });});
+            }
+            originals.push({r:r,value:r.newMap,t:r.t});
+          });
+          updates.forEach(function(u){var r=plotById(u.id);if(u.value)r.newMap=JSON.parse(JSON.stringify(u.value));else delete r.newMap;r.t=Date.now();});
+          if(!savePlots())throw new Error('Could not save these geometry edits.');
+          return true;
+        }catch(e){originals.forEach(function(o){if(o.value)o.r.newMap=o.value;else delete o.r.newMap;o.r.t=o.t;});alert(e.message);return false;}
+      }
+    });
+  }
   loadFromSnapshot();
   buildLayerPanel();
   /* Start the layer panel collapsed on a phone: it was covering roughly half the screen,
