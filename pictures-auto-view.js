@@ -7,7 +7,7 @@ window.createPicturesAutoView = function(api){
   var panel=document.createElement('section'); panel.id='pictures-auto-panel';panel.hidden=true;
   panel.innerHTML='<header><div><b>Pictures Auto</b><small id="pa-count"></small></div><button id="pa-collapse" title="Collapse record list">−</button></header>'+
     '<div id="pa-body"><div class="pa-controls"><input id="pa-search" aria-label="Search records" placeholder="Search name, old plot, or record…">'+
-    '<select id="pa-filter" aria-label="Filter records"><option value="all">All records</option><option value="auto">New Auto evidence</option><option value="unassigned">Unassigned — no guessed shape</option><option value="pending">Needs checking</option><option value="confirmed">Checked placements</option><option value="placeholder">User-placed squares</option><option value="split">Approximate building parts</option><option value="site">Open-space observations</option><option value="missing">Needs screenshot</option></select>'+
+    '<label for="pa-filter">Show on map and in list</label><select id="pa-filter" aria-label="Filter records"><option value="all">All cards</option><option value="auto">Auto additions — with new screenshots</option><option value="original">Original only — no Auto additions</option><option value="unassigned">Unassigned — no guessed shape</option><option value="pending">Needs checking</option><option value="confirmed">Checked placements</option><option value="placeholder">User-placed squares</option><option value="split">Approximate building parts</option><option value="site">Open-space observations</option><option value="missing">Needs screenshot</option></select>'+
     '<label><input type="checkbox" id="pa-old"> Aligned old plot outlines</label><button id="pa-fit">Fit records</button><button id="pa-site">Our plot</button></div>'+
     '<p id="pa-hint" role="status">Old survey locally aligned to this base. Photo-reviewed candidates are dashed, not confirmed. Uncertain cards have no guessed shape.</p>'+
     '<div id="pa-list"></div><div id="pa-detail" hidden></div><small class="pa-source">Base © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a> · Survey parts are schematic, not cadastral boundaries.</small></div>';
@@ -48,7 +48,7 @@ window.createPicturesAutoView = function(api){
   function scale(){return api.map.distance(api.map.containerPointToLatLng([0,0]),api.map.containerPointToLatLng([100,0]))>0?100/api.map.distance(api.map.containerPointToLatLng([0,0]),api.map.containerPointToLatLng([100,0])):1;}
   function matches(r){var s=shape(r),q=el('pa-search').value.toLowerCase(),f=el('pa-filter').value;
     return (!q||(title(r)+' '+r.id+' '+r.parcel).toLowerCase().includes(q))&&
-      (f==='all'||f==='auto'&&!!r.autoEvidence||f==='pending'&&s.status!=='confirmed'||f==='confirmed'&&s.status==='confirmed'||
+      (f==='all'||f==='auto'&&!!r.autoEvidence||f==='original'&&!r.autoEvidence||f==='pending'&&s.status!=='confirmed'||f==='confirmed'&&s.status==='confirmed'||
        f==='unassigned'&&!mapped(s)||f==='placeholder'&&s.kind==='placeholder'||f==='site'&&s.kind==='site'||f==='split'&&['split','survey-part'].includes(s.kind)||f==='missing'&&!api.shots(r.id).length);}
   function draw(){
     if(!D)return;
@@ -59,10 +59,10 @@ window.createPicturesAutoView = function(api){
     if(!api.group.hasLayer(guide))guide.addTo(api.group);
     records.clearLayers();markers={};display={};
     var rr=api.records(),checked=rr.filter(function(r){return shape(r).status==='confirmed';}).length;
-    var located=rr.filter(function(r){return mapped(shape(r));}).length;
-    el('pa-count').textContent=rr.length+' cards · '+rr.filter(function(r){return !!r.autoEvidence;}).length+' with Auto evidence · '+located+' placed · '+(rr.length-located)+' unassigned · '+checked+' checked';
+    var filtered=rr.filter(matches),located=filtered.filter(function(r){return mapped(shape(r));}).length;
+    el('pa-count').textContent='Showing '+filtered.length+' of '+rr.length+' cards · '+located+' placed · '+(filtered.length-located)+' unassigned · '+checked+' checked overall';
     el('pa-list').innerHTML='';
-    rr.filter(matches).forEach(function(r){
+    filtered.forEach(function(r){
       var s=shape(r),color=r.id===selected?'#C27429':s.status==='confirmed'?'#416D53':'#607D8B';
       if(mapped(s)){
       var layer=L.polygon(s.parts,{color:color,fillColor:color,fillOpacity:0,weight:r.id===selected?3:1.4,
@@ -150,7 +150,7 @@ window.createPicturesAutoView = function(api){
   api.map.on('click',mapClick);
   api.map.on('zoomend',function(){if(!active||!baseReady)return;var k=scale(),i=0;bg.eachLayer(function(l){var f=D.base[i++];if(f&&f.line&&f.widthM)l.setStyle({weight:Math.max(.45,f.widthM*k)});});});
   el('pa-search').oninput=function(){selected=null;mode=null;clicks=[];guide.clearLayers();el('pa-detail').hidden=true;el('pa-list').hidden=false;panel.classList.remove('pa-viewing');draw();hint('Photo-reviewed candidates are dashed, not confirmed. Uncertain cards have no guessed shape.');};
-  el('pa-filter').onchange=el('pa-search').oninput;
+  el('pa-filter').onchange=function(){el('pa-search').oninput();var f=this.value;hint(f==='auto'?'Only cards with screenshots added by the assistant. Their original photos and notes are still preserved. Unassigned cards appear in the list only, unless a frontage reference exists.':f==='original'?'Only original cards with no assistant additions. Use All cards to see the complete original collection, including cards enriched with Auto evidence.':'Photo-reviewed candidates are dashed, not confirmed. Uncertain cards have no guessed shape.');};
   el('pa-old').onchange=draw;
   el('pa-collapse').onclick=function(){var body=el('pa-body');body.hidden=!body.hidden;this.textContent=body.hidden?'+':'−';};
   el('pa-fit').onclick=function(){var points=[];api.records().filter(matches).forEach(function(r){shape(r).parts.forEach(function(p){points=points.concat(p[0]);});if(r.autoEvidence&&r.autoEvidence.location)points.push(r.autoEvidence.location.at);});api.map.fitBounds(points.length?points:(D.site||D.bounds),padding());};
