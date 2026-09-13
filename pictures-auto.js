@@ -56,7 +56,7 @@ window.createPicturesAuto = function(api){
   var note=document.createElement('p');note.className='pa-banner';note.textContent='Independent copy · new observations do not overwrite your survey. Manual Auto shape edits stay on this device; export them for backup.';
   var body=document.getElementById('pa-body');body.prepend(note);body.prepend(tools);
   var exportButton=document.createElement('button');exportButton.textContent='Export Auto copy';exportButton.onclick=function(){
-    var blob=new Blob([JSON.stringify({version:A.version,records:records,media:media,additions:A.additions,geometryEdits:changes},null,2)],{type:'application/json'});
+    var blob=new Blob([JSON.stringify({version:A.version,records:records,media:media,additions:A.additions,aliases:A.aliases||[],retiredRecords:A.retiredRecords||[],geometryEdits:changes},null,2)],{type:'application/json'});
     var url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='pictures-auto-'+A.collectedOn+'.json';a.click();setTimeout(function(){URL.revokeObjectURL(url);},30000);
   };tools.appendChild(exportButton);
   var state=view.stats;view.stats=function(){return Object.assign(state(),{autoEvidence:A.additions.length,newScreenshots:A.additions.reduce(function(n,a){return n+a.screenshots.length;},0),baselineRecords:A.baselineCount||records.filter(function(r){return !r.autoCreated;}).length});};
