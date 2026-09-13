@@ -898,8 +898,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Entering Beirut">
 <link rel="stylesheet" href="pictures-new.css?v=20260913-1">
-  <script src="pictures-new-data.js?v=20260913-2"></script>
-  <script src="pictures-new.js?v=20260913-2"></script>
+  <script src="pictures-new-data.js?v=20260913-3"></script>
+  <script src="pictures-new.js?v=20260913-3"></script>
 </head>
 <body>
 
@@ -7767,7 +7767,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
           updates.forEach(function(u){
             var r=plotById(u.id);if(!r)throw new Error('Record no longer exists; refresh the list.');
             if(u.value){
-              if(!Array.isArray(u.value.parts)||!u.value.parts.length)throw new Error('Shape is empty.');
+              if(!Array.isArray(u.value.parts)||(!u.value.parts.length&&u.value.kind!=='unassigned'))throw new Error('Shape is empty.');
               u.value.parts.forEach(function(poly){poly.forEach(function(ring){
                 if(ring.length<4||ring.length>5000)throw new Error('Invalid shape.');
                 ring.forEach(function(p){if(p.length!==2||!p.every(Number.isFinite)||Math.abs(p[0])>90||Math.abs(p[1])>180)throw new Error('Invalid map coordinates.');});
