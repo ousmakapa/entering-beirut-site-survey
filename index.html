@@ -900,6 +900,10 @@
 <link rel="stylesheet" href="pictures-new.css?v=20260913-1">
   <script src="pictures-new-data.js?v=20260913-3"></script>
   <script src="pictures-new.js?v=20260913-3"></script>
+  <link rel="stylesheet" href="pictures-auto.css?v=20260913-1">
+  <script src="pictures-auto-data.js?v=20260913-1"></script>
+  <script src="pictures-auto-view.js?v=20260913-1"></script>
+  <script src="pictures-auto.js?v=20260913-1"></script>
 </head>
 <body>
 
@@ -1449,6 +1453,9 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     {key:'picturesnew',label:'Pictures New',short:'Pictures New',group:'FIELD DATA',color:'var(--accent)',
      blurb:'Your existing cards and exact linked pictures on the clearer OSM base. Dashed shapes are provisional or approximate. Large buildings may be divided into separate recorded parts; missing outlines use schematic squares. Check a card’s picture before confirming its location.'});
   var TAG_OPTIONS_NOTES = ['General','Traffic','Greenery','Land use','Movement','Environmental'];
+  TABS.splice(TABS.findIndex(function(t){return t.key==='picturesnew';})+1,0,
+    {key:'picturesauto',label:'Pictures Auto',short:'Pictures Auto',group:'FIELD DATA',color:'var(--accent)',
+     blurb:'Independent Pictures New copy with new screenshot-backed research. Original survey facts are preserved; Auto evidence and uncertain placements are labelled separately.'});
 
   /* ---------- map (diagram only — no image tiles) ---------- */
   var map = L.map('map', {zoomControl:true, attributionControl:false,
@@ -2063,6 +2070,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     addBase('pictures',     {quietParcels:true});   // the parcels are what you assign photos to
     if (typeof drawPictures === 'function') drawPictures();
     if (window.picturesNew) window.picturesNew.draw();
+    if (window.picturesAuto) window.picturesAuto.draw();
 
     /* Figure-ground from BUILT vs VACANT parcels.
        A true footprint poché is not available: the survey gives wall lines, not closed outlines
@@ -4257,6 +4265,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   function fitFor(key){
     map.invalidateSize({animate:false});
     if(key==='picturesnew' && window.picturesNew){window.picturesNew.fit();return;}
+    if(key==='picturesauto' && window.picturesAuto){window.picturesAuto.fit();return;}
     /* Padding has to scale with the frame. The desktop numbers are a large share of a 430 px
        phone, which pushed the drawing off the bottom on their own. */
     var mw = map.getSize().x, mh = map.getSize().y;
@@ -4296,6 +4305,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
 
   function renderTab(key){
     if(window.picturesNew) window.picturesNew.show(key==='picturesnew');
+    if(window.picturesAuto) window.picturesAuto.show(key==='picturesauto');
     var t = TABS.filter(function(x){ return x.key === key; })[0];
     var storyOn = key === 'story';
     var workspace = document.getElementById('workspace');
@@ -7587,7 +7597,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
      for the brief and the locator, then switch to Pictures -- and a tap there has to assign a
      photograph, not open a field record form. */
   map.on('click', function(e){
-    if (field.on && currentTab !== 'pictures' && currentTab !== 'picturesnew') openFieldForm(e.latlng);
+    if (field.on && currentTab !== 'pictures' && currentTab !== 'picturesnew' && currentTab !== 'picturesauto') openFieldForm(e.latlng);
   });
   /* A phone rotates, and a desktop window resizes. Either changes the frame the drawing was
      fitted to, so fit it again -- debounced, because resize fires continuously. */
@@ -7781,6 +7791,9 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
         }catch(e){originals.forEach(function(o){if(o.value)o.r.newMap=o.value;else delete o.r.newMap;o.r.t=o.t;});alert(e.message);return false;}
       }
     });
+  }
+  if(window.createPicturesAuto && window.PICTURES_AUTO_ADDITIONS){
+    window.picturesAuto=window.createPicturesAuto({map:map,group:groups.picturesauto,canvas:L.canvas({padding:.4}),faces:PARCEL_FACES,getPhoto:picGet});
   }
   loadFromSnapshot();
   buildLayerPanel();
