@@ -30,3 +30,6 @@ body.pictures-auto-on #pic-alarm{display:none!important}
 /* One direct-click tag per record; approximate frontage positions are explicit. */
 .pa-approximate span{min-width:38px!important;border-color:#a77439!important;color:#794717;background:#fffaf1!important}
 .pa-outline-size{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.pa-outline-size label{flex:1;min-width:95px;font-size:11px}.pa-outline-size input{display:block;width:100%;box-sizing:border-box;padding:6px}.pa-outline-size small{flex-basis:100%;color:#62706a}
+/* Visit targets are deliberately distinct from photographed building cards. */
+.pa-manual-tag span{background:#fff1da!important;color:#8d430d!important;border:2px solid #b45d17!important;font-weight:700;}
+.pa-manual-row{border-left:4px solid #b45d17!important;}

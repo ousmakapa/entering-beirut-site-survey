@@ -14,6 +14,12 @@ window.createPicturesAutoView = function(api){
   document.getElementById('map').parentElement.appendChild(panel);
   var streetOption=document.createElement('option');streetOption.value='street';streetOption.textContent='Ring street — 5 new + 3 corrected';
   document.getElementById('pa-filter').insertBefore(streetOption,document.getElementById('pa-filter').options[1]);
+  var riverOption=document.createElement('option');riverOption.value='river';riverOption.textContent='River-side block — 7 new buildings';
+  document.getElementById('pa-filter').insertBefore(riverOption,document.getElementById('pa-filter').options[1]);
+  var manualOption=document.createElement('option');manualOption.value='manual';manualOption.textContent='Manual visit needed — street evidence not found';
+  document.getElementById('pa-filter').insertBefore(manualOption,document.getElementById('pa-filter').options[1]);
+  var interiorOption=document.createElement('option');interiorOption.value='interior';interiorOption.textContent='Interior block — new exterior evidence';
+  document.getElementById('pa-filter').insertBefore(interiorOption,document.getElementById('pa-filter').options[1]);
   document.querySelector('#pa-filter option[value="batch30"]').textContent='Earlier batch — 30 screenshots';
   document.querySelector('#pa-filter option[value="placeholder"]').textContent='Approximate / user-placed outlines';
   L.DomEvent.disableClickPropagation(panel);L.DomEvent.disableScrollPropagation(panel);
@@ -68,8 +74,32 @@ window.createPicturesAutoView = function(api){
   function matches(r){var s=shape(r),q=el('pa-search').value.toLowerCase(),f=el('pa-filter').value;
     var aliases=(r.autoEvidence&&r.autoEvidence.mergedFrom||[]).map(function(a){return a.label+' '+a.from;}).join(' ');
     return (!q||(title(r)+' '+r.id+' '+r.parcel+' '+aliases+' '+(r.autoCreated?'A'+r.autoNumber:'')).toLowerCase().includes(q))&&
-      (f==='all'||f==='new'&&!!r.autoCreated||f==='baseline'&&!r.autoCreated||f==='enriched'&&!r.autoCreated&&!!r.autoEvidence||f==='batch30'&&r.autoEvidence&&r.autoEvidence.batch==='nearby-30-2026-09-13'||f==='auto'&&!!r.autoEvidence||f==='original'&&!r.autoEvidence||f==='pending'&&s.status!=='confirmed'||f==='confirmed'&&s.status==='confirmed'||
+      (f==='all'||f==='interior'&&r.autoEvidence&&r.autoEvidence.batch==='river-interior-2026-09-13'||f==='river'&&r.autoEvidence&&r.autoEvidence.batch==='river-south-2026-09-13'||f==='new'&&!!r.autoCreated||f==='baseline'&&!r.autoCreated||f==='enriched'&&!r.autoCreated&&!!r.autoEvidence||f==='batch30'&&r.autoEvidence&&r.autoEvidence.batch==='nearby-30-2026-09-13'||f==='auto'&&!!r.autoEvidence||f==='original'&&!r.autoEvidence||f==='pending'&&s.status!=='confirmed'||f==='confirmed'&&s.status==='confirmed'||
        f==='street'&&r.autoEvidence&&r.autoEvidence.streetReview==='ring-street-2026-09-13'||f==='unassigned'&&!mapped(s)||f==='placeholder'&&['placeholder','schematic','approximate-outline','schematic-rectangle'].includes(s.kind)||f==='site'&&s.kind==='site'||f==='split'&&['split','survey-part'].includes(s.kind)||f==='missing'&&!api.shots(r.id).length);}
+  function manualVisits(){
+    var occupied=new Set(api.records().filter(function(r){return mapped(shape(r));}).map(function(r){return shape(r).parentId;}));
+    return (D.manualReview&&D.manualReview.visits||[]).filter(function(v){return !occupied.has(v.buildingId);});
+  }
+  function filteredVisits(){var f=el('pa-filter').value,q=el('pa-search').value.toLowerCase();
+    return (f==='all'||f==='manual')?manualVisits().filter(function(v){return !q||(v.label+' '+v.buildingId+' manual visit needed').toLowerCase().includes(q);}):[];
+  }
+  function openManual(id,zoom){
+    var v=manualVisits().find(function(x){return x.id===id;});if(!v)return;
+    selected=id;mode=null;clicks=[];guide.clearLayers();draw();panel.classList.add('pa-viewing');
+    var detail=el('pa-detail');detail.hidden=false;el('pa-list').hidden=true;
+    var checks=(D.manualReview.checks||[]).filter(function(c){return v.checks.includes(c.id);});
+    detail.innerHTML='<button id="pa-back">← All cards / visits</button><h3>'+esc(v.label)+' · Manual visit needed</h3>'+
+      '<p class="pa-banner">NOT DOCUMENTED · No usable street-level screenshot linked. This is a visit target, not a completed survey card.</p>'+
+      '<p>'+esc(v.reason)+'</p><h4>Collect on your visit</h4><ul>'+v.tasks.map(function(t){return '<li>'+esc(t)+'</li>';}).join('')+'</ul>'+
+      '<p><a href="'+esc(v.sourceUrl)+'" target="_blank" rel="noopener">Open this mapped building location</a></p>'+
+      '<h4>Online checks · '+esc(v.checkedOn)+'</h4>'+checks.map(function(c){return '<p><b>'+esc(c.label)+'</b><br>'+esc(c.result)+' <a href="'+esc(c.url)+'" target="_blank" rel="noopener">Source checked</a></p>';}).join('')+
+      '<p class="pa-help">'+esc(v.limits)+'</p><small>'+esc(v.buildingId)+'</small>';
+    el('pa-back').onclick=function(){selected=null;detail.hidden=true;el('pa-list').hidden=false;panel.classList.remove('pa-viewing');panel.scrollTop=0;guide.clearLayers();draw();};
+    var b=D.buildings.find(function(x){return x.id===v.buildingId;});
+    if(b)L.polygon(b.rings,{color:'#B45D17',weight:2,fill:false,interactive:false,renderer:api.canvas}).addTo(guide);
+    if(zoom)api.map.fitBounds(L.latLng(v.at).toBounds(65),Object.assign({maxZoom:20},padding()));
+    hint('M = manual visit needed. Existing map footprint only; use, floors and identity remain TBD until documented.');
+  }
   function draw(){
     if(!D)return;
     if(!baseReady)drawBase();
@@ -107,6 +137,17 @@ window.createPicturesAutoView = function(api){
       button.innerHTML='<b>'+esc(title(r))+'</b><small>'+esc(placeName(r,s))+
         (mapped(s)?' · '+(s.status==='confirmed'?'Checked':'Needs checking'):'')+' · '+api.shots(r.id).length+' photo(s)'+(r.autoEvidence?' · NEW AUTO':'')+'</small>';
       button.onclick=function(){open(r.id,true);};el('pa-list').appendChild(button);
+    });
+    var visits=filteredVisits();
+    el('pa-count').textContent+=(visits.length?' · '+visits.length+' manual visit targets (not cards)':'');
+    if(el('pa-filter').value==='manual')el('pa-count').textContent=visits.length+' manual visit targets · 0 counted as documented · '+rr.length+' existing cards preserved';
+    visits.forEach(function(v){
+      L.marker(v.at,{icon:L.divIcon({className:'pa-badge pa-manual-tag',html:'<span data-manual="'+esc(v.id)+'">'+esc(v.label)+'</span>',iconSize:[34,24],iconAnchor:[17,12]}),zIndexOffset:2200,bubblingMouseEvents:false})
+        .bindTooltip(v.label+' — manual visit needed; no street-level evidence linked')
+        .on('click',function(){openManual(v.id,false);}).addTo(records);
+      var row=document.createElement('button');row.className='pa-row pa-manual-row';row.dataset.manual=v.id;
+      row.innerHTML='<b>'+esc(v.label)+' · Manual visit needed</b><small>Not documented · take one street-level facade photo</small>';
+      row.onclick=function(){openManual(v.id,true);};el('pa-list').appendChild(row);
     });
     if(el('pa-old').checked){old.clearLayers();(D.alignedFaces||[]).forEach(function(g){L.polygon(g,{color:'#A64138',weight:1,fill:false,dashArray:'3 5',interactive:false,renderer:api.canvas}).addTo(old);});old.addTo(api.group);}
     else api.group.removeLayer(old);
@@ -185,11 +226,11 @@ window.createPicturesAutoView = function(api){
   api.map.on('click',mapClick);
   api.map.on('zoomend',function(){if(!active||!baseReady)return;var k=scale();roadLayers.forEach(function(r){r.layer.setStyle({weight:Math.max(.45,r.width*k)});});});
   el('pa-search').oninput=function(){selected=null;mode=null;clicks=[];guide.clearLayers();el('pa-detail').hidden=true;el('pa-list').hidden=false;panel.classList.remove('pa-viewing');draw();hint('One tag opens one building/frontage card. ≈ = approximate position. Zoom closer if nearby tags overlap.');};
-  el('pa-filter').onchange=function(){el('pa-search').oninput();var f=this.value;hint(f==='original'?'Only original cards with no assistant additions. Your original collection includes all 71 baseline cards, including enriched ones.':'One tag opens one building/frontage card. ≈ = approximate position. List, map and Fit records share this filter.');};
+  el('pa-filter').onchange=function(){el('pa-search').oninput();var f=this.value;hint(f==='manual'?'Orange M tags = manual visit needed after online checks. They are not photographed cards and do not increase the documentation count.':f==='original'?'Only original cards with no assistant additions. Your original collection includes all 71 baseline cards, including enriched ones.':'One tag opens one building/frontage card. ≈ = approximate position. List, map and Fit records share this filter.');};
   el('pa-old').onchange=draw;
   el('pa-context').onchange=draw;
   el('pa-collapse').onclick=function(){var body=el('pa-body');body.hidden=!body.hidden;this.textContent=body.hidden?'+':'−';};
-  el('pa-fit').onclick=function(){var points=[];api.records().filter(matches).forEach(function(r){shape(r).parts.forEach(function(p){points=points.concat(p[0]);});if(!mapped(shape(r))&&r.autoEvidence){if(r.autoEvidence.tagAnchor)points.push(r.autoEvidence.tagAnchor.at);else if(r.autoEvidence.location&&r.autoEvidence.location.type!=='camera-reference')points.push(r.autoEvidence.location.at);}});api.map.fitBounds(points.length?points:(D.site||D.bounds),padding());};
+  el('pa-fit').onclick=function(){var points=filteredVisits().map(function(v){return v.at;});api.records().filter(matches).forEach(function(r){shape(r).parts.forEach(function(p){points=points.concat(p[0]);});if(!mapped(shape(r))&&r.autoEvidence){if(r.autoEvidence.tagAnchor)points.push(r.autoEvidence.tagAnchor.at);else if(r.autoEvidence.location&&r.autoEvidence.location.type!=='camera-reference')points.push(r.autoEvidence.location.at);}});api.map.fitBounds(points.length?points:(D.site||D.bounds),padding());};
   el('pa-site').onclick=function(){mode=null;clicks=[];guide.clearLayers();api.map.fitBounds(L.latLngBounds(D.site).pad(1),Object.assign({maxZoom:19},padding()));hint('OUR PLOT: original survey outline, locally aligned to the new base using seven matching structures. Approximate display registration, not a certified boundary.');};
   return {draw:draw,show:function(on){active=on;panel.hidden=!on;document.body.classList.toggle('pictures-auto-on',on);if(on){window.scrollTo(0,0);api.map.invalidateSize();draw();}else{mode=null;clicks=[];guide.clearLayers();}},
     open:open,shape:shape,cut:cut,fit:function(){el('pa-fit').click();},stats:function(){return {records:api.records().length,visible:Object.keys(display).length,seedKinds:D.seeds,selected:selected,mode:mode};}};
