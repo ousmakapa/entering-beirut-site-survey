@@ -3,12 +3,12 @@
 window.createPicturesAutoView = function(api){
   'use strict';
   var D=window.PICTURES_AUTO_DATA, active=false, selected=null, mode=null, clicks=[], undo=[], drafts={}, markers={}, display={}, baseReady=false;
-  var bg=L.layerGroup(), buildings=L.layerGroup(), records=L.layerGroup(), old=L.layerGroup(), guide=L.layerGroup();
+  var bg=L.layerGroup(), buildings=L.layerGroup(), records=L.layerGroup(), old=L.layerGroup(), reference=L.layerGroup(), guide=L.layerGroup(), roadLayers=[];
   var panel=document.createElement('section'); panel.id='pictures-auto-panel';panel.hidden=true;
   panel.innerHTML='<header><div><b>Pictures Auto</b><small id="pa-count"></small></div><button id="pa-collapse" title="Collapse record list">−</button></header>'+
     '<div id="pa-body"><div class="pa-controls"><input id="pa-search" aria-label="Search records" placeholder="Search name, old plot, or record…">'+
     '<label for="pa-filter">Show on map and in list</label><select id="pa-filter" aria-label="Filter records"><option value="all">All cards</option><option value="batch30">Latest batch — 30 screenshots</option><option value="new">New Auto records only</option><option value="auto">Auto additions — with new screenshots</option><option value="enriched">Existing cards enriched by Auto</option><option value="baseline">Your original collection — all cards</option><option value="original">Original only — no Auto additions</option><option value="unassigned">Unassigned — no guessed shape</option><option value="pending">Needs checking</option><option value="confirmed">Checked placements</option><option value="placeholder">User-placed squares</option><option value="split">Approximate building parts</option><option value="site">Open-space observations</option><option value="missing">Needs screenshot</option></select>'+
-    '<label><input type="checkbox" id="pa-old"> Aligned old plot outlines</label><button id="pa-fit">Fit records</button><button id="pa-site">Our plot</button></div>'+
+    '<label><input type="checkbox" id="pa-old"> Aligned old plot outlines</label><label><input type="checkbox" id="pa-context"> Source footprint reference</label><button id="pa-fit">Fit records</button><button id="pa-site">Our plot</button></div>'+
     '<p id="pa-hint" role="status">One tag opens one building/frontage card. A = Auto observation; ≈ = approximate tag position. Dashed outlines remain provisional. Zoom closer if nearby tags overlap.</p>'+
     '<div id="pa-list"></div><div id="pa-detail" hidden></div><small class="pa-source">Base © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a> · Survey parts are schematic, not cadastral boundaries.</small></div>';
   document.getElementById('map').parentElement.appendChild(panel);
@@ -28,9 +28,9 @@ window.createPicturesAutoView = function(api){
       return [at[0]+(x*Math.sin(angle)+y*Math.cos(angle))/111320,at[1]+(x*Math.cos(angle)-y*Math.sin(angle))/(111320*Math.cos(at[0]*Math.PI/180))];});
     return [[ring]];
   }
-  function shape(r){return drafts[r.id]||r.newMap||D.seeds[r.id]||{featureId:'record-'+r.id,parts:[],kind:'unassigned',status:'pending',basis:'New record awaiting an explicit placement. No shape has been guessed.'};}
+  function shape(r){return drafts[r.id]||(r.newMap&&r.newMap.version===D.version?r.newMap:null)||(D.layout&&D.layout.placements||{})[r.id]||r.newMap||D.seeds[r.id]||{featureId:'record-'+r.id,parts:[],kind:'unassigned',status:'pending',basis:'New record awaiting an explicit placement. No shape has been guessed.'};}
   function mapped(s){return Array.isArray(s.parts)&&s.parts.length>0;}
-  function kindName(s){return ({unassigned:'Unassigned — no shape',building:'Building candidate','survey-part':'Approximate survey-derived part',split:'User-divided part',site:'Open-space observation',placeholder:'User-placed outline',schematic:'Legacy schematic square','approximate-outline':'Approximate building outline',adjusted:'User-adjusted outline'})[s.kind]||s.kind;}
+  function kindName(s){return ({unassigned:'Unassigned — no shape',building:'Building candidate','survey-part':'Approximate survey-derived part',split:'User-divided part',site:'Open-space observation',placeholder:'User-placed outline',schematic:'Legacy schematic square','approximate-outline':'Approximate building outline','schematic-rectangle':'Schematic building rectangle',adjusted:'User-adjusted outline'})[s.kind]||s.kind;}
   function placeName(r,s){return !mapped(s)&&r.autoEvidence&&r.autoEvidence.tagAnchor?'Individual frontage tag — approximate position':kindName(s);}
   function hint(text){el('pa-hint').textContent=text;}
   function padding(){return {paddingTopLeft:[20,20],paddingBottomRight:window.innerWidth<700?[20,panel.offsetHeight+20]:[panel.offsetWidth+20,20]};}
@@ -38,17 +38,23 @@ window.createPicturesAutoView = function(api){
   function save(updates,message){
     var before=updates.map(function(u){return snapshotState(api.record(u.id));});
     if (!api.saveAssignments(updates))return false;
-    undo.push(before);if(undo.length>20)undo.shift();drafts={};mode=null;clicks=[];guide.clearLayers();draw();
+    undo.push(before);if(undo.length>20)undo.shift();drafts={};mode=null;clicks=[];guide.clearLayers();baseReady=false;draw();
     if(selected)open(selected,false);hint(message);return true;
   }
   function edited(r,parts,kind,parent){var s=clone(shape(r));s.parts=parts;delete s.anchor;s.kind=kind;s.parentId=parent||null;s.status='pending';s.basis=kind==='unassigned'?'Placement removed by user; original card and photos retained.':'User-adjusted shape; review position against screenshot.';s.version=D.version;return s;}
   function drawBase(){
-    bg.clearLayers();buildings.clearLayers();
-    D.base.forEach(function(f){
+    bg.clearLayers();buildings.clearLayers();roadLayers=[];
+    var hiddenIndices=new Set(D.layout&&D.layout.hiddenBaseIndices||[]),hiddenIds=new Set(D.layout&&D.layout.hiddenBuildingIds||[]);
+    D.base.forEach(function(f,i){
+      if(hiddenIndices.has(i))return;
       if(f.polygon)L.polygon(f.polygon,{stroke:!!f.building,color:f.color,weight:.8,fillColor:f.color,fillOpacity:f.building?0:1,interactive:false,renderer:api.canvas}).addTo(bg);
-      else L.polyline(f.line,{color:f.color,weight:f.widthM?Math.max(.45,f.widthM*scale()):.6,opacity:1,interactive:false,renderer:api.canvas}).addTo(bg);
+      else {var road=L.polyline(f.line,{color:f.color,weight:f.widthM?Math.max(.45,f.widthM*scale()):.6,opacity:1,interactive:false,renderer:api.canvas}).addTo(bg);if(f.widthM)roadLayers.push({layer:road,width:f.widthM});}
     });
-    D.buildings.forEach(function(b){L.polygon(b.rings,{stroke:false,fillOpacity:0,renderer:api.canvas,bubblingMouseEvents:false}).on('click',function(e){
+    var targets=D.buildings.filter(function(b){return !hiddenIds.has(b.id);});
+    Object.keys(D.layout&&D.layout.placements||{}).forEach(function(id){var r=api.record(id);if(!r)return;var s=shape(r);
+      s.parts.forEach(function(part){L.polygon(part,{color:'#78909c',weight:.8,fill:false,interactive:false,renderer:api.canvas}).addTo(bg);
+        targets.push({id:s.parentId||'layout-'+id,rings:part});});});
+    targets.forEach(function(b){L.polygon(b.rings,{stroke:false,fillOpacity:0,renderer:api.canvas,bubblingMouseEvents:false}).on('click',function(e){
       if(mode==='building'&&selected){var r=api.record(selected),occupants=api.records().filter(function(other){return other.id!==r.id&&mapped(shape(other))&&shape(other).parentId===b.id;});
         if(occupants.length){hint('This outline already contains '+occupants.map(title).join(', ')+'. Use its existing card for another photo, or divide the outline into separate parts; do not assign the whole building twice.');return;}
         save([{id:r.id,value:edited(r,[b.rings],'building',b.id)}],'Building selected. Check its screenshot, then confirm its location.');}
@@ -63,7 +69,7 @@ window.createPicturesAutoView = function(api){
     var aliases=(r.autoEvidence&&r.autoEvidence.mergedFrom||[]).map(function(a){return a.label+' '+a.from;}).join(' ');
     return (!q||(title(r)+' '+r.id+' '+r.parcel+' '+aliases+' '+(r.autoCreated?'A'+r.autoNumber:'')).toLowerCase().includes(q))&&
       (f==='all'||f==='new'&&!!r.autoCreated||f==='baseline'&&!r.autoCreated||f==='enriched'&&!r.autoCreated&&!!r.autoEvidence||f==='batch30'&&r.autoEvidence&&r.autoEvidence.batch==='nearby-30-2026-09-13'||f==='auto'&&!!r.autoEvidence||f==='original'&&!r.autoEvidence||f==='pending'&&s.status!=='confirmed'||f==='confirmed'&&s.status==='confirmed'||
-       f==='street'&&r.autoEvidence&&r.autoEvidence.streetReview==='ring-street-2026-09-13'||f==='unassigned'&&!mapped(s)||f==='placeholder'&&['placeholder','schematic','approximate-outline'].includes(s.kind)||f==='site'&&s.kind==='site'||f==='split'&&['split','survey-part'].includes(s.kind)||f==='missing'&&!api.shots(r.id).length);}
+       f==='street'&&r.autoEvidence&&r.autoEvidence.streetReview==='ring-street-2026-09-13'||f==='unassigned'&&!mapped(s)||f==='placeholder'&&['placeholder','schematic','approximate-outline','schematic-rectangle'].includes(s.kind)||f==='site'&&s.kind==='site'||f==='split'&&['split','survey-part'].includes(s.kind)||f==='missing'&&!api.shots(r.id).length);}
   function draw(){
     if(!D)return;
     if(!baseReady)drawBase();
@@ -75,7 +81,7 @@ window.createPicturesAutoView = function(api){
     var rr=api.records(),checked=rr.filter(function(r){return shape(r).status==='confirmed';}).length;
     var filtered=rr.filter(matches),located=filtered.filter(function(r){return mapped(shape(r));}).length;
     var tagOnly=filtered.filter(function(r){return !mapped(shape(r))&&r.autoEvidence&&r.autoEvidence.tagAnchor;}).length;
-    var approximate=filtered.filter(function(r){return mapped(shape(r))&&['schematic','approximate-outline','placeholder'].includes(shape(r).kind);}).length;
+    var approximate=filtered.filter(function(r){return mapped(shape(r))&&['schematic','approximate-outline','placeholder','schematic-rectangle'].includes(shape(r).kind);}).length;
     el('pa-count').textContent='Showing '+filtered.length+' of '+rr.length+' cards · '+located+' outlines ('+approximate+' approximate) · '+tagOnly+' approximate frontage tags · '+(filtered.length-located-tagOnly)+' without outline/frontage tag · '+checked+' checked overall';
     el('pa-list').innerHTML='';
     filtered.forEach(function(r){
@@ -85,7 +91,7 @@ window.createPicturesAutoView = function(api){
         dashArray:s.status!=='confirmed'||s.kind!=='building'?'6 4':null,renderer:api.canvas,bubblingMouseEvents:false})
         .on('click',function(e){if(mode){mapClick(e);return;}open(r.id,false);}).addTo(records);
       display[r.id]=layer;
-      var pos=s.anchor||layer.getBounds().getCenter(),text=(r.autoCreated?'A'+r.autoNumber:r.storeys?r.storeys+'F':'•')+(['schematic','approximate-outline'].includes(s.kind)?'≈':'');
+      var pos=s.anchor||layer.getBounds().getCenter(),text=(r.autoCreated?'A'+r.autoNumber:r.storeys?r.storeys+'F':'•')+(['schematic','approximate-outline','schematic-rectangle'].includes(s.kind)?'≈':'');
       markers[r.id]=L.marker(pos,{icon:L.divIcon({className:'pa-badge pa-building-tag',html:'<span data-record="'+esc(r.id)+'">'+esc(text)+'</span>',iconSize:[28,22],iconAnchor:[14,11]}),zIndexOffset:2000,bubblingMouseEvents:false})
         .on('click',function(e){if(mode){mapClick(e);return;}open(r.id,false);}).addTo(records);
       }else if(r.autoEvidence&&r.autoEvidence.tagAnchor){
@@ -104,6 +110,9 @@ window.createPicturesAutoView = function(api){
     });
     if(el('pa-old').checked){old.clearLayers();(D.alignedFaces||[]).forEach(function(g){L.polygon(g,{color:'#A64138',weight:1,fill:false,dashArray:'3 5',interactive:false,renderer:api.canvas}).addTo(old);});old.addTo(api.group);}
     else api.group.removeLayer(old);
+    reference.clearLayers();
+    if(el('pa-context').checked){var ids=new Set(D.layout&&D.layout.hiddenBuildingIds||[]);D.buildings.filter(function(b){return ids.has(b.id);}).forEach(function(b){L.polygon(b.rings,{color:'#a58eae',weight:1,fill:false,dashArray:'2 6',interactive:false,renderer:api.canvas}).addTo(reference);});reference.addTo(api.group);}
+    else api.group.removeLayer(reference);
   }
   function open(id,zoom){
     var r=api.record(id);if(!r)return;selected=id;mode=null;clicks=[];guide.clearLayers();draw();
@@ -111,6 +120,7 @@ window.createPicturesAutoView = function(api){
     var s=shape(r),shots=api.shots(id),detail=el('pa-detail');detail.hidden=false;
     detail.innerHTML='<button id="pa-back">← All cards</button><h3>'+esc(title(r))+'</h3>'+
       '<p class="pa-state">'+esc(placeName(r,s))+(mapped(s)?' · '+(s.status==='confirmed'?'Placement checked':'Needs checking'):'')+'</p><p class="pa-help">'+esc(r.autoEvidence?r.autoEvidence.summary:s.basis)+'</p>'+
+      (s.kind==='schematic-rectangle'?'<p class="pa-banner">Simplified rectangular layout — approximate size and position, not a surveyed plot. Original shape retained in the source reference; photos and recorded facts unchanged.</p>':'')+
       '<div id="pa-gallery">'+(shots.length?'Loading linked pictures…':'No screenshot linked to this card.')+'</div>'+
       '<div class="pa-outline-size"><label>Width (m) <input id="pa-width" type="number" min="2" max="150" value="12"></label><label>Depth (m) <input id="pa-depth" type="number" min="2" max="150" value="18"></label><label>Rotation (° from east) <input id="pa-angle" type="number" value="0"></label><small>Estimates only. Match the street and neighbouring footprints.</small></div>'+
       '<div class="pa-actions"><button id="pa-confirm" '+(!mapped(s)?'disabled':'')+'>Confirm location</button><button id="pa-building">Assign to building</button><button id="pa-square">Place sized outline</button><button id="pa-move" '+(!mapped(s)?'disabled':'')+'>Move this shape</button><button id="pa-unassign" '+(!mapped(s)?'disabled':'')+'>Remove placement</button><button id="pa-reference">Show old plot reference</button><button id="pa-undo" '+(!undo.length?'disabled':'')+'>Undo shape edit</button></div>'+
@@ -134,7 +144,7 @@ window.createPicturesAutoView = function(api){
     el('pa-move').onclick=function(){start('move','Click the new centre for this card’s shape.');};
     el('pa-split').onclick=function(){if(!el('pa-second').value){hint('Choose the other record first, then draw the line.');return;}start('split','Click two points across the shape. First card goes to the left side of your line; second card goes to the right.');};
     el('pa-cancel').onclick=function(){mode=null;clicks=[];guide.clearLayers();this.hidden=true;draw();hint('Drawing cancelled; nothing changed.');};
-    el('pa-undo').onclick=function(){var prior=undo.pop();if(prior&&api.saveAssignments(prior)){draw();open(id,false);hint('Previous shape restored.');}};
+    el('pa-undo').onclick=function(){var prior=undo.pop();if(prior&&api.saveAssignments(prior)){baseReady=false;draw();open(id,false);hint('Previous shape restored.');}};
     if(shots.length)api.gallery('pa-gallery',shots);
     hint(mapped(s)?'Compare the linked photo with this '+kindName(s).toLowerCase()+'. Dashed outlines are still provisional.':'This card has no assigned shape. Its photo and original information are preserved.');
     if(zoom&&display[id])api.map.fitBounds(display[id].getBounds().pad(.6),Object.assign({maxZoom:20},padding()));
@@ -173,10 +183,11 @@ window.createPicturesAutoView = function(api){
     }catch(error){clicks=[];guide.clearLayers();hint(error.message);}
   }
   api.map.on('click',mapClick);
-  api.map.on('zoomend',function(){if(!active||!baseReady)return;var k=scale(),i=0;bg.eachLayer(function(l){var f=D.base[i++];if(f&&f.line&&f.widthM)l.setStyle({weight:Math.max(.45,f.widthM*k)});});});
+  api.map.on('zoomend',function(){if(!active||!baseReady)return;var k=scale();roadLayers.forEach(function(r){r.layer.setStyle({weight:Math.max(.45,r.width*k)});});});
   el('pa-search').oninput=function(){selected=null;mode=null;clicks=[];guide.clearLayers();el('pa-detail').hidden=true;el('pa-list').hidden=false;panel.classList.remove('pa-viewing');draw();hint('One tag opens one building/frontage card. ≈ = approximate position. Zoom closer if nearby tags overlap.');};
   el('pa-filter').onchange=function(){el('pa-search').oninput();var f=this.value;hint(f==='original'?'Only original cards with no assistant additions. Your original collection includes all 71 baseline cards, including enriched ones.':'One tag opens one building/frontage card. ≈ = approximate position. List, map and Fit records share this filter.');};
   el('pa-old').onchange=draw;
+  el('pa-context').onchange=draw;
   el('pa-collapse').onclick=function(){var body=el('pa-body');body.hidden=!body.hidden;this.textContent=body.hidden?'+':'−';};
   el('pa-fit').onclick=function(){var points=[];api.records().filter(matches).forEach(function(r){shape(r).parts.forEach(function(p){points=points.concat(p[0]);});if(!mapped(shape(r))&&r.autoEvidence){if(r.autoEvidence.tagAnchor)points.push(r.autoEvidence.tagAnchor.at);else if(r.autoEvidence.location&&r.autoEvidence.location.type!=='camera-reference')points.push(r.autoEvidence.location.at);}});api.map.fitBounds(points.length?points:(D.site||D.bounds),padding());};
   el('pa-site').onclick=function(){mode=null;clicks=[];guide.clearLayers();api.map.fitBounds(L.latLngBounds(D.site).pad(1),Object.assign({maxZoom:19},padding()));hint('OUR PLOT: original survey outline, locally aligned to the new base using seven matching structures. Approximate display registration, not a certified boundary.');};

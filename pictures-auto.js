@@ -5,7 +5,7 @@ window.createPicturesAuto = function(api){
   var A=window.PICTURES_AUTO_ADDITIONS,B=window.PICTURES_NEW_DATA;
   var records=clone(A.records),media=clone(A.media),changes={},key='studio7PicturesAutoGeometryV1';
   try{changes=JSON.parse(localStorage.getItem(key)||'{}');if(!changes||Array.isArray(changes))changes={};}catch(e){changes={};}
-  window.PICTURES_AUTO_DATA=Object.assign({},B,{version:A.version,seeds:clone(B.seeds)});
+  window.PICTURES_AUTO_DATA=Object.assign({},B,{version:A.version,seeds:clone(B.seeds),layout:clone(A.layout||{})});
   var D=window.PICTURES_AUTO_DATA;
   A.additions.forEach(function(add){
     var r=records.find(function(r){return r.id===add.recordId;});if(!r)return;
@@ -56,7 +56,7 @@ window.createPicturesAuto = function(api){
   var note=document.createElement('p');note.className='pa-banner';note.textContent='Independent copy · new observations do not overwrite your survey. Manual Auto shape edits stay on this device; export them for backup.';
   var body=document.getElementById('pa-body');body.prepend(note);body.prepend(tools);
   var exportButton=document.createElement('button');exportButton.textContent='Export Auto copy';exportButton.onclick=function(){
-    var blob=new Blob([JSON.stringify({version:A.version,records:records,media:media,additions:A.additions,aliases:A.aliases||[],retiredRecords:A.retiredRecords||[],geometryEdits:changes},null,2)],{type:'application/json'});
+    var blob=new Blob([JSON.stringify({version:A.version,records:records,media:media,additions:A.additions,layout:A.layout||{},aliases:A.aliases||[],retiredRecords:A.retiredRecords||[],geometryEdits:changes},null,2)],{type:'application/json'});
     var url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='pictures-auto-'+A.collectedOn+'.json';a.click();setTimeout(function(){URL.revokeObjectURL(url);},30000);
   };tools.appendChild(exportButton);
   var state=view.stats;view.stats=function(){return Object.assign(state(),{autoEvidence:A.additions.length,newScreenshots:A.additions.reduce(function(n,a){return n+a.screenshots.length;},0),baselineRecords:A.baselineCount||records.filter(function(r){return !r.autoCreated;}).length});};
