@@ -1,0 +1,285 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Accessibility — the whole journey</title><style>body{margin:0;background:#f7f7f3;color:#243338;font:17px/1.65 Arial,sans-serif}main{max-width:900px;margin:45px auto;padding:0 25px 65px}h1{font-size:46px;letter-spacing:-1.8px;line-height:1.15}h2{font-size:25px;margin-top:42px;border-top:1px solid #ccd5cb;padding-top:24px}h3{font-size:20px;margin-top:28px}p{max-width:80ch}a{color:#346e78}table{display:block;overflow:auto;border-collapse:collapse;font-size:14px;width:100%}td,th{border-bottom:1px solid #ccc;padding:10px;text-align:left;min-width:130px}blockquote{border-left:3px solid #236e61;padding:5px 20px;margin-left:0;background:#f0eee5}nav{padding:15px 25px;border-bottom:1px solid #ccd5cb;font-size:13px}li{margin:8px 0}code{overflow-wrap:anywhere}@media(max-width:600px){main{font-size:15px;margin-top:25px}h1{font-size:33px}}@media print{nav{display:none}body{background:white}main{margin:0;font-size:11pt}h2,h3{break-after:avoid}}</style><nav><a href="site-analysis-map.html#accessibility">← Accessibility map</a> · <a href="#journeys">Approaches</a> · <a href="#design">Design</a> · <a href="#field-plan">Field plan</a></nav><main><h1>Accessibility — the whole journey to our plot</h1>
+<p>Item 5 · 2026-09-15 · Bourj Hammoud / Entering Beirut</p>
+<p><strong>Finding:</strong> the site has several mapped approaches, but a continuous, independently usable arrival is not established. The nearest bridge is only one component. Its stairs, the route before it, the landing after it, the pavement beside the plot and the building threshold have to work together. An attractive protected interior cannot compensate for an unusable approach.</p>
+<p>This is a desk-based analysis and a design brief, not a current access certification. <strong>VERIFY</strong> means a condition needs evidence; <strong>TBD</strong> means information is missing. No access score, wheelchair route, crossing safety rating, measured pedestrian flow or gradient has been invented.</p>
+<h2>1. What the professor’s instruction means</h2>
+<p><a id="course"></a></p>
+<p>The course lecture’s page 9 connects contours, slope, drainage and section, and asks the student to distinguish highway movement, local movement and pedestrians while examining landings, stopping and service conflicts. Our technical-integration checklist separately requires a continuous accessible route to public spaces and verification of the applicable authority and requirements. These are design obligations in our project record, not proof of existing conditions. <a href="#course">Lecture notes</a>, <a href="#design">Technical integration</a>.</p>
+<p>In plain language: <strong>do not just draw a line ending at the plot. Draw what a person actually has to do along it.</strong> A route may involve changing street side, negotiating a kerb, climbing, waiting, turning around a parked vehicle, finding the entrance and opening a door. These actions need space and appropriate levels. A line in plan hides most of them.</p>
+<p>For this project, accessibility therefore has three scales:</p>
+<ol>
+<li><strong>Urban access:</strong> which approach and crossing could serve someone coming from each side?</li>
+<li><strong>Street access:</strong> can the person continue along the edge, negotiate junctions, rest and reach the plot?</li>
+<li><strong>Building access:</strong> can the person enter with others, find the destination and use public functions independently?</li>
+</ol>
+<p>The first two maps, Connections and People &amp; Needs, identify potential links and audiences. Daily Rhythm asks when their journeys may occur. This study asks whether those journeys are usable, including when the building is only partly open.</p>
+<h2>2. Evidence: what our map actually establishes</h2>
+<p><a id="evidence"></a></p>
+<p>The preserved 2026-09-13 OSM geometry places the plot north of the main highway, east of the river, beside the curve of Street 80 and near the northern approach of C1. Building rectangles in Pictures Auto include schematic interpretations; they must not be used to measure pavement clearance or legal boundaries. The original mapped site boundary remains the location reference. Source files: <code>02-project/pictures-new-data.js</code>, <code>02-project/connections-data.js</code>, and the unchanged raw Overpass extract in <code>00-source-documents/osm/</code>.</p>
+<h3>Two crossings, not two certified step-free choices</h3>
+<p><strong>C1, nearest the plot:</strong> source way <a href="https://www.openstreetmap.org/way/701135687">701135687</a> is a pedestrian bridge. Its southern approach <a href="https://www.openstreetmap.org/way/270786366">270786366</a> and northern approach <a href="https://www.openstreetmap.org/way/701135688">701135688</a> are tagged <code>highway=steps</code>. This supports marking source-mapped stairs. It does not establish present condition, stair dimensions, handrails, a working lift, absence of all ramps or a complete alternative route.</p>
+<p><strong>C2, farther east:</strong> <a href="https://www.openstreetmap.org/way/1069243892">1069243892</a> combines <code>bridge=yes</code>, <code>layer=1</code> and <code>crossing=zebra</code>. Its associated approaches <a href="https://www.openstreetmap.org/way/1069243890">1069243890</a> and <a href="https://www.openstreetmap.org/way/1069243891">1069243891</a> are tagged steps. This is a material interpretation trap: the zebra tag alone must not become a drawn at-grade highway crossing. The new map retains the bridge interpretation and flags the conflicting attributes for verification.</p>
+<p><strong>Conclusion from these records:</strong> neither crossing can currently be presented as a verified step-free solution. This is narrower—and more defensible—than claiming no accessible crossing exists anywhere.</p>
+<h3>A road line is not a pedestrian strip</h3>
+<p>Street 80 <a href="https://www.openstreetmap.org/way/275315121">275315121</a>, Street 52 components <a href="https://www.openstreetmap.org/way/306996681">306996681</a> and <a href="https://www.openstreetmap.org/way/715531021">715531021</a>, and Armenia bridge components <a href="https://www.openstreetmap.org/way/452148075">452148075</a> and <a href="https://www.openstreetmap.org/way/452148076">452148076</a> establish mapped road geometry. Their vehicle-lane, one-way and asphalt tags are not evidence of a clear pedestrian width. In particular, vehicle one-way direction is not a ban on walking in the other direction.</p>
+<p>The 398 records displayed by the Connections way table have these exact way-level tag counts:</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th align="right">Records with that exact tag</th>
+<th>What the count does not establish</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>sidewalk</code></td>
+<td align="right">0</td>
+<td>It does not mean there are no sidewalks.</td>
+</tr>
+<tr>
+<td><code>sidewalk:left</code>, <code>sidewalk:right</code>, <code>sidewalk:both</code></td>
+<td align="right">0 each</td>
+<td>Separately mapped objects and nodes need their own audit.</td>
+</tr>
+<tr>
+<td><code>width</code></td>
+<td align="right">0</td>
+<td>No usable pedestrian width is established.</td>
+</tr>
+<tr>
+<td><code>incline</code></td>
+<td align="right">0</td>
+<td>A flat-looking plan is not a level survey.</td>
+</tr>
+<tr>
+<td><code>wheelchair</code></td>
+<td align="right">0</td>
+<td>No route can be certified from these tags.</td>
+</tr>
+<tr>
+<td><code>kerb</code> / <code>tactile_paving</code></td>
+<td align="right">0 each</td>
+<td>These may be node-level or missing observations.</td>
+</tr>
+<tr>
+<td><code>lit</code></td>
+<td align="right">36</td>
+<td>Presence of a tag is not a night lighting measurement.</td>
+</tr>
+<tr>
+<td><code>surface</code></td>
+<td align="right">307</td>
+<td>Road surfacing is not necessarily sidewalk surfacing.</td>
+</tr>
+</tbody></table>
+<p>These are <strong>dataset-completeness counts</strong>, not counts of deficient streets or a field audit. The raw export includes repeated elements; the displayed way table is the denominator. Missing metadata must remain unknown, not be converted into a red barrier map.</p>
+<h3>One useful historical photograph</h3>
+<p>The existing <a href="pictures-auto-evidence/2026-09-13/64-m9-bridge-oblique.png">Armenia bridge-angle screenshot</a>, reused without alteration, has <strong>April 2023</strong> imagery. A railing, pavement joints and vegetation near the walking surface are visible. It gives a specific reason to inspect surface continuity and the usable strip, but cannot supply reliable width, crossfall or current maintenance condition. The photographed building behind the frontage is not the same thing as the camera’s position on the bridge. The access tag uses the viewing location approximately, not the building’s assigned outline.</p>
+<h2>3. What local research adds—and what it cannot add</h2>
+<p>UN-Habitat’s November 2022 account describes five improved alleyways in <strong>Maraach</strong>, including lighting and drainage; a resident explains that the drainage work improved her children’s walk to school. This supports treating weather and operation as access questions. It is not evidence that our Street 80 approach floods or lacks lighting. <a href="https://unhabitat.org/news/09-nov-2022/urban-october-in-beirut-improving-life-through-urban-interventions">UN-Habitat, Urban October in Beirut</a>.</p>
+<p>AUB’s 2016 <strong>Nabaa/Sis Street</strong> study describes delivery-related blockages and shop displays occupying sidewalks, alongside the social and economic value of street activity. That is historical evidence from a different subarea. The transferable question is how to maintain a usable passage while accommodating everyday work—not an assumption that every local shop is an obstruction or should be cleared. <a href="https://www.aub.edu.lb/ifi/Documents/publications/working_papers/2015-2016/20160822_nabaa.pdf">AUB, Rethinking Shared Space, printed pp.13–14</a>.</p>
+<p><strong>Site-specific inference to test:</strong> our industrial/workshop context and plot-side curve make the relationship between delivery, passing and waiting important. We do not yet know actual vehicle sizes, loading hours, obstructions or operating agreements. A delivery schedule may reduce conflicts, but cannot substitute for adequate space and a route that remains available when someone needs it.</p>
+<h2>4. Compare complete approaches, not isolated links</h2>
+<p><a id="journeys"></a></p>
+<table>
+<thead>
+<tr>
+<th>Possible origin</th>
+<th>Source-supported components</th>
+<th>Most important unresolved link</th>
+<th>Design implication</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Lower / southern neighbourhood</td>
+<td>Street 52 and C1; C2 as another crossing in the wider extract</td>
+<td>Stairs and any continuous step-free alternative, then kerb-to-entrance continuity</td>
+<td>Do not equate the closest crossing with inclusive access.</td>
+</tr>
+<tr>
+<td>Upper / northern side</td>
+<td>Street 80 on the same side of the highway as the plot</td>
+<td>Pavements, driveways, road-side choice, bend and threshold levels</td>
+<td>Test this arrival separately; avoiding the highway does not remove local barriers.</td>
+</tr>
+<tr>
+<td>River / western side</td>
+<td>Armenia road bridge and local roads east of it</td>
+<td>Bridge edge width/surface, junctions and onward route</td>
+<td>Audit the complete connection, not just the river span.</td>
+</tr>
+<tr>
+<td>Taxi, private vehicle or assisted arrival</td>
+<td>Road system; no verified designated bay at the plot</td>
+<td>Lawful stopping, passenger exit, boarding and kerb-to-door route</td>
+<td>Investigate set-down carefully; never propose stopping on the highway.</td>
+</tr>
+<tr>
+<td>Service / delivery</td>
+<td>Road approach and workshop context</td>
+<td>Vehicle size, swept path, permission, time and pedestrian conflict</td>
+<td>Test service separation without sacrificing the public arrival.</td>
+</tr>
+</tbody></table>
+<p>These are <strong>candidate journeys</strong>, not pedestrian navigation instructions. No route has been filled across an unverified gap. No bus stop or parking bay has been placed as an existing amenity. Actual transport services, boarding accessibility, stop positions and operating hours remain TBD.</p>
+<h3>The last few metres may determine the whole journey</h3>
+<p>At X8, the Street 80 bend, the site boundary and the bridge-side approach are close together in plan. That proximity could help create a recognisable arrival, but it could also concentrate people who are turning, waiting, searching for a door or servicing a building. This is a spatial conflict hypothesis, not crash evidence.</p>
+<p>A useful design comparison is therefore not “entrance north or south?” in isolation. It is:</p>
+<ul>
+<li>Which entrance connects to the more continuous pedestrian edge?</li>
+<li>Can a visitor pause before the door without blocking another person?</li>
+<li>Can a person arriving from the other direction reach it without an extra unsafe manoeuvre?</li>
+<li>Does the service vehicle cross the waiting area?</li>
+<li>Can the route remain available when the outer public area is open and inner rooms are closed?</li>
+</ul>
+<p>Resolve these with the ground plan <strong>and a level section</strong>, before committing the main entrance or building platform. Do not derive slopes from our two-dimensional source lines.</p>
+<h2>5. Accessibility is not only a wheelchair question</h2>
+<p>The following are project design tests, not claims about the number or characteristics of nearby residents:</p>
+<table>
+<thead>
+<tr>
+<th>Access situation</th>
+<th>What to test on this site</th>
+<th>Where the plan alone is insufficient</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Wheelchair, stroller, wheeled load</td>
+<td>Continuous changes of level, clear turning and passing</td>
+<td>Kerbs, crossfalls, door operation and landings need measurements.</td>
+</tr>
+<tr>
+<td>Limited walking endurance</td>
+<td>Rest before and after a demanding approach; sheltered waiting</td>
+<td>Short distance does not establish tolerable effort or a usable seat.</td>
+</tr>
+<tr>
+<td>Low vision</td>
+<td>Detectable edges, consistent placement of furniture, contrast and unobstructed travel</td>
+<td>A coloured map cannot show what is detectable at ground level.</td>
+</tr>
+<tr>
+<td>Hearing or cognitive access needs</td>
+<td>Legible decisions and more than one form of information</td>
+<td>Noise or a complex visual environment may make a single cue insufficient; user testing needed.</td>
+</tr>
+<tr>
+<td>Child with companion / unfamiliar visitor</td>
+<td>Waiting together, sight lines, readable entrance and return route</td>
+<td>Adult standing-height visibility and a familiar route are insufficient tests.</td>
+</tr>
+<tr>
+<td>Staff and delivery worker</td>
+<td>Safe loading, carrying route and separation from visitors</td>
+<td>A service arrow does not demonstrate an actual manoeuvre.</td>
+</tr>
+</tbody></table>
+<p>As a <strong>foreign comparative benchmark</strong>, the UK Department for Transport’s 2022 guide recommends a normally 2,000 mm clear footway and frequent seating, with a 50 m maximum interval in commonly used pedestrian areas. Those figures illustrate why clearance and rest need measurement; they are not adopted here as Lebanese legal minima or dimensions already available on this site. <a href="https://assets.publishing.service.gov.uk/media/61d32bb7d3bf7f1f72b5ffd2/inclusive-mobility-a-guide-to-best-practice-on-access-to-pedestrian-and-transport-infrastructure.pdf">Inclusive Mobility, sections 4.2 and 4.5</a>.</p>
+<p>The US Access Board separately structures its guidance around a continuous pedestrian access route and kerb transitions. This is a useful analytical distinction, not a statement that US requirements apply in Bourj Hammoud. <a href="https://www.access-board.gov/prowag/technical.html">PROWAG, R302–R304</a>. <strong>Applicable Lebanese requirements, authority review and detailed compliance remain VERIFY.</strong></p>
+<h2>6. From analysis to our nesting concept</h2>
+<p><a id="design"></a></p>
+<p>The accessibility study changes nesting from merely “putting a protected space inside another” to <strong>a sequence of protection that remains easy to enter and use</strong>.</p>
+<ol>
+<li><strong>An accessible outer threshold.</strong> The first protected space should receive people from the street: a clear arrival, shelter and room to orient themselves. It must not force every visitor to climb to a podium.</li>
+<li><strong>A legible shared layer.</strong> The next space should make the destination understandable, with a clear route onward and room for companions. Avoid turning enclosure into a maze or hiding the public door behind service access.</li>
+<li><strong>Quieter inner rooms.</strong> Use position, enclosure and buffering to reduce exposure while retaining an independently usable route. If public functions are upstairs, their access cannot be an afterthought.</li>
+<li><strong>A parallel service arrangement.</strong> Loading and storage should support the building without consuming its arrival space. The exact service location remains a design test, not a new driveway drawn as approved.</li>
+<li><strong>An operational boundary.</strong> When only one layer stays open, its entrance, necessary facilities and exit arrangements must still function. The Daily Rhythm map informs this test; it does not prove a 24-hour programme is necessary.</li>
+</ol>
+<p>This analysis does <strong>not</strong> select a final entrance, design a new bridge, certify a public right of way or establish a detailed ramp. It gives criteria by which those design decisions can be compared.</p>
+<h3>Who can actually change each condition?</h3>
+<table>
+<thead>
+<tr>
+<th>Responsibility to establish</th>
+<th>Potential scope</th>
+<th>What cannot be promised yet</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Project team / client</td>
+<td>Internal ground levels, entrance, waiting, public circulation, facilities and service organisation</td>
+<td>Ownership outside the plot; final compliance before authority/code review</td>
+</tr>
+<tr>
+<td>Street authority and neighbouring frontages</td>
+<td>Pavement continuity, kerbs, drainage, driveways and permitted stopping</td>
+<td>That the student project can move kerbs or remove obstructions independently</td>
+</tr>
+<tr>
+<td>Bridge / transport infrastructure authorities</td>
+<td>Crossings, stair alternatives, operation, boarding arrangements</td>
+<td>A lift, ramp, traffic restriction or new stop without feasibility and approvals</td>
+</tr>
+</tbody></table>
+<p>The design should show these dependencies honestly. If an urban link is unresolved, that limitation belongs in the argument rather than being concealed by a green “accessible route” arrow.</p>
+<h2>7. How the new map communicates the analysis</h2>
+<p>The <strong>Accessibility</strong> tab is separate from the older <strong>Access</strong> tab and preserves Connections, People, Daily Rhythm and all photo maps. It contains <strong>15 research tags</strong>, <strong>three shaded inspection windows</strong>, <strong>11 source-way components</strong>, and four approach views. Every tag separates evidence, interpretation, design consequence and the check still needed.</p>
+<ul>
+<li><strong>Red S:</strong> source-mapped steps, not a claim that the entire neighbourhood is inaccessible.</li>
+<li><strong>Amber ?:</strong> continuity requiring inspection. Dashed road components are not footpath directions.</li>
+<li><strong>Purple C:</strong> sensory, resting and operating conditions to check—not measured comfort.</li>
+<li><strong>Blue A:</strong> arrival and service questions; not new existing stops or loading bays.</li>
+<li><strong>Teal P:</strong> matters for the project design; not a pass/fail accessibility result.</li>
+<li><strong>Shading:</strong> authored study windows, not catchments, ownership or barrier intensity.</li>
+</ul>
+<p>“Mapped components only” hides inspection tags and shading. It retains the two decks, four stair ways, road components and plot location, with source links. This deliberately does not certify a connected route.</p>
+<h2>8. Focused fieldwork that can change decisions</h2>
+<p><a id="field-plan"></a></p>
+<p>The first priority is <strong>C1’s two ends and the complete Street 80-to-plot approach</strong>. These checks determine whether the current entrance assumptions are viable. The second priority is the full southern and river-side alternatives. The third is repeated operational observation and user testing. These are planned tasks; none are marked complete by this report.</p>
+<table>
+<thead>
+<tr>
+<th>Station</th>
+<th>Capture / measure</th>
+<th>Decision it can change</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>X1–X2, both C1 ends</td>
+<td>Photos of complete approaches; step-free provision and operation; landing dimensions/levels; rails; onward path</td>
+<td>Whether C1 can support the intended audience and what urban dependency remains</td>
+</tr>
+<tr>
+<td>X5–X8, Street 80 / bend</td>
+<td>Both edges; minimum clear width at each pinch point; kerbs, driveways, drainage, turning and waiting</td>
+<td>Main arrival side, door setback and service separation</td>
+</tr>
+<tr>
+<td>X4, Street 52</td>
+<td>Continuous route on each side, junctions, barriers and any detour</td>
+<td>Whether a southern journey reaches the crossing without another unresolved link</td>
+</tr>
+<tr>
+<td>X6–X7, Armenia and onward junctions</td>
+<td>Clear bridge strip; surface/crossfall; junction transitions and sight lines</td>
+<td>Whether the western candidate is realistic</td>
+</tr>
+<tr>
+<td>X3, C2</td>
+<td>Current crossing form, both approaches and onward chain</td>
+<td>Resolve contradictory tags; do not presume a viable detour</td>
+</tr>
+<tr>
+<td>X9–X10–X14</td>
+<td>Resting places, shade at recorded time, signs/contrast, lighting, drainage after rain when safe</td>
+<td>Rest provision, entrance legibility and opening arrangement</td>
+</tr>
+<tr>
+<td>X12–X13</td>
+<td>Actual delivery vehicle type, occupied space/duration; real transport stops and boarding conditions</td>
+<td>Service layout and lawful passenger arrival</td>
+</tr>
+<tr>
+<td>X11 / P</td>
+<td>Surveyed spot levels, door/landing strategy, public destination and exit route</td>
+<td>Ground section, platform decision and internal circulation</td>
+</tr>
+</tbody></table>
+<p>For each segment record: date/time, side of street, start/end locations, view direction, photograph ID, clear width at the narrowest point, level changes, surface, obstructions and whether they are permanent or temporary. Store observations separately from inferred causes. Record equipment/method and uncertainty for measured gradients; a perspective photograph is not a measuring instrument.</p>
+<p>Repeat selected stations during a delivery period and early evening. Log actual conditions rather than assuming the published business schedule equals public accessibility. After-rain checks should only be undertaken from safe pedestrian positions. Do not test a dangerous crossing, enter the carriageway to measure it or ask a disabled participant to attempt an unverified route. Engage users about their experiences and preferences rather than simulate disability as evidence.</p>
+<p><strong>Completion criteria:</strong> a route is ready to support an accessibility claim only when its complete sequence, including thresholds and operation, has evidence. A partial photograph or mapped street is still valuable, but remains a partial check. Until then, present candidate arrivals and unresolved links—not a definitive accessible-route map.</p>
+<h2>9. What to say in the critique</h2>
+<p>“Our first map showed that connections exist. This analysis shows why connection alone is not enough. The closest bridge has steps recorded at both ends; the alternative crossing is not established as step-free either. On the same side of the highway, we still need to resolve pavement continuity, the plot-side bend and the entrance level. So the design begins with an accessible, sheltered threshold. Nesting then protects people progressively, without making the protected centre difficult to enter. The map distinguishes what the source shows, what we must measure and what the project can actually control.”</p>
+<p><strong>Status:</strong> desk research and mapped analysis complete; current continuous-route inspection, levels, user consultation, transport verification and local compliance review remain open. This is content development for later boards, not a finished board composition.</p>
+</main></html>

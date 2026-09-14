@@ -31,7 +31,7 @@ window.createPicturesAuto = function(api){
       var figure=document.createElement('figure');figure.className='pa-figure';
       var link=document.createElement('a');link.target='_blank';link.rel='noopener';
       var img=document.createElement('img');img.loading='lazy';img.alt=m.caption||'Original survey screenshot';link.appendChild(img);figure.appendChild(link);
-      var cap=document.createElement('figcaption');cap.textContent=m.caption?m.caption+' · '+m.attribution+' · imagery '+(m.imageryDate||'date not displayed')+' · captured '+A.collectedOn:'Original linked screenshot — preserved, not newly collected';figure.appendChild(cap);
+      var cap=document.createElement('figcaption');cap.textContent=m.caption?m.caption+' · '+m.attribution+' · imagery '+(m.imageryDate||'date not displayed')+' · captured '+(m.capturedOn||A.collectedOn):'Original linked screenshot — preserved, not newly collected';figure.appendChild(cap);
       if(m.sourceUrl){var source=document.createElement('a');source.href=m.sourceUrl;source.target='_blank';source.rel='noopener';source.textContent='Open exact source view';cap.appendChild(document.createElement('br'));cap.appendChild(source);}
       if(m.file&&m.auto){img.src=m.file;link.href=m.file;}
       else api.getPhoto(m.id,function(src){if(!figure.isConnected)return;if(!src&&m.file)src=m.file;if(!src){cap.appendChild(document.createTextNode(' · original image unavailable on this device'));return;}var url=typeof src==='string'?src:URL.createObjectURL(src);img.src=url;link.href=url;img.onerror=function(){cap.appendChild(document.createTextNode(' · original image could not load'));};});

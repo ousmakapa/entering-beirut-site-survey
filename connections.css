@@ -1,0 +1,24 @@
+body.connections-on #map{background:#f7f7f3}
+body.connections-on{overflow:hidden}
+body.connections-on footer{display:none}
+body.connections-on .workspace{grid-template-columns:1fr;grid-template-areas:"map";height:calc(100dvh - var(--chrome,100px))}
+body.connections-on .map-shell{min-height:0;height:100%}
+body.connections-on .facts-panel,body.connections-on .layer-panel,body.connections-on #map-legend{display:none!important}
+#connections-panel{position:absolute;right:14px;top:14px;z-index:1100;width:345px;max-height:calc(100% - 30px);overflow:auto;background:#fffffc;border:1px solid #c7cbc6;color:#243338;font:14px/1.5 Inter,Arial,sans-serif}
+#connections-panel[hidden],#connections-panel [hidden],#connections-key[hidden],#connections-caption[hidden]{display:none!important}
+#connections-panel header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:16px;border-bottom:1px solid #ddd;position:sticky;top:0;background:#fffffc;z-index:1}
+#connections-panel h2{font-size:22px;margin:0;letter-spacing:-.6px}#connections-panel header small{font-size:11px;color:#667779}
+#connections-panel h3{font-size:18px;line-height:1.3;margin:14px 0 8px}#connections-panel h4{font-size:12px;text-transform:uppercase;margin:16px 0 4px}
+#cn-body{padding:16px}.cn-intro{font-size:20px;line-height:1.25;margin:0 0 10px;font-weight:600}.cn-sub{color:#647276;font-size:13px;margin-top:0}
+#connections-panel button{font:inherit;font-size:12px;padding:8px 9px;background:#fff;border:1px solid #c3cbc5;color:#243338;cursor:pointer}
+#connections-panel button:hover,#connections-panel button:focus-visible{background:#e8efec}#connections-panel button[aria-pressed=true]{background:#233d39;color:#fff;border-color:#233d39}
+.cn-presets,.cn-actions{display:flex;gap:5px;margin:10px 0;flex-wrap:wrap}#cn-filters{display:grid;gap:7px;padding:10px 0}#cn-filters label{display:flex;align-items:center;gap:7px;font-size:12px}#cn-filters i{width:16px;height:4px}
+#connections-panel details{border-top:1px solid #ddd;padding:12px 0}#connections-panel summary{cursor:pointer;font-size:13px;font-weight:600}#connections-panel a{color:#305f69;text-decoration:underline}#connections-panel a:hover{color:#a65035}
+.cn-small,.cn-cites{font-size:11px;color:#647276}.cn-limit{padding-top:10px;border-top:1px solid #ddd}.cn-status{font-size:11px;color:#875e32;letter-spacing:.15px}#cn-detail:not(:empty){padding-bottom:16px;border-bottom:1px solid #c5cdc6;margin-bottom:12px}
+#cn-list{display:grid;gap:5px}#cn-list .cn-item{display:flex;gap:10px;text-align:left;padding:10px;border-color:#e0e4df}.cn-item>span{font-weight:800;min-width:24px}.cn-item small,#cn-source-list small{display:block;font-size:10px;color:#6e797a;margin-top:3px}.cn-item.selected{background:#edf1e9!important;border-color:#8c9b90!important}
+.cn-pin button{display:block;width:38px;height:26px;padding:0;border:1.5px solid var(--cn-color);background:#fffffa;color:var(--cn-color);font:bold 12px Arial;cursor:pointer;box-shadow:0 1px 2px #0001}.cn-pin button:hover,.cn-pin button:focus-visible{background:#edf2e8;outline:2px solid #314741}
+.cn-area-label{font:600 10px/1.3 Inter,Arial,sans-serif;letter-spacing:1px;text-align:center;color:#445859;text-shadow:0 0 3px #fff,0 0 5px #fff;pointer-events:none}
+#connections-key{position:absolute;left:14px;bottom:45px;z-index:900;background:#fffffcf0;border:1px solid #c7cbc6;padding:12px;font:11px/1.5 Arial;color:#344443;max-width:245px}#connections-key b{display:block;margin-bottom:5px;letter-spacing:1px}#connections-key span{display:block}#connections-key i{display:inline-block;width:21px;height:3px;margin:0 7px 3px 0}#connections-key small{display:block;max-width:210px;margin-top:7px;color:#637370}
+#connections-caption{position:absolute;left:70px;top:14px;right:390px;z-index:850;font:10px/1.4 Arial;letter-spacing:.7px;background:#fffffbe8;padding:8px;text-align:center;color:#5d6e70;pointer-events:none}
+#connections-caption a{pointer-events:auto;color:inherit;letter-spacing:0;font-size:9px}
+@media(max-width:700px){body.connections-on .tb-right{flex-wrap:wrap;max-width:100%}#connections-panel{top:auto;bottom:8px;left:8px;right:8px;width:auto;max-height:43%}#connections-panel header{padding:9px 12px}#connections-panel h2{font-size:18px}#cn-body{padding:12px}#connections-key{display:none}#connections-caption{left:60px;right:8px;top:8px;font-size:8px}.cn-area-label{font-size:8px}.cn-pin button{font-size:11px}}

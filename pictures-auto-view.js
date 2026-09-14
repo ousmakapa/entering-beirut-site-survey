@@ -20,6 +20,10 @@ window.createPicturesAutoView = function(api){
   document.getElementById('pa-filter').insertBefore(manualOption,document.getElementById('pa-filter').options[1]);
   var interiorOption=document.createElement('option');interiorOption.value='interior';interiorOption.textContent='Interior block — new exterior evidence';
   document.getElementById('pa-filter').insertBefore(interiorOption,document.getElementById('pa-filter').options[1]);
+  var angleOption=document.createElement('option');angleOption.value='angles';angleOption.textContent='Manual targets — new angle evidence';
+  document.getElementById('pa-filter').insertBefore(angleOption,document.getElementById('pa-filter').options[1]);
+  var sideOption=document.createElement('option');sideOption.value='sides';sideOption.textContent='Side / rear views — 4 more buildings';
+  document.getElementById('pa-filter').insertBefore(sideOption,document.getElementById('pa-filter').options[1]);
   document.querySelector('#pa-filter option[value="batch30"]').textContent='Earlier batch — 30 screenshots';
   document.querySelector('#pa-filter option[value="placeholder"]').textContent='Approximate / user-placed outlines';
   L.DomEvent.disableClickPropagation(panel);L.DomEvent.disableScrollPropagation(panel);
@@ -72,9 +76,11 @@ window.createPicturesAutoView = function(api){
   }
   function scale(){return api.map.distance(api.map.containerPointToLatLng([0,0]),api.map.containerPointToLatLng([100,0]))>0?100/api.map.distance(api.map.containerPointToLatLng([0,0]),api.map.containerPointToLatLng([100,0])):1;}
   function matches(r){var s=shape(r),q=el('pa-search').value.toLowerCase(),f=el('pa-filter').value;
+    if(f==='sides')return !!(r.autoEvidence&&r.autoEvidence.batch==='manual-side-retry-2026-09-14')&&(!q||(title(r)+' '+r.id+' '+r.autoEvidence.manualTarget+' A'+r.autoNumber).toLowerCase().includes(q));
     var aliases=(r.autoEvidence&&r.autoEvidence.mergedFrom||[]).map(function(a){return a.label+' '+a.from;}).join(' ');
+    aliases+=' '+(r.autoEvidence&&r.autoEvidence.manualTarget||'');
     return (!q||(title(r)+' '+r.id+' '+r.parcel+' '+aliases+' '+(r.autoCreated?'A'+r.autoNumber:'')).toLowerCase().includes(q))&&
-      (f==='all'||f==='interior'&&r.autoEvidence&&r.autoEvidence.batch==='river-interior-2026-09-13'||f==='river'&&r.autoEvidence&&r.autoEvidence.batch==='river-south-2026-09-13'||f==='new'&&!!r.autoCreated||f==='baseline'&&!r.autoCreated||f==='enriched'&&!r.autoCreated&&!!r.autoEvidence||f==='batch30'&&r.autoEvidence&&r.autoEvidence.batch==='nearby-30-2026-09-13'||f==='auto'&&!!r.autoEvidence||f==='original'&&!r.autoEvidence||f==='pending'&&s.status!=='confirmed'||f==='confirmed'&&s.status==='confirmed'||
+      (f==='all'||f==='angles'&&r.autoEvidence&&r.autoEvidence.batch==='manual-angle-retry-2026-09-13'||f==='interior'&&r.autoEvidence&&r.autoEvidence.batch==='river-interior-2026-09-13'||f==='river'&&r.autoEvidence&&r.autoEvidence.batch==='river-south-2026-09-13'||f==='new'&&!!r.autoCreated||f==='baseline'&&!r.autoCreated||f==='enriched'&&!r.autoCreated&&!!r.autoEvidence||f==='batch30'&&r.autoEvidence&&r.autoEvidence.batch==='nearby-30-2026-09-13'||f==='auto'&&!!r.autoEvidence||f==='original'&&!r.autoEvidence||f==='pending'&&s.status!=='confirmed'||f==='confirmed'&&s.status==='confirmed'||
        f==='street'&&r.autoEvidence&&r.autoEvidence.streetReview==='ring-street-2026-09-13'||f==='unassigned'&&!mapped(s)||f==='placeholder'&&['placeholder','schematic','approximate-outline','schematic-rectangle'].includes(s.kind)||f==='site'&&s.kind==='site'||f==='split'&&['split','survey-part'].includes(s.kind)||f==='missing'&&!api.shots(r.id).length);}
   function manualVisits(){
     var occupied=new Set(api.records().filter(function(r){return mapped(shape(r));}).map(function(r){return shape(r).parentId;}));
