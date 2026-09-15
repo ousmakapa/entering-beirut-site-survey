@@ -5,7 +5,14 @@
 .jury-more,.jury-view-detail,.jury-tag-list,.jury-record-intro {border-top:1px solid #cbd1cc;padding:.8rem 0;margin:.7rem 0;}
 .jury-more>summary,.jury-view-detail>summary,.jury-tag-list>summary,.jury-record-intro>summary {cursor:pointer;font-weight:600;font-size:.9rem;line-height:1.5;}
 .jury-more[open]>summary,.jury-view-detail[open]>summary,.jury-tag-list[open]>summary,.jury-record-intro[open]>summary {margin-bottom:.9rem;}
-.jury-panel:has(.jury-tag-story) [id$="-summary"] {display:none;}
+.jury-preserved {display:none!important;}
+.jury-sources {border-top:1px solid #cbd1cc;padding:.8rem 0;margin:.7rem 0;}
+.jury-sources>summary {cursor:pointer;font-weight:600;font-size:.9rem;}
+.jury-sources p,.jury-evidence-links {font-size:.8rem;line-height:1.45;}
+.jury-tag-evidence {border-left:3px solid #78908a;padding:.1rem .8rem;margin:.8rem 0;}
+.jury-tag-evidence h4 {font-size:1rem;margin:.6rem 0;}
+.jury-tag-evidence p {font-size:.9rem;line-height:1.55;}
+.jury-tag-evidence .jury-evidence-limit {font-size:.8rem;color:#5b6b70;}
 .jury-tag-story {margin-top:.8rem;}
 .jury-legacy-note {border-left:3px solid #ac7838;padding-left:.8rem;}
 #facts-panel>.jury-overview {padding-top:.3rem;}
