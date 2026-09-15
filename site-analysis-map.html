@@ -700,13 +700,15 @@
     border-radius:6px; padding:.3rem .4rem; margin-bottom:.2rem;}
   .pf-warn{color:var(--layer-environmental); border-left:2px solid var(--layer-environmental);}
   /* a part carries its use as its colour, so a street reads at a glance */
-  /* Not a line in a bar. The one thing that lost a morning's work was a warning nobody
-     could be expected to read, so this cannot be read past. */
-  .pic-alarm{ position:absolute; left:.6rem; right:.6rem; z-index:1400;
-    background:var(--sem-problem); color:#fff; padding:.6rem .8rem; border-radius:6px;
-    font-size:.82rem; line-height:1.45; box-shadow:0 4px 18px rgba(0,0,0,.3);}
-  .pic-alarm b{ display:block; font-size:.9rem; margin-bottom:.15rem;}
-  .pic-alarm i{ font-style:normal; opacity:.9;}
+  /* Compact, persistent access to backup actions; never cover the whole map with an alarm. */
+  .pic-alarm{position:absolute;left:.6rem;right:auto;z-index:1400;max-width:min(340px,calc(100% - 1.2rem));
+    background:#fffaf0;color:#66512b;border:1px solid #cdbd9c;border-radius:6px;
+    font-size:.78rem;line-height:1.45;box-shadow:0 2px 9px rgba(0,0,0,.12);}
+  .pic-alarm summary{cursor:pointer;padding:.4rem .65rem;font-weight:600;}
+  .pic-alarm summary:focus-visible{outline:2px solid #6c7553;outline-offset:2px;}
+  .pic-alarm .backup-help{padding:0 .7rem .7rem;max-height:40vh;overflow:auto;}
+  .pic-alarm .backup-help p{margin:.45rem 0;}
+  .pic-alarm button{font:inherit;padding:.4rem .6rem;border:1px solid #b9ac8d;border-radius:4px;background:white;color:#4c442e;cursor:pointer;}
   /* only on screen while the survey is empty */
   .pic-rescue{ font-family:var(--font-mono); font-size:.68rem; cursor:pointer;
     padding:.2rem .45rem; border:1px dashed var(--line-strong); border-radius:4px;
@@ -6586,23 +6588,30 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     if (r) r.hidden = bkTotal() > 0;
     paintAlarm();
   }
-  /* A blocked download looks exactly like a successful one from here, so the only way to
-     catch a refusal is to state, loudly, that no file has ever been written. */
+  /* Download initiation is not proof a file reached disk. Keep truthful, compact guidance.
+     Build controls once: catch-up backup can repaint during pointerdown; replacing the clicked
+     element would swallow its subsequent click. This UI writes no backup/data state. */
   function paintAlarm(){
     var a = document.getElementById('pic-alarm');
     if (!a) return;
     var n = bkTotal();
-    var show = n > 0 && !bkAt;
-    a.hidden = !show;
-    if (!show) return;
-    a.innerHTML = '<b>Nothing has been backed up yet.</b>' +
-      '<i>This page saves a copy of the survey to your Downloads folder by itself. If Chrome ' +
-      'asked <b>&ldquo;Allow multiple downloads?&rdquo;</b> and it was blocked, that is why &mdash; ' +
-      'allow it from the icon at the right of the address bar. Everything here lives only in ' +
-      'this browser until a file lands.</i>';
-    /* layoutBars() already measures the bar into --picbar, and measuring it again here ran
-       before it had been laid out: offsetHeight was 0 and the alarm sat on top of the
-       buttons it is telling you about. */
+    a.hidden = n === 0;
+    if (!n) return;
+    if (!document.getElementById('backup-compact-label')){
+      a.innerHTML='<details id="backup-compact-details"><summary><span id="backup-compact-label"></span></summary>'+
+        '<div class="backup-help"><p id="backup-compact-status"></p>'+
+        '<button type="button" id="backup-full-export">Export survey + photos</button>'+
+        '<p>Check the downloaded ZIP and its survey.json. If the export has several parts, keep every part. Check its missing-file list too.</p>'+
+        '<p>Automatic JSON backups contain records and photo metadata, not the photo files themselves. Allow downloads for this site if Chrome blocks them.</p>'+
+        '<p>For manual Pictures Auto shape edits, also use <b>Export Auto copy</b> in Pictures Auto.</p>'+
+        '<p>Do not clear site data. Localhost and the live site have separate browser stores; changing address does not transfer your edits.</p></div></details>';
+      document.getElementById('backup-full-export').addEventListener('click',function(){exportField();});
+      if(window.L){L.DomEvent.disableClickPropagation(a);L.DomEvent.disableScrollPropagation(a);}
+    }
+    document.getElementById('backup-compact-label').textContent=bkAt?'Backup options':'Backup · check your copy';
+    document.getElementById('backup-compact-status').textContent=bkAt?
+      'A backup download was requested on this browser. Please check that the file is actually in Downloads; the page cannot confirm it reached disk.':
+      'No automatic backup-download attempt is recorded on this browser yet. This does not mean your survey is missing. Keep an exported copy before clearing storage or changing device.';
     a.style.bottom = 'calc(var(--picbar, 0px) + 12px + env(safe-area-inset-bottom))';
   }
 
