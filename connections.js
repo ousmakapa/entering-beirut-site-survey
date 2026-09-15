@@ -17,7 +17,7 @@ window.createConnections = function(api){
     '<p class="cn-small cn-limit">Detailed base: approximately 1.2 km. Actual sea frontage is outside this extract. No completed waterfront route is claimed.</p></div>';
   shell.appendChild(panel);L.DomEvent.disableClickPropagation(panel);L.DomEvent.disableScrollPropagation(panel);
   var key=document.createElement('div');key.id='connections-key';key.hidden=true;
-    key.innerHTML='<b>CONNECTIONS / 01</b><span><i style="background:#a65035"></i>Regional road</span><span><i style="background:#14776e"></i>Local network</span><span><i style="background:#a73765"></i>Mapped crossing</span><span><i style="background:#6750a0"></i>Destination ≈</span><small>Shaded areas are study windows—not land-use boundaries. Short tag pointers are label leaders, not routes.</small>';shell.appendChild(key);L.DomEvent.disableClickPropagation(key);
+    key.innerHTML='<b>CONNECTIONS / 01</b><span><i style="background:#a65035"></i>Regional road</span><span><i style="background:#14776e"></i>Local network</span><span><i style="background:#a73765"></i>Mapped crossing</span><span><i style="background:#6750a0"></i>Destination ≈</span><small>Building tint groups study areas—not recorded building use. Short tag pointers are label leaders, not routes.</small>';shell.appendChild(key);L.DomEvent.disableClickPropagation(key);
   var banner=document.createElement('div');banner.id='connections-caption';banner.hidden=true;banner.innerHTML='THE COASTAL-SIDE ROAD IS NOT THE SHORELINE · sea lies beyond the detailed base<br><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a> · interpretative study overlay';shell.appendChild(banner);L.DomEvent.disableClickPropagation(banner);
   function el(id){return document.getElementById(id);}
   function esc(x){return String(x==null?'':x).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
@@ -27,6 +27,7 @@ window.createConnections = function(api){
   function fit(){var bounds=preset==='journey'?[[33.8945,35.5398],[33.8983,35.5429]]:D.bounds;api.map.invalidateSize();api.map.fitBounds(bounds,Object.assign({animate:false},pad()));}
   function allowed(t){if(!shown[t.kind]&&t.kind!=='plot')return false;if(preset==='journey')return ['P','C1','L1','L2','D1','Q2'].includes(t.id);if(preset==='crossings')return ['P','C1','C2','C3','Q2'].includes(t.id);return true;}
   function buildBase(){
+    if(window.BuildingMap){BuildingMap.base(base,canvas);return;}
     if(ready)return;
     B.base.forEach(function(f){
       if(f.building)return;
@@ -40,7 +41,7 @@ window.createConnections = function(api){
   function draw(){
     if(!active)return;buildBase();api.group.clearLayers();zones.clearLayers();roads.clearLayers();tags.clearLayers();focus.clearLayers();markers={};
     if(shown.zones&&preset==='all'){
-      D.zones.forEach(function(z){L.polygon(z.ring,{color:z.color,weight:1,dashArray:'5 7',fillColor:z.color,fillOpacity:.11,renderer:canvas}).bindPopup('<b>'+esc(z.title)+'</b><p>'+esc(z.note)+'</p>',{maxWidth:270}).addTo(zones);});
+      D.zones.forEach(function(z){BuildingMap.shade(z.ring,{color:z.color,weight:1,dashArray:'5 7',fillColor:z.color,fillOpacity:.11,renderer:canvas}).bindPopup('<b>'+esc(z.title)+'</b><p>'+esc(z.note)+'</p>',{maxWidth:270}).addTo(zones);});
       zones.addTo(api.group);
     }
     base.addTo(api.group);
@@ -91,7 +92,7 @@ window.createConnections = function(api){
     if(window.JuryStories)JuryStories.detail('connections',id,document.getElementById('cn-detail'));el('cn-close-detail').onclick=function(){selected=null;focus.clearLayers();el('cn-detail').innerHTML='';highlight(null);};
     el('cn-body').hidden=false;el('cn-collapse').textContent='−';el('cn-collapse').setAttribute('aria-expanded','true');scrollDetail();
   }
-  [['regional','Regional roads'],['local','Local streets'],['crossing','Mapped crossings / stairs'],['destination','Destination tags'],['question','Unresolved connections'],['zones','Study-area shading']].forEach(function(v){
+  [['regional','Regional roads'],['local','Local streets'],['crossing','Mapped crossings / stairs'],['destination','Destination tags'],['question','Unresolved connections'],['zones','Building-aligned study tint']].forEach(function(v){
     var label=document.createElement('label');label.innerHTML='<input type="checkbox" data-layer="'+v[0]+'" checked><i style="background:'+(colors[v[0]]||'#baaa93')+'"></i>'+v[1];label.querySelector('input').onchange=function(){shown[v[0]]=this.checked;if(selected&&!allowed(D.tags.find(t=>t.id===selected))){selected=null;el('cn-detail').innerHTML='';}draw();};el('cn-filters').appendChild(label);
   });
   Object.keys(D.sources).forEach(function(id){var s=D.sources[id],p=document.createElement('p');p.innerHTML='<a href="'+esc(s.url)+'" target="_blank" rel="noopener">'+esc(s.title)+'</a><small>'+esc(s.publisher+' · '+s.date)+'</small><small>'+esc(s.note)+'</small>';el('cn-source-list').appendChild(p);});

@@ -1,0 +1,14 @@
+.building-map-on #layer-panel{display:none!important}
+.building-map-on #map{background:#f7f8f5}
+.building-map-on:not(.pictures-on) #map-legend{bottom:60px;max-height:calc(100% - 90px);overflow:auto}
+.building-map-on .north-mark{display:none}
+.bm-small{font-size:11px;line-height:1.5;color:#596e73;margin:10px 0}
+.bm-tag span{display:inline-block;background:#fffffb;border:1px solid #6f8075;border-radius:4px;padding:2px 5px;font:11px/1.2 system-ui;color:#243c36;white-space:nowrap}
+.bm-tag{text-align:center}
+.bm-label{text-align:center;font:600 11px/1.4 system-ui;letter-spacing:.025em}
+.bm-label span{background:#fffffbe8;padding:3px 6px;white-space:nowrap}
+.bm-swatch{display:inline-block;width:17px;height:12px;flex-shrink:0;border:1px solid #ffffff99}
+.bm-reference{display:flex;align-items:center;gap:6px;font-size:11px;line-height:1.5;margin-top:10px}
+.bm-controls{display:flex;gap:8px;margin-top:8px}.bm-controls label{font-size:11px}.bm-controls select{display:block;max-width:180px;padding:6px;background:white;border:1px solid #bac7bf}
+.bm-coverage{margin-top:16px;font-size:12px;line-height:1.55}.bm-coverage summary{cursor:pointer}.bm-coverage button{display:block;max-width:100%;margin:6px 0;background:white;border:1px solid #c1cec7;padding:7px;text-align:left;color:#29443e}
+.bm-proof figure{margin:8px 0}.bm-proof img{display:block;width:100%;height:auto}.bm-proof figcaption{font-size:10px;line-height:1.4;color:#526870;margin-top:3px}

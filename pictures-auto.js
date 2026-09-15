@@ -60,6 +60,9 @@ window.createPicturesAuto = function(api){
     var url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='pictures-auto-'+A.collectedOn+'.json';a.click();setTimeout(function(){URL.revokeObjectURL(url);},30000);
   };tools.appendChild(exportButton);
   var state=view.stats;view.stats=function(){return Object.assign(state(),{autoEvidence:A.additions.length,newScreenshots:A.additions.reduce(function(n,a){return n+a.screenshots.length;},0),baselineRecords:A.baselineCount||records.filter(function(r){return !r.autoCreated;}).length});};
+  // Read-only bridge: analytical maps use the same displayed shapes, including local edits.
+  // No analytical map is permitted to save assignments through this interface.
+  view.readBuildings=function(){return records.map(function(r){return {record:clone(r),shape:clone(view.shape(r)),shots:clone(shots(r.id))};});};
   if(window.JuryStories)JuryStories.records('picturesauto',body);
   return view;
 };

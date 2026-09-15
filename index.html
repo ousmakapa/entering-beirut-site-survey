@@ -905,25 +905,27 @@
   <link rel="stylesheet" href="pictures-auto.css?v=20260914-13">
   <script src="pictures-auto-data.js?v=20260914-13"></script>
   <script src="pictures-auto-view.js?v=20260914-13"></script>
-  <script src="pictures-auto.js?v=20260915-jury1"></script>
+  <script src="pictures-auto.js?v=20260915-buildings1"></script>
   <link rel="stylesheet" href="connections.css?v=20260914-1">
   <script src="connections-data.js?v=20260914-1"></script>
-  <script src="connections.js?v=20260915-jury1"></script>
+  <script src="connections.js?v=20260915-buildings1"></script>
   <link rel="stylesheet" href="people.css?v=20260914-1">
   <script src="people-data.js?v=20260914-1"></script>
-  <script src="people.js?v=20260915-jury1"></script>
+  <script src="people.js?v=20260915-buildings1"></script>
   <link rel="stylesheet" href="daily.css?v=20260914-1">
   <script src="daily-data.js?v=20260914-1"></script>
-  <script src="daily.js?v=20260915-jury1"></script>
+  <script src="daily.js?v=20260915-buildings1"></script>
   <link rel="stylesheet" href="accessibility.css?v=20260915-1">
   <script src="accessibility-data.js?v=20260915-1"></script>
-  <script src="accessibility.js?v=20260915-jury1"></script>
+  <script src="accessibility.js?v=20260915-buildings1"></script>
   <link rel="stylesheet" href="protection.css?v=20260915-1">
   <script src="protection-data.js?v=20260915-1"></script>
-  <script src="protection.js?v=20260915-jury1"></script>
+  <script src="protection.js?v=20260915-buildings1"></script>
   <link rel="stylesheet" href="jury-stories.css?v=20260915-1">
-  <script src="jury-stories-data.js?v=20260915-1"></script>
+  <script src="jury-stories-data.js?v=20260915-buildings1"></script>
   <script src="jury-stories.js?v=20260915-1"></script>
+  <link rel="stylesheet" href="building-map.css?v=20260915-buildings1">
+  <script src="building-map.js?v=20260915-buildings1"></script>
 </head>
 <body>
 
@@ -4272,7 +4274,8 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   })();
 
   /* ---------- tabs ---------- */
-  var currentTab = location.hash === '#protection' ? 'protection' : location.hash === '#accessibility' ? 'accessibility' : location.hash === '#daily' ? 'daily' : location.hash === '#people' ? 'people' : location.hash === '#connections' ? 'connections' : 'history';
+  var requestedTab = location.hash.slice(1);
+  var currentTab = TABS.some(function(t){return t.key === requestedTab;}) ? requestedTab : 'history';
   var tabstrip = document.getElementById('tabstrip');
   var lastGroup = null;
   TABS.forEach(function(t){
@@ -4294,6 +4297,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
 
   function setTab(key){
     currentTab = key;
+    if (location.hash !== '#' + key) history.replaceState(null, '', '#' + key);
     Array.prototype.forEach.call(tabstrip.querySelectorAll('.tab-btn'), function(el){
       el.classList.toggle('active', el.getAttribute('data-key') === key); });
     renderTab(key);
@@ -4303,6 +4307,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   /* The fit, on its own, so a rotation or a window resize can re-run just this rather
      than rebuilding every layer on the map. */
   function fitFor(key){
+    if (window.BuildingMap && BuildingMap.fit(key)) return;
     map.invalidateSize({animate:false});
     if(key==='picturesnew' && window.picturesNew){window.picturesNew.fit();return;}
     if(key==='picturesauto' && window.picturesAuto){window.picturesAuto.fit();return;}
@@ -4431,6 +4436,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
                       section:'section', history:'history'};
     var ov = OVERLAY_OF[key];
     var empty = !!(ov && !SHOW[ov]);
+    if (window.BuildingMap && BuildingMap.keys.includes(key)) empty = false;
     if (empty){
       rows = [{sw:'line', color:'--ink-soft', label:'Legal parcel boundary'},
               {sw:'line', color:'--ink-soft', label:'Surveyed wall line'},
@@ -4786,6 +4792,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       panel.appendChild(emptyP);
     }
     if (window.JuryStories) JuryStories.legacy(key, panel, empty);
+    if (window.BuildingMap) BuildingMap.render(key);
   }
 
   /* exposed for the audit script and for debugging in the console */
@@ -6766,6 +6773,9 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     GAL_URLS = [];
   }
   function drawPictures(){
+    if (window.BuildingMap && window.picturesAuto && currentTab === 'pictures') {
+      paintMissingFilter(); BuildingMap.render('pictures'); return;
+    }
     var g = groups.pictures;
     if (!g) return;
     parcelGeom();
@@ -7779,6 +7789,16 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     map.on('popupclose', releaseURLs);
     map.on('click', function(e){
       if (currentTab !== 'pictures') return;
+      if (window.BuildingMap && document.body.classList.contains('building-map-on')) {
+        var hit = BuildingMap.recordAt([e.latlng.lat,e.latlng.lng]);
+        if (!hit) { if (pendingMedia) alert('This building has no reliable original-record link. Choose the exact existing record before attaching the photo.'); return; }
+        if (pendingMedia) {
+          mediaPlot = hit.id;
+          var itemsForBuilding = pendingMedia; pendingMedia = null;
+          commitMedia(itemsForBuilding, hit.parcel, currentPos()); return;
+        }
+        openFacts(hit.parcel, null, hit.id); return;
+      }
       var c = nearbyParcels(e.latlng.lat, e.latlng.lng, null, 1);
       if (pendingMedia){
         if (!c.length){ alert('No surveyed parcel there \u2014 tap on one.'); return; }
@@ -7853,6 +7873,19 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   if(window.createPicturesAuto && window.PICTURES_AUTO_ADDITIONS){
     window.picturesAuto=window.createPicturesAuto({map:map,group:groups.picturesauto,canvas:L.canvas({padding:.4}),faces:PARCEL_FACES,getPhoto:picGet});
   }
+  if(window.BuildingMap) BuildingMap.configure({map:map,groups:groups,records:function(){return plots;},
+    missingOnly:function(){return picturesMissingOnly;},
+    media:function(){return picMeta;},mediaPopup:picPopupShell,fillGallery:fillGallery,
+    capture:function(r){
+      if (currentTab !== 'pictures' || !pendingMedia || !plotById(r.id)) return false;
+      mediaPlot = r.id; var exactItems = pendingMedia; pendingMedia = null;
+      commitMedia(exactItems, r.parcel, currentPos()); map.closePopup(); return true;
+    },
+    shots:function(id){return screenshotLinks()[id]||[];},fillStrip:fillStrip,getPhoto:picGet,fitPopup:fitOpenPopup,
+    card:function(r,links){return plotCardHTML(r,0,1,links||screenshotLinks());},fieldRows:surveyFieldRows,
+    category:surveyFieldCategory,legend:surveyFieldLegendRows,css:cssVar,go:setTab,
+    title:function(key){return TABS.find(function(t){return t.key===key;}).label;}
+  });
   if(window.createConnections && window.CONNECTIONS_DATA){
     window.connections=window.createConnections({map:map,group:groups.connections});
   }
