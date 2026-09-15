@@ -149,6 +149,7 @@ window.createPicturesNew = function(api){
   el('pn-collapse').onclick=function(){var body=el('pn-body');body.hidden=!body.hidden;this.textContent=body.hidden?'+':'−';};
   el('pn-fit').onclick=function(){var points=[];api.records().filter(matches).forEach(function(r){shape(r).parts.forEach(function(p){points=points.concat(p[0]);});});api.map.fitBounds(points.length?points:(D.site||D.bounds),padding());};
   el('pn-site').onclick=function(){mode=null;clicks=[];guide.clearLayers();api.map.fitBounds(L.latLngBounds(D.site).pad(1),Object.assign({maxZoom:19},padding()));hint('OUR PLOT: original survey outline, locally aligned to the new base using seven matching structures. Approximate display registration, not a certified boundary.');};
+  if(window.JuryStories)JuryStories.records('picturesnew',el('pn-body'));
   return {draw:draw,show:function(on){active=on;panel.hidden=!on;document.body.classList.toggle('pictures-new-on',on);if(on){draw();}else{mode=null;clicks=[];guide.clearLayers();}},
     open:open,shape:shape,cut:cut,fit:function(){el('pn-fit').click();},stats:function(){return {records:api.records().length,visible:Object.keys(display).length,seedKinds:D.seeds,selected:selected,mode:mode};}};
 };

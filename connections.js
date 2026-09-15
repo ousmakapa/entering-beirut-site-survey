@@ -67,6 +67,7 @@ window.createConnections = function(api){
       [[33.9002,35.5432],'COASTAL-SIDE WORK + BUSINESS'],[[33.89745,35.5396],'MIXED FRONTAGES'],[[33.8929,35.5424],'LIVING + SHOPS + WORKSHOPS']
     ].forEach(function(p){L.marker(p[0],{interactive:false,keyboard:false,icon:L.divIcon({className:'cn-area-label',html:esc(p[1]),iconSize:[230,30],iconAnchor:[115,15]})}).addTo(tags);});}
     if(selected&&D.tags.some(t=>t.id===selected&&allowed(t)))highlight(selected);
+    if(window.JuryStories)JuryStories.overview('connections',preset);
     declutter();
   }
   var leaders=L.layerGroup();
@@ -87,7 +88,7 @@ window.createConnections = function(api){
     el('cn-list').querySelectorAll('[data-tag]').forEach(function(e){e.classList.toggle('selected',e.dataset.tag===id);});
   }
   function open(id){var t=D.tags.find(t=>t.id===id);if(!t)return;selected=id;highlight(id);el('cn-detail').innerHTML='<button id="cn-close-detail">← All analysis tags</button><h3>'+esc(t.id+' · '+t.title)+'</h3><p class="cn-status">'+esc(t.status)+'</p><p>'+esc(t.text)+'</p><h4>What to check / design implication</h4><p>'+esc(t.check)+'</p><p class="cn-cites">'+links(t.sources)+'</p>';
-    el('cn-close-detail').onclick=function(){selected=null;focus.clearLayers();el('cn-detail').innerHTML='';highlight(null);};
+    if(window.JuryStories)JuryStories.detail('connections',id,document.getElementById('cn-detail'));el('cn-close-detail').onclick=function(){selected=null;focus.clearLayers();el('cn-detail').innerHTML='';highlight(null);};
     el('cn-body').hidden=false;el('cn-collapse').textContent='−';el('cn-collapse').setAttribute('aria-expanded','true');scrollDetail();
   }
   [['regional','Regional roads'],['local','Local streets'],['crossing','Mapped crossings / stairs'],['destination','Destination tags'],['question','Unresolved connections'],['zones','Study-area shading']].forEach(function(v){
@@ -98,5 +99,6 @@ window.createConnections = function(api){
   el('cn-fit').onclick=fit;el('cn-plot').onclick=function(){api.map.fitBounds(L.latLngBounds(B.site).pad(1.8),Object.assign({animate:false,maxZoom:19},pad()));open('P');};
   el('cn-collapse').onclick=function(){var body=el('cn-body');body.hidden=!body.hidden;this.textContent=body.hidden?'+':'−';this.setAttribute('aria-expanded',String(!body.hidden));};
   api.map.on('zoomend moveend',declutter);
+ if(window.JuryStories)JuryStories.mount('connections',panel);
   return {draw:draw,fit:fit,open:open,show:function(on){active=on;panel.hidden=!on;key.hidden=!on;banner.hidden=!on;document.body.classList.toggle('connections-on',on);if(on){api.map.invalidateSize();draw();}},stats:function(){return {active:active,preset:preset,tags:Object.keys(markers),ways:D.ways.length,selected:selected};}};
 };

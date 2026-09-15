@@ -901,26 +901,29 @@
   <meta name="apple-mobile-web-app-title" content="Entering Beirut">
 <link rel="stylesheet" href="pictures-new.css?v=20260913-1">
   <script src="pictures-new-data.js?v=20260913-3"></script>
-  <script src="pictures-new.js?v=20260913-3"></script>
+  <script src="pictures-new.js?v=20260915-jury1"></script>
   <link rel="stylesheet" href="pictures-auto.css?v=20260914-13">
   <script src="pictures-auto-data.js?v=20260914-13"></script>
   <script src="pictures-auto-view.js?v=20260914-13"></script>
-  <script src="pictures-auto.js?v=20260914-13"></script>
+  <script src="pictures-auto.js?v=20260915-jury1"></script>
   <link rel="stylesheet" href="connections.css?v=20260914-1">
   <script src="connections-data.js?v=20260914-1"></script>
-  <script src="connections.js?v=20260914-1"></script>
+  <script src="connections.js?v=20260915-jury1"></script>
   <link rel="stylesheet" href="people.css?v=20260914-1">
   <script src="people-data.js?v=20260914-1"></script>
-  <script src="people.js?v=20260914-1"></script>
+  <script src="people.js?v=20260915-jury1"></script>
   <link rel="stylesheet" href="daily.css?v=20260914-1">
   <script src="daily-data.js?v=20260914-1"></script>
-  <script src="daily.js?v=20260914-1"></script>
+  <script src="daily.js?v=20260915-jury1"></script>
   <link rel="stylesheet" href="accessibility.css?v=20260915-1">
   <script src="accessibility-data.js?v=20260915-1"></script>
-  <script src="accessibility.js?v=20260915-1"></script>
+  <script src="accessibility.js?v=20260915-jury1"></script>
   <link rel="stylesheet" href="protection.css?v=20260915-1">
   <script src="protection-data.js?v=20260915-1"></script>
-  <script src="protection.js?v=20260915-1"></script>
+  <script src="protection.js?v=20260915-jury1"></script>
+  <link rel="stylesheet" href="jury-stories.css?v=20260915-1">
+  <script src="jury-stories-data.js?v=20260915-1"></script>
+  <script src="jury-stories.js?v=20260915-1"></script>
 </head>
 <body>
 
@@ -4782,6 +4785,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
       emptyP.textContent = 'No sourced context notes for this map — it reads directly from the geometry and your own tagging.';
       panel.appendChild(emptyP);
     }
+    if (window.JuryStories) JuryStories.legacy(key, panel, empty);
   }
 
   /* exposed for the audit script and for debugging in the console */

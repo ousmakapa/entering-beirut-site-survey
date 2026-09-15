@@ -1,0 +1,13 @@
+/* Quiet reading hierarchy for the jury story; no map/data styling changes. */
+.jury-overview h3 {font-size:1.3rem;line-height:1.3;margin:0 0 .85rem;font-weight:650;}
+.jury-overview p,.jury-tag-story p {font-size:1rem;line-height:1.65;margin:0 0 .9rem;}
+.jury-panel .jury-overview {padding:.2rem 0 .6rem;}
+.jury-more,.jury-view-detail,.jury-tag-list,.jury-record-intro {border-top:1px solid #cbd1cc;padding:.8rem 0;margin:.7rem 0;}
+.jury-more>summary,.jury-view-detail>summary,.jury-tag-list>summary,.jury-record-intro>summary {cursor:pointer;font-weight:600;font-size:.9rem;line-height:1.5;}
+.jury-more[open]>summary,.jury-view-detail[open]>summary,.jury-tag-list[open]>summary,.jury-record-intro[open]>summary {margin-bottom:.9rem;}
+.jury-panel:has(.jury-tag-story) [id$="-summary"] {display:none;}
+.jury-tag-story {margin-top:.8rem;}
+.jury-legacy-note {border-left:3px solid #ac7838;padding-left:.8rem;}
+#facts-panel>.jury-overview {padding-top:.3rem;}
+.jury-record-intro {padding:.7rem .4rem;}
+@media(max-width:700px){.jury-overview h3{font-size:1.14rem;}.jury-overview p,.jury-tag-story p{font-size:.94rem;line-height:1.55;}}
