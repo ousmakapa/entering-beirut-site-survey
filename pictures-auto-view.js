@@ -128,14 +128,14 @@ window.createPicturesAutoView = function(api){
         .on('click',function(e){if(mode){mapClick(e);return;}open(r.id,false);}).addTo(records);
       display[r.id]=layer;
       var pos=s.anchor||layer.getBounds().getCenter(),text=(r.autoCreated?'A'+r.autoNumber:r.storeys?r.storeys+'F':'•')+(['schematic','approximate-outline','schematic-rectangle'].includes(s.kind)?'≈':'');
-      markers[r.id]=L.marker(pos,{icon:L.divIcon({className:'pa-badge pa-building-tag',html:'<span data-record="'+esc(r.id)+'">'+esc(text)+'</span>',iconSize:[28,22],iconAnchor:[14,11]}),zIndexOffset:2000,bubblingMouseEvents:false})
+      markers[r.id]=ArchitecturalMap.label(pos,text,{height:4.5,box:true,className:'pa-building-tag',dataRecord:r.id})
         .on('click',function(e){if(mode){mapClick(e);return;}open(r.id,false);}).addTo(records);
       }else if(r.autoEvidence&&r.autoEvidence.tagAnchor){
-        markers[r.id]=L.marker(r.autoEvidence.tagAnchor.at,{icon:L.divIcon({className:'pa-badge pa-building-tag pa-approximate',html:'<span data-record="'+esc(r.id)+'">A'+esc(r.autoNumber)+'≈</span>',iconSize:[40,22],iconAnchor:[20,11]}),zIndexOffset:2100,bubblingMouseEvents:false})
+        markers[r.id]=ArchitecturalMap.label(r.autoEvidence.tagAnchor.at,'A'+r.autoNumber+'≈',{height:4.5,box:true,color:'#9c651f',className:'pa-approximate',dataRecord:r.id})
           .bindTooltip(title(r)+' — approximate frontage position; click for its screenshot')
           .on('click',function(e){if(mode){mapClick(e);return;}open(r.id,false);}).addTo(records);
       }else if(r.autoEvidence&&r.autoEvidence.location&&r.autoEvidence.location.type!=='camera-reference'){
-        markers[r.id]=L.marker(r.autoEvidence.location.at,{icon:L.divIcon({className:'pa-frontage',html:'<span>F</span>',iconSize:[26,26],iconAnchor:[13,13]}),zIndexOffset:2100,bubblingMouseEvents:false})
+        markers[r.id]=ArchitecturalMap.label(r.autoEvidence.location.at,'F',{height:4.5,box:true,color:'#9c651f'})
           .bindTooltip('Frontage reference only — building boundary unresolved')
           .on('click',function(e){if(mode){mapClick(e);return;}open(r.id,false);}).addTo(records);
       }
@@ -148,7 +148,7 @@ window.createPicturesAutoView = function(api){
     el('pa-count').textContent+=(visits.length?' · '+visits.length+' manual visit targets (not cards)':'');
     if(el('pa-filter').value==='manual')el('pa-count').textContent=visits.length+' manual visit targets · 0 counted as documented · '+rr.length+' existing cards preserved';
     visits.forEach(function(v){
-      L.marker(v.at,{icon:L.divIcon({className:'pa-badge pa-manual-tag',html:'<span data-manual="'+esc(v.id)+'">'+esc(v.label)+'</span>',iconSize:[34,24],iconAnchor:[17,12]}),zIndexOffset:2200,bubblingMouseEvents:false})
+      ArchitecturalMap.label(v.at,v.label,{height:4.5,box:true,color:'#a35c20',fill:'#fff4df',className:'pa-manual-tag',dataManual:v.id})
         .bindTooltip(v.label+' — manual visit needed; no street-level evidence linked')
         .on('click',function(){openManual(v.id,false);}).addTo(records);
       var row=document.createElement('button');row.className='pa-row pa-manual-row';row.dataset.manual=v.id;
@@ -160,6 +160,7 @@ window.createPicturesAutoView = function(api){
     reference.clearLayers();
     if(el('pa-context').checked){var ids=new Set(D.layout&&D.layout.hiddenBuildingIds||[]);D.buildings.filter(function(b){return ids.has(b.id);}).forEach(function(b){L.polygon(b.rings,{color:'#a58eae',weight:1,fill:false,dashArray:'2 6',interactive:false,renderer:api.canvas}).addTo(reference);});reference.addTo(api.group);}
     else api.group.removeLayer(reference);
+    ArchitecturalMap.scalePaths(api.map,records,18);
   }
   function open(id,zoom){
     var r=api.record(id);if(!r)return;selected=id;mode=null;clicks=[];guide.clearLayers();draw();

@@ -26,8 +26,9 @@ window.JuryStories=(()=>{
   host.replaceChildren(story(D.maps[name]));host.dataset.explanation=name;
  }
  function detail(name,id,container){
+  if(window.ArchitecturalMap)ArchitecturalMap.select(name,id);
   const data=datasets()[name],t=data?.tags.find(t=>t.id===id);if(!t||!container)return;
-  const button=container.querySelector(':scope > button');if(button){button.textContent='Close selected evidence';button.addEventListener('click',()=>{container.closest('.jury-panel').scrollTop=0;});}
+  const button=container.querySelector(':scope > button');if(button){button.textContent='Close selected evidence';button.addEventListener('click',()=>{if(window.ArchitecturalMap)ArchitecturalMap.select(name,null);container.closest('.jury-panel').scrollTop=0;});}
   const box=document.createElement('section');box.className='jury-tag-evidence';
   box.innerHTML='<h4>'+escape(t.id+' · '+t.title)+'</h4><p>'+escape(t.fact||t.text||'Mapped research location; interpretation remains provisional.')+'</p>';
   const check=t.check||t.test;if(check){const d=document.createElement('p');d.className='jury-evidence-limit';d.textContent='Still to check: '+check;box.append(d);}

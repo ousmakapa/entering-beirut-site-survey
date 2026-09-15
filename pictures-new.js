@@ -70,7 +70,7 @@ window.createPicturesNew = function(api){
         .on('click',function(e){if(mode){mapClick(e);return;}open(r.id,false);}).addTo(records);
       display[r.id]=layer;
       var pos=s.anchor||layer.getBounds().getCenter(),text=r.storeys?r.storeys+'F':'•';
-      markers[r.id]=L.marker(pos,{icon:L.divIcon({className:'pn-badge',html:'<span>'+esc(text)+'</span>',iconSize:[28,22],iconAnchor:[14,11]}),zIndexOffset:2000,bubblingMouseEvents:false})
+      markers[r.id]=ArchitecturalMap.label(pos,text,{height:4.5,box:true,className:'pn-badge',dataRecord:r.id})
         .on('click',function(e){if(mode){mapClick(e);return;}open(r.id,false);}).addTo(records);
       }
       var button=document.createElement('button');button.className='pn-row'+(selected===r.id?' selected':'');button.dataset.record=r.id;
@@ -80,6 +80,7 @@ window.createPicturesNew = function(api){
     });
     if(el('pn-old').checked){old.clearLayers();(D.alignedFaces||[]).forEach(function(g){L.polygon(g,{color:'#A64138',weight:1,fill:false,dashArray:'3 5',interactive:false,renderer:api.canvas}).addTo(old);});old.addTo(api.group);}
     else api.group.removeLayer(old);
+    ArchitecturalMap.scalePaths(api.map,records,18);
   }
   function open(id,zoom){
     var r=api.record(id);if(!r)return;selected=id;mode=null;clicks=[];guide.clearLayers();draw();

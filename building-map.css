@@ -12,3 +12,5 @@
 .bm-controls{display:flex;gap:8px;margin-top:8px}.bm-controls label{font-size:11px}.bm-controls select{display:block;max-width:180px;padding:6px;background:white;border:1px solid #bac7bf}
 .bm-coverage{margin-top:16px;font-size:12px;line-height:1.55}.bm-coverage summary{cursor:pointer}.bm-coverage button{display:block;max-width:100%;margin:6px 0;background:white;border:1px solid #c1cec7;padding:7px;text-align:left;color:#29443e}
 .bm-proof figure{margin:8px 0}.bm-proof img{display:block;width:100%;height:auto}.bm-proof figcaption{font-size:10px;line-height:1.4;color:#526870;margin-top:3px}
+.auto-attributes{border-top:1px solid #b7c6bd;margin:12px 0;padding:8px 0}.auto-attributes h4{margin:4px 0;font-size:14px}.auto-attribute-row{display:grid;gap:4px;margin:12px 0;font-size:13px;line-height:1.45}.auto-attribute-row small{font-size:11px;color:#526870}.pa-collection-notes{margin:12px 0}.pa-collection-notes summary{cursor:pointer;font-size:13px}.bm-tag.partial span{border-style:dashed;color:#526870}.bm-tag.unknown span{color:#6d7a7f}
+@media(max-width:760px){.building-map-on .tb-right{max-width:100%;flex-wrap:wrap}}

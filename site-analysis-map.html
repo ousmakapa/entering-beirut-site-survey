@@ -901,31 +901,34 @@
   <meta name="apple-mobile-web-app-title" content="Entering Beirut">
 <link rel="stylesheet" href="pictures-new.css?v=20260913-1">
   <script src="pictures-new-data.js?v=20260913-3"></script>
-  <script src="pictures-new.js?v=20260915-jury1"></script>
+  <script src="pictures-new.js?v=20260916-drawing1"></script>
   <link rel="stylesheet" href="pictures-auto.css?v=20260914-13">
   <script src="pictures-auto-data.js?v=20260914-13"></script>
-  <script src="pictures-auto-view.js?v=20260914-13"></script>
-  <script src="pictures-auto.js?v=20260915-buildings1"></script>
+  <script src="pictures-auto-view.js?v=20260916-drawing1"></script>
+  <script src="pictures-auto-attributes.js?v=20260915-review1"></script>
+  <script src="pictures-auto.js?v=20260915-review1"></script>
   <link rel="stylesheet" href="connections.css?v=20260914-1">
   <script src="connections-data.js?v=20260914-1"></script>
-  <script src="connections.js?v=20260915-buildings1"></script>
+  <script src="connections.js?v=20260916-drawing1"></script>
   <link rel="stylesheet" href="people.css?v=20260914-1">
   <script src="people-data.js?v=20260914-1"></script>
-  <script src="people.js?v=20260915-buildings1"></script>
+  <script src="people.js?v=20260916-drawing1"></script>
   <link rel="stylesheet" href="daily.css?v=20260914-1">
   <script src="daily-data.js?v=20260914-1"></script>
-  <script src="daily.js?v=20260915-single1"></script>
+  <script src="daily.js?v=20260916-drawing1"></script>
   <link rel="stylesheet" href="accessibility.css?v=20260915-1">
   <script src="accessibility-data.js?v=20260915-1"></script>
-  <script src="accessibility.js?v=20260915-buildings1"></script>
+  <script src="accessibility.js?v=20260916-drawing1"></script>
   <link rel="stylesheet" href="protection.css?v=20260915-1">
   <script src="protection-data.js?v=20260915-1"></script>
-  <script src="protection.js?v=20260915-buildings1"></script>
+  <script src="protection.js?v=20260916-drawing1"></script>
   <link rel="stylesheet" href="jury-stories.css?v=20260915-single1">
   <script src="jury-stories-data.js?v=20260915-single1"></script>
-  <script src="jury-stories.js?v=20260915-single1"></script>
-  <link rel="stylesheet" href="building-map.css?v=20260915-buildings1">
-  <script src="building-map.js?v=20260915-single1"></script>
+  <script src="jury-stories.js?v=20260916-drawing1"></script>
+  <link rel="stylesheet" href="building-map.css?v=20260915-review1">
+  <script src="building-map.js?v=20260916-drawing1"></script>
+  <script src="architectural-map.js?v=20260916-drawing1"></script>
+  <link rel="stylesheet" href="architectural-map.css?v=20260916-drawing1">
 </head>
 <body>
 
@@ -4275,10 +4278,13 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
 
   /* ---------- tabs ---------- */
   var requestedTab = location.hash.slice(1);
+  // Retired presentation only. Original roof observations remain in records and exports.
+  if(requestedTab==='surveychange'){requestedTab='surveystoreys';history.replaceState(null,'','#surveystoreys');}
   var currentTab = TABS.some(function(t){return t.key === requestedTab;}) ? requestedTab : 'history';
   var tabstrip = document.getElementById('tabstrip');
   var lastGroup = null;
   TABS.forEach(function(t){
+    if(t.key==='surveychange')return;
     if (t.group && t.group !== lastGroup){
       var sep = document.createElement('span');
       sep.className = 'tab-group';
@@ -4296,6 +4302,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   });
 
   function setTab(key){
+    if(key==='surveychange')key='surveystoreys';
     currentTab = key;
     if (location.hash !== '#' + key) history.replaceState(null, '', '#' + key);
     Array.prototype.forEach.call(tabstrip.querySelectorAll('.tab-btn'), function(el){
