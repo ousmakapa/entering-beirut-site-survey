@@ -31,6 +31,12 @@ window.ArchitecturalMap=(function(){
  }
  function context(svg,m,zones,colors,unit){const g=el('g',{'data-role':'building-aligned-study-context'});svg.appendChild(g);zones.forEach((z,i)=>{m.features.filter(f=>BuildingMap.contains(f.at,[z.ring])).forEach(f=>g.appendChild(el('path',{d:geoPath(f.rings),fill:colors[i],opacity:.18,stroke:colors[i],'stroke-width':unit*.25,'data-context-building':f.id})));});}
  function roads(svg,ids,col,width,dash){ids.forEach(id=>{const w=CONNECTIONS_DATA.ways.find(w=>w.id===id);if(w){const p=el('path',{d:geoPath(w.lines,false),fill:'none',stroke:col,'stroke-width':width,'stroke-linecap':'round','data-role':'named-source-street','data-source-way':id});if(dash)p.setAttribute('stroke-dasharray',dash);svg.appendChild(p);}});}
+ function streetNetwork(svg,arrivalOnly=false){
+  const g=el('g',{'data-combined-layer':arrivalOnly?'access-traces':'street-hierarchy'});svg.appendChild(g);
+  CONNECTIONS_DATA.ways.forEach(w=>{const h=w.tags.highway,walk=/^(footway|steps|path|pedestrian)$/.test(h);if(arrivalOnly&&!walk)return;const major=/^(motorway|trunk|primary)/.test(h),col=walk?palette.walk:major?palette.road:palette.local;
+   g.appendChild(el('path',{d:geoPath(w.lines,false),fill:'none',stroke:col,'stroke-width':arrivalOnly?1.4:major?3:walk?1.4:1.1,opacity:arrivalOnly?.55:.55,'data-source-way':w.id,'data-street-class':walk?'footway-steps':major?'regional':'local'}));
+  });
+ }
  function commonRoads(svg,unit,options={}){roads(svg,[200611932,237737315,692409629],options.highway||palette.road,unit*3);roads(svg,[26316545,692400343],palette.road,unit*2);roads(svg,[275315121],options.local||palette.local,unit*2.6,options.dash);roads(svg,[306996681,715531021],options.local||palette.local,unit*2.3,options.dash);roads(svg,[701135687,701135688,270786366,1069243892,1069243890,1069243891],palette.walk,unit*3.3);roads(svg,[452148075,452148076],palette.local,unit*2.2);}
  function site(svg,unit){const g=el('g',{'data-role':'project-site'});g.appendChild(el('path',{d:geoPath([PICTURES_NEW_DATA.site]),fill:'#efdc91',stroke:palette.ink,'stroke-width':unit*2,'fill-opacity':.88}));svg.appendChild(g);return g;}
  function refs(parent,ids,p,size,col,state){ids.forEach((id,i)=>{const t=state.tags.find(t=>t.id===id);if(!t)return;text(parent,[p[0]+i*size*3.6,p[1]],id,size,col,{class:'arch-ref','data-evidence':id,'aria-label':id+' · '+t.title});});}
@@ -44,6 +50,7 @@ window.ArchitecturalMap=(function(){
  function titleAt(svg,p,s,size,col){text(svg,p,s,size,col,{'font-weight':650,'letter-spacing':size*.035});}
  function north(svg,f,size){const x=f[0]+f[2]-size*2,y=f[1]+size*3;arrow(svg,[x,y+size*2.5],[x,y],palette.ink,size*.7,size*.16);text(svg,[x,y-size*.5],'N',size,palette.ink,{'text-anchor':'middle'});}
  function urban(state){const {svg,size,key}=state,u=2.2,m=base(svg,u);if(key==='connections')context(svg,m,CONNECTIONS_DATA.zones,[palette.north,palette.work,palette.home],u);else context(svg,m,(key==='people'?PEOPLE_DATA:DAILY_DATA).zones,[palette.home,palette.work,palette.north,palette.water],u);
+  if(key==='connections')streetNetwork(svg);
   commonRoads(svg,u);site(svg,u);titleAt(svg,[-21,-8],'OUR PLOT',size*.82,palette.ink);titleAt(svg,[-590,60],'BEIRUT RIVER',size*.85,palette.water);
   if(key==='connections'){
    callout(state,['Q1'],[280,-570],'SHORELINE IS FURTHER NORTH','No continuous waterfront route established','check',palette.grey);
@@ -76,7 +83,7 @@ window.ArchitecturalMap=(function(){
    const x=-180,y=505;['MORNING','WORKING DAY','EVENING / REST'].forEach((s,i)=>{const xx=x+i*225;if(i<2)arrow(svg,[xx+9,y],[xx+207,y],palette.grey,7,1.2);svg.appendChild(el('circle',{cx:xx,cy:y,r:6,fill:[palette.work,palette.home,palette.north][i]}));text(svg,[xx,y+23],s,12,palette.ink);});text(svg,[x,y+46],'Sequence to investigate · no measured hourly flows',11,palette.grey);
   }
  }
- function accessibility(state){const {svg,size}=state,u=1.5;base(svg,u);commonRoads(svg,u,{highway:'#c0b5ac',local:palette.local,dash:'10 5'});site(svg,u);titleAt(svg,[-26,-12],'OUR PLOT',size*.78,palette.ink);
+ function accessibility(state){const {svg,size}=state,u=1.5;base(svg,u);streetNetwork(svg,true);commonRoads(svg,u,{highway:'#c0b5ac',local:palette.local,dash:'10 5'});site(svg,u);titleAt(svg,[-26,-12],'OUR PLOT',size*.78,palette.ink);
   // Steps are the mapped geometry, not generic crossing dots.
   [270786366,701135688,1069243890,1069243891].forEach(id=>{const w=CONNECTIONS_DATA.ways.find(w=>w.id===id);if(w)w.lines.forEach(r=>{const pts=r.map(project);for(let i=1;i<pts.length;i++){const a=pts[i-1],b=pts[i],t=Math.atan2(b[1]-a[1],b[0]-a[0]),len=Math.hypot(b[0]-a[0],b[1]-a[1]);for(let d=0;d<len;d+=4){const x=a[0]+d*Math.cos(t),y=a[1]+d*Math.sin(t);line(svg,[[x-4*Math.sin(t),y+4*Math.cos(t)],[x+4*Math.sin(t),y-4*Math.cos(t)]],palette.walk,1.4);}}});});
   callout(state,['X5','X12'],[85,-209],'NORTH · STREET 80',['Same-side approach / loading interface','Pavements and driveways need checking'],'road',palette.local);
@@ -122,6 +129,8 @@ window.ArchitecturalMap=(function(){
   const keybox=document.getElementById(key+'-key');if(keybox){keybox.innerHTML='<b>'+({connections:'Reading the connections',people:'Reading the neighbours',daily:'Reading the day',accessibility:'Reading the arrival',protection:'Reading the pressures'})[key]+'</b><small>'+({connections:'Colour follows mapped streets and bridges. Building tint groups context, not individual use.',people:'Building tint groups study areas, not population. Possible users and reasons to visit need testing.',daily:'The sequence describes questions, not measured activity or confirmed opening hours.',accessibility:'Stair strokes show mapped steps. Dashed roads are approaches to check, not certified accessible routes.',protection:'Waves: sound source · dots: emissions source<br>Rays: sun test · arrows: airflow cases<br>No measured exposure, plume or flood extent.'})[key]+'</small><span class="arch-key-note">Fine grey lines connect notes to locations; they are not routes. Small references open the evidence.</span>';}
   const caption=document.getElementById(key+'-caption');if(caption)caption.innerHTML='<span class="arch-sheet-heading">Bourj Hammoud <i>/</i> '+({connections:'Connections across the highway',people:'Neighbours around our plot',daily:'The plot through the day',accessibility:'From the neighbourhood to our door',protection:'Shelter at the highway edge'})[key]+'</span><span class="arch-sheet-source"><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a> · corrected building base · interpretative study</span>';
   if(keybox)keybox.querySelector('.arch-key-note').textContent='Fine grey lines connect notes to locations; they are not routes. Drawing labels are static. Supporting research remains in the right panel.';
+  if(keybox&&key==='connections'){keybox.querySelector('b').textContent='CONNECTIONS & STREETS';keybox.querySelector('small').innerHTML='<span style="color:#a05843">Rust · regional roads</span><br><span style="color:#267e78">Teal · local streets</span><br><span style="color:#a33867">Rose · footways / mapped steps</span><br>Line weight shows hierarchy, not measured road width or traffic volume. Building tint is context, not individual use.';}
+  if(keybox&&key==='accessibility')keybox.querySelector('b').textContent='ARRIVAL & ACCESSIBILITY';
   window.ARCHITECTURAL_MAP_AUDIT={key,tagIds:[...svg.querySelectorAll('[data-evidence]')].map(n=>n.getAttribute('data-evidence')),featureIds:[...svg.querySelectorAll('[data-bm-id]')].map(n=>n.getAttribute('data-bm-id')),frame:f.slice(),fixed:true};return true;
  }
  function roadNames(svg,f,size){

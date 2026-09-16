@@ -1,0 +1,6 @@
+.workspace.winddiagram-mode{grid-template-columns:1fr;grid-template-areas:"map";}
+.workspace.winddiagram-mode .facts-panel{display:none!important;}
+.workspace.winddiagram-mode .map-shell>:not(.winddiagram-view){visibility:hidden;pointer-events:none;}
+.winddiagram-view .sa-sheet header>span,.winddiagram-view .sa-kicker{color:#54808a;}
+.winddiagram-view .sa-sheet footer{color:#647a7d;}
+@media(max-width:900px){.winddiagram-on .tb-right{max-width:100%;overflow-x:auto;}}

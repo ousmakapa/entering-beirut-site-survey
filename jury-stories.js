@@ -10,6 +10,8 @@ window.JuryStories=(()=>{
  function archive(nodes){const e=document.createElement('div');e.className='jury-preserved';e.hidden=true;e.inert=true;nodes.forEach(n=>e.append(n));e.querySelectorAll('input,select,button').forEach(n=>n.disabled=true);return e;}
  function mount(name,panel){
   if(!panel||panel.dataset.juryMounted)return;panel.dataset.juryMounted='single';panel.classList.add('jury-panel');
+  const combined={connections:'Connections & Streets',accessibility:'Arrival & Accessibility'};
+  if(combined[name]){panel.querySelector('header h2').textContent=combined[name];const sub=panel.querySelector('header small');if(sub)sub.textContent=name==='connections'?'Street hierarchy, crossings and destinations':'From street and crossing to our entrance';}
   const pre=prefixes[name],body=panel.querySelector('#'+pre+'-body');if(!body)return;
   let host=body.querySelector('#'+pre+'-summary');if(!host){host=document.createElement('div');host.id=pre+'-summary';}
   const actions=body.querySelector('.'+pre+'-actions'),detail=body.querySelector('#'+pre+'-detail'),list=body.querySelector('#'+pre+'-list');

@@ -905,7 +905,7 @@
   <link rel="stylesheet" href="pictures-auto.css?v=20260914-13">
   <script src="pictures-auto-data.js?v=20260914-13"></script>
   <script src="pictures-auto-view.js?v=20260916-drawing1"></script>
-  <script src="pictures-auto-attributes.js?v=20260915-review1"></script>
+  <script src="pictures-auto-attributes.js?v=20260916-review2"></script>
   <script src="pictures-auto.js?v=20260915-review1"></script>
   <link rel="stylesheet" href="connections.css?v=20260914-1">
   <script src="connections-data.js?v=20260914-1"></script>
@@ -923,11 +923,15 @@
   <script src="protection-data.js?v=20260915-1"></script>
   <script src="protection.js?v=20260916-drawing1"></script>
   <link rel="stylesheet" href="jury-stories.css?v=20260915-single1">
-  <script src="jury-stories-data.js?v=20260915-single1"></script>
-  <script src="jury-stories.js?v=20260916-drawing1"></script>
+  <script src="jury-stories-data.js?v=20260916-combined1"></script>
+  <script src="jury-stories.js?v=20260916-combined1"></script>
   <link rel="stylesheet" href="building-map.css?v=20260915-review1">
-  <script src="building-map.js?v=20260916-cad2"></script>
-  <script src="architectural-map.js?v=20260916-cad2"></script>
+  <script src="building-map.js?v=20260916-combined1"></script>
+  <script src="architectural-map.js?v=20260916-combined1"></script>
+  <link rel="stylesheet" href="sun-axon.css?v=20260916-1">
+  <script src="sun-axon.js?v=20260916-2"></script>
+  <link rel="stylesheet" href="wind-diagram.css?v=20260916-1">
+  <script src="wind-diagram.js?v=20260916-1"></script>
   <link rel="stylesheet" href="architectural-map.css?v=20260916-cad2">
 </head>
 <body>
@@ -1471,6 +1475,8 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     {key:'access', label:'Access & Arrival', short:'Access', group:'MOVEMENT', color:'var(--layer-movement)', blurb:'How anyone actually reaches the plot. Every distance is measured on the survey to the layer-0 plot edge, and every walk is routed through the derived public space rather than drawn straight. The finding: the <b>nearest</b> arrival on paper — the bridge’s north landing at 75.4 m — sits <b>29.2 m</b> from any public space, so there is no walking route to it at all. The bus stop, at 74.3 m straight and <b>83.7 m</b> on foot, is the closest real approach.'},
     {key:'noise', label:'The Corridor', short:'Corridor', group:'MOVEMENT', color:'var(--layer-environmental)', blurb:'The widest continuous public space in the survey — one connected 32,853 m² piece, up to 54.5 m across. The plot’s south side lies along 100% of its length. The survey gives it no name; that it is the Charles Helou axis comes from the brief, not from this drawing. Distance bands are a geometric model from the surveyed edge, not a measured noise reading.'},
     {key:'sun', label:'Sun & Shadow', short:'Sun', group:'ANALYSIS', color:'var(--layer-landuse)', blurb:'Solar geometry computed for this site\u2019s latitude (33.90\u00b0 N) and drawn against the plot\u2019s own surveyed bearings. Nothing here comes from another map \u2014 it is the sun and the plot.'},
+    {key:'sunaxon', label:'Sun / Axonometric', short:'Sun · 3D', group:'ANALYSIS', color:'var(--layer-landuse)', blurb:'Seasonal sun paths over the same building footprints; estimated masses, not measured heights.'},
+    {key:'winddiagram', label:'Wind / Site Diagram', short:'Wind · Diagram', group:'ANALYSIS', color:'#54808a', blurb:'Incoming direction cases on our actual building plan; not measured airflow.'},
     {key:'wind', label:'Wind & Air', short:'Wind', group:'ANALYSIS', color:'var(--layer-movement)', blurb:'Prevailing wind by season, plotted against the plot\u2019s own surveyed axis to find the cross-ventilation line. The directions are station data for Beirut, not a site measurement \u2014 the geometry they are drawn against is the survey.'},
     {key:'story', label:'Nesting', short:'Story', group:'ANALYSIS', color:'var(--accent)', blurb:'The selected site-to-building concept, read as a narrative rather than another map.'}
   ];
@@ -1498,6 +1504,10 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   TABS.splice(TABS.findIndex(function(t){return t.key==='accessibility';})+1,0,
     {key:'protection',label:'Protection',short:'Protection',group:'ANALYSIS',color:'#876546',
      blurb:'Six separate investigations: noise, air, sun/heat, wind, rain/ground and traffic/visual exposure. Research stations and design tests, not measured hazard zones.'});
+  // Only the three explicitly approved overlaps are combined. Keep all source groups.
+  var COMBINED_TABS={edges:'siteplot',streets:'connections',access:'accessibility'};
+  var COMBINED_TITLES={siteplot:'Our Plot & Edges',connections:'Connections & Streets',accessibility:'Arrival & Accessibility'};
+  TABS.forEach(function(t){if(COMBINED_TITLES[t.key])t.label=t.short=COMBINED_TITLES[t.key];});
   var map = L.map('map', {zoomControl:true, attributionControl:false,
     /* zoomSnap 0.25 keeps fitBounds nearly exact while cutting the number of distinct
        renders a wheel gesture triggers; 0 made every pixel of scroll a fresh redraw. */
@@ -4278,13 +4288,14 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
 
   /* ---------- tabs ---------- */
   var requestedTab = location.hash.slice(1);
+  if(COMBINED_TABS[requestedTab]){requestedTab=COMBINED_TABS[requestedTab];history.replaceState(null,'','#'+requestedTab);}
   // Retired presentation only. Original roof observations remain in records and exports.
   if(requestedTab==='surveychange'){requestedTab='surveystoreys';history.replaceState(null,'','#surveystoreys');}
   var currentTab = TABS.some(function(t){return t.key === requestedTab;}) ? requestedTab : 'history';
   var tabstrip = document.getElementById('tabstrip');
   var lastGroup = null;
   TABS.forEach(function(t){
-    if(t.key==='surveychange')return;
+    if(t.key==='surveychange'||COMBINED_TABS[t.key])return;
     if (t.group && t.group !== lastGroup){
       var sep = document.createElement('span');
       sep.className = 'tab-group';
@@ -4302,6 +4313,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   });
 
   function setTab(key){
+    key=COMBINED_TABS[key]||key;
     if(key==='surveychange')key='surveystoreys';
     currentTab = key;
     if (location.hash !== '#' + key) history.replaceState(null, '', '#' + key);
@@ -4314,6 +4326,8 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   /* The fit, on its own, so a rotation or a window resize can re-run just this rather
      than rebuilding every layer on the map. */
   function fitFor(key){
+    if(key==='sunaxon' && window.SunAxon){SunAxon.fit();return;}
+    if(key==='winddiagram' && window.WindDiagram){WindDiagram.fit();return;}
     if (window.BuildingMap && BuildingMap.fit(key)) return;
     map.invalidateSize({animate:false});
     if(key==='picturesnew' && window.picturesNew){window.picturesNew.fit();return;}
@@ -4376,6 +4390,16 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     workspace.classList.toggle('story-mode', storyOn);
     mapShell.classList.toggle('story-open', storyOn);
     storyView.hidden = !storyOn;
+    if(window.SunAxon) SunAxon.show(key==='sunaxon');
+    if(window.WindDiagram) WindDiagram.show(key==='winddiagram');
+    if(key==='sunaxon'||key==='winddiagram'){
+      lastTab=key;
+      setPicturesMode(false);
+      try { map.closePopup(); } catch(e) {}
+      Object.keys(groups).forEach(function(k){ map.removeLayer(groups[k]); });
+      if(window.BuildingMap) BuildingMap.render(key);
+      return;
+    }
     if (storyOn){
       lastTab = key;
       setPicturesMode(false);

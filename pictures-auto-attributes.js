@@ -3,7 +3,7 @@
    A visible level count is not necessarily the total number of floors. */
 window.AutoAttributes=(function(){
  'use strict';
- const version='2026-09-15-review1', reviewedOn='2026-09-15';
+ const version='2026-09-16-review2', reviewedOn='2026-09-16';
  const total=(value,basis)=>({value,kind:'estimate',basis});
  const minimum=(value,basis)=>({value,kind:'minimum',basis});
  const ground=(values,basis)=>({values:Array.isArray(values)?values:[values],basis});
@@ -17,7 +17,7 @@ window.AutoAttributes=(function(){
   'auto30-26':{sourceId:'auto-26-white-balcony-infill',storeys:total(4,'Ground level plus three upper window/balcony bands on the narrow white infill. The lightweight roof canopy is excluded.'),upper:upper('residential','Repeated domestic-scale windows and small balconies suggest homes above; occupancy is not verified.')},
   'auto30-27':{sourceId:'auto-27-grey-rounded-tower',storeys:total(8,'Ground and seven repeated upper facade levels can be followed to the roof. This remains an exterior estimate.'),limits:'Forecourt cars and glazing do not establish the building use.'},
   'auto30-28':{sourceId:'auto-28-junction-low-service-block',storeys:total(1,'One low flat-roofed volume with doors and a high vent band; internal mezzanines cannot be seen.'),limits:'The closed doors do not identify a shop, workshop or utility use.'},
-  'auto30-29':{sourceId:'auto-29-salmon-balcony-lane',storeys:minimum(4,'At least four facade levels including ground are visible; the top is not fully resolved.'),upper:upper('residential','Laundry on the upper balcony and domestic balconies support a residential reading above. Ground use is not identified.')},
+  'auto30-29':{sourceId:'auto-29-salmon-balcony-lane',reviewedOn:'2026-09-16',storeys:minimum(4,'At least four facade levels including ground are visible; the top is not fully resolved.'),ground:ground('Residential entrance','A pedestrian gate leads to a recessed glazed domestic entrance beneath the laundry balconies. Visual interpretation / VERIFY: this identifies an entrance, not every ground-floor room.'),upper:upper('residential','Laundry on the upper balcony and domestic balconies support a residential reading above; occupancy remains unverified.')},
   'auto30-30':{sourceId:'auto-30-exposed-upper-bay',storeys:total(2,'Ground shutters and one open upper structural level are visible. The unfinished upper level is counted, not assumed occupied.'),change:'An exposed upper structural bay is visible. This is not proof of spare structural capacity or a dated added floor.'},
   'auto30-32':{sourceId:'auto-32-ochre-projecting-balconies',storeys:minimum(3,'Ground and two upper projecting balcony levels are visible; the roof is outside the frame.'),upper:upper('residential','Domestic-scale balconies, windows and external air-conditioning suggest homes above; verify occupancy.')},
   'auto30-33':{sourceId:'auto-33-yellow-glazed-roof-lane',storeys:total(3,'Ground, the broad middle window band and the glazed top enclosure form three visible levels.'),green:{value:'shrubs',basis:'Small planted shrubs are visible in the narrow fenced frontage. Coverage, ownership and access are unknown.'},change:'A glazed top enclosure is visible. Its construction date and whether it was a later addition remain unknown.'},
@@ -51,7 +51,14 @@ window.AutoAttributes=(function(){
   'auto-side-70':{sourceId:'angle-70-m24-high-cafe-tower',storeys:minimum(6,'Ground frontage and at least five upper window bands are visible; the tower roof is outside the frame and the podium may include a mezzanine.'),ground:ground('Café / restaurant','HIGH CAFE is signed at the street-level entrance.'),limits:'The cafe sign identifies the ground frontage only, not the tower’s upper use or total floors.'},
   'auto-side-71':{sourceId:'angle-71-m36-church-side',use:{value:'institutional',basis:'Cross, church form and worship-building exterior support a religious/institutional building reading. Identity and public opening hours are not inferred.'},ground:ground('Other','Religious worship building, read from the church exterior. Other means worship, not retail.'),limits:'A nave, drum and spire are not ordinary stacked storeys. Storey count remains TBD.'},
   'auto-side-72':{sourceId:'angle-72-m35-rear-tower-above-church',storeys:minimum(3,'At least three upper window-band levels of the rear tower are visible above the church; the lower tower is hidden.'),limits:'Do not infer total floors, office use or institutional ownership from this partial rear view.'},
-  'auto-side-73':{sourceId:'angle-73-m43-long-white-side',storeys:total(3,'The visible white corner shows a ground frontage and two long upper window bands below the roof.'),ground:ground('Shops','Street-level shop signs and separate storefront openings are visible along the white building; exact tenants are not legible.'),limits:'Oblique view: verify the ground retail interpretation. Upper bands do not prove school or office use.'}
+  'auto-side-73':{sourceId:'angle-73-m43-long-white-side',storeys:total(3,'The visible white corner shows a ground frontage and two long upper window bands below the roof.'),ground:ground('Shops','Street-level shop signs and separate storefront openings are visible along the white building; exact tenants are not legible.'),limits:'Oblique view: verify the ground retail interpretation. Upper bands do not prove school or office use.'},
+  // Supplemental readings of original records, never writes to the original survey.
+  'wmtutctunqtn':{supplemental:true,reviewedOn:'2026-09-16',sourceId:'auto-19-simtec',storeys:minimum(2,'SIMTEC has a street-level opening zone and a separate upper glazed/window band. At least two visible levels; internal divisions and the complete total remain VERIFY.')},
+  'wmtuu0kpy6gc':{supplemental:true,reviewedOn:'2026-09-16',sourceId:'pmtuu046fwxkb8',storeys:minimum(2,'The central low corner block shows a lower window band and a distinct upper window level below the exposed roof slab. At least two facade levels; verify internal floor divisions.'),limits:'The photograph does not identify ground activity. The existing residential classification is retained, not independently confirmed.'},
+  'wmtvtrpzsduc':{supplemental:true,reviewedOn:'2026-09-16',sourceId:'auto-38-tan-highway-balcony-tower',storeys:minimum(6,'At least six repeated upper balcony levels can be distinguished on the tan tower. The foreground wall hides the base: six is a lower bound, not the total including ground.'),limits:'Existing construction-use classification is retained. No construction date or ground use is inferred.'},
+  'wmtvu70gucyh':{supplemental:true,reviewedOn:'2026-09-16',sourceId:'angle-66-m46-originale-silver-city',storeys:minimum(3,'Originale / Silver City shows the street frontage, a separate upper window/sign band and a glazed roof enclosure. At least three visible levels; do not include the setback zigzag tower.')},
+  'wmtvua1v6esd':{supplemental:true,reviewedOn:'2026-09-16',sourceId:'pmtvu9j4fe3z70',storeys:minimum(2,'Mano Bakery shows ground retail and a separate enclosed window level. The open roof terrace/canopy is not counted as another enclosed storey.'),limits:'Since 1964 on a business sign is not a construction date for this building.'},
+  'wmtvubmtv7w7':{supplemental:true,reviewedOn:'2026-09-16',sourceId:'pmtvubb7oh30m3',storeys:minimum(1,'At least the low Pascanoush Gifts storefront level is visible. Taller structures behind it are not assigned to this frontage; the full building total remains TBD.')}
  };
  const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const copy=x=>JSON.parse(JSON.stringify(x));
@@ -59,14 +66,14 @@ window.AutoAttributes=(function(){
  const fields={surveyuse:['ground','autoGroundUses','autoUpperUse','use'],surveystoreys:['storeys','autoStoreysMinimum'],surveygreen:['green'],surveychange:['autoRoofObservation'],surveyera:[]};
  function resolve(record,shots){
   const r={...record},q=data[r.id],s=shots?.find(s=>s.id===q?.sourceId);
-  if(!r.autoCreated||!q||!s)return r;
+  if(!q||!s||(!r.autoCreated&&!q.supplemental))return r;
   const applied=[];
   if(blank(r.storeys)&&q.storeys){const k=q.storeys.kind==='minimum'?'autoStoreysMinimum':'storeys';r[k]=q.storeys.value;applied.push(k);}
   if(blank(r.ground)&&q.ground){if(q.ground.values.length===1){r.ground=q.ground.values[0];applied.push('ground');}else{r.autoGroundUses=copy(q.ground.values);applied.push('autoGroundUses');}}
   if(blank(r.use)){if(q.upper){r.autoUpperUse=q.upper.value;applied.push('autoUpperUse');}if(q.use){r.use=q.use.value;applied.push('use');}}
   if(blank(r.green)&&q.green){r.green=q.green.value;applied.push('green');}
   if(!['y','n'].includes(r.added)&&!['y','n'].includes(r.ready)&&q.change){r.autoRoofObservation=q.change;applied.push('autoRoofObservation');}
-  r.autoAttributeReview={version,reviewedOn,sourceId:q.sourceId,imageryDate:s.imageryDate||'not recorded',applied};
+  r.autoAttributeReview={version,reviewedOn:q.reviewedOn||'2026-09-15',sourceId:q.sourceId,imageryDate:s.imageryDate||'not recorded',applied};
   return r;
  }
  function applied(key,r){return !!r.autoAttributeReview?.applied.some(k=>(fields[key]||[]).includes(k));}
@@ -83,7 +90,7 @@ window.AutoAttributes=(function(){
   if((all&&(q.change||r.added||r.ready))||key==='surveychange')add('Roof / vertical observation',r.autoRoofObservation||(['y','n'].includes(r.added)||['y','n'].includes(r.ready)?'Existing record: added floor '+(r.added==='y'?'yes':r.added==='n'?'no':'not assessed')+'; exposed columns '+(r.ready==='y'?'yes':r.ready==='n'?'no':'not assessed'):'TBD — not assessed'),'A single image does not date an addition or establish structural capacity.');
   if(key==='surveyera')add('Construction date',r.era?r.era+' · existing recorded estimate / VERIFY':'TBD — not established',r.era?'Existing recorded estimate takes priority; the Auto review assigns no date.':'No construction decade is assigned from facade colour or condition.');
   const overriding=Object.entries(fields).some(([k,ff])=>(all||key===k)&&ff.some(f=>!blank(r[f])&&!r.autoAttributeReview.applied.includes(f)));
-  return '<section class="auto-attributes"><h4>Auto screenshot reading · VERIFY</h4><p class="bm-small">Imagery '+esc(r.autoAttributeReview.imageryDate)+' · reviewed '+reviewedOn+'. Historical visual evidence, not a current field survey.'+(overriding?' Existing recorded values take priority over the readings below.':'')+'</p>'+parts.join('')+(q.limits?'<p class="bm-small">'+esc(q.limits)+'</p>':'')+'</section>';
+  return '<section class="auto-attributes"><h4>Screenshot reading · VERIFY</h4><p class="bm-small">Imagery '+esc(r.autoAttributeReview.imageryDate)+' · reviewed '+esc(r.autoAttributeReview.reviewedOn)+'. Historical visual evidence, not a current field survey.'+(overriding?' Existing recorded values take priority over the readings below.':'')+'</p>'+parts.join('')+(q.limits?'<p class="bm-small">'+esc(q.limits)+'</p>':'')+'</section>';
  }
  function freeze(o){Object.values(o).forEach(v=>{if(v&&typeof v==='object')freeze(v);});return Object.freeze(o);}freeze(data);
  return {version,reviewedOn,data,resolve,applied,rows,exportData:()=>({version,reviewedOn,method:'Historical screenshot interpretation; total estimates and visible minimums are separate. Original survey values take priority.',records:copy(data)})};

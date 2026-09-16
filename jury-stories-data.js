@@ -6,9 +6,9 @@ history: [
  'The important legacy for our project is the contrast between local daily life and infrastructure that carries people past it. I would make a small, readable public entrance from Street 80 and the bridge-side approach, rather than make the highway façade our only address. The coloured drawing shows today’s corridors; it is not a reconstruction of a historical date.'
 ],
 siteplot: [
- 'Our entrance opportunity is on the eastern side',
+ 'One plot, four different edge conditions',
  'The highway runs along the southern side of our plot. Street 80 bends beside its eastern edge, and the nearby footbridge brings a southern approach onto the same side of the highway. Buildings close the northern and western sides more tightly; the site does not have four equally open frontages.',
- 'This gives the eastern edge two jobs: welcome people from the local street and connect the bridge-side approach to the building. I would test a recessed, covered entrance here, with a place to pause inside our boundary. The southern edge should address the highway but also help protect the shared space behind it. Exact entry levels and permissions still need checking.'
+ 'The colours follow those edges: the southern highway side needs protection; the eastern Street 80 side offers the clearest arrival; the northern and western neighbour edges need careful openings and privacy. I would recess a covered entrance on the east, keep waiting inside our boundary, and test a protective southern strip. The south-east corner must connect the bridge-side approach without putting people in the delivery path. Entry levels, setbacks and permissions remain to be checked.'
 ],
 figureground: [
  'The open ground is beside traffic, not inside a protected block',
@@ -93,7 +93,7 @@ wind: [
 connections: [
  'Our plot can strengthen the link between Street 52 and Street 80',
  'From the south, Street 52 approaches the pedestrian bridge over the highway. On the northern side, the bridge-side approach lies near our plot and the Street 80 bend. Street 80 continues north to Seaside Road and the working frontages. Armenia Street crosses the river farther south, providing a separate western approach to investigate.',
- 'The highway connects the wider city but concentrates local crossing at bridges; our plot sits beside one of those crossing opportunities. I would use the eastern edge to make the arrival recognisable and give people a sheltered reason to stop. This strengthens an existing local link—it does not mean our building connects the district to the sea. The shoreline is farther north, and that onward walk is not established.'
+ 'The rust-coloured highway carries the wider city past our plot, but local crossings concentrate at the pink bridges and walking links. The teal streets are the finer network that brings people to the site. Street 80, not the highway, should be our readable local address: an eastern entrance with a sheltered pause, and deliveries kept clear of the bridge-side arrival. This strengthens an existing connection; it does not establish a continuous walk to the sea farther north.'
 ],
 people: [
  'Our first audience is on the nearby working and residential streets',
