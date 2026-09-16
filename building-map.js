@@ -50,7 +50,7 @@ window.BuildingMap=(function(){
   return group;
  }
  function point(at,bearing,metres){const a=bearing*Math.PI/180;return[at[0]+metres*Math.cos(a)/111320,at[1]+metres*Math.sin(a)/(111320*Math.cos(at[0]*Math.PI/180))];}
- function note(group,at,text,color='#344f54'){ArchitecturalMap.label(at,text,{height:['siteplot','edges'].includes(current)?2.7:7,color,interactive:false,className:'bm-label'}).addTo(group);}
+ function note(group,at,text,color='#344f54'){ArchitecturalMap.label(at,text,{height:['siteplot','edges'].includes(current)?2.7:['history','figureground','grain','streets','access','noise'].includes(current)?20:7,color,interactive:false,className:'bm-label'}).addTo(group);}
  function arrow(group,start,end,color){L.polyline([start,end],{color,weight:2.5,dashArray:'7 5',interactive:false}).addTo(group);const a=ArchitecturalMap.project(start),b=ArchitecturalMap.project(end),t=Math.atan2(b[1]-a[1],b[0]-a[0]);L.polyline([ArchitecturalMap.unproject([b[0]-9*Math.cos(t-.5),b[1]-9*Math.sin(t-.5)]),end,ArchitecturalMap.unproject([b[0]-9*Math.cos(t+.5),b[1]-9*Math.sin(t+.5)])],{color,weight:2.5,interactive:false}).addTo(group);}
  function fit(key){if(!api||!keys.includes(key))return false;api.map.invalidateSize();const close=['siteplot','edges'].includes(key),climate=['sun','wind'].includes(key),field=key.startsWith('survey')||key==='pictures',ctr=center([B().site]),recordPoints=model().features.filter(f=>f.recordIds.length).flatMap(f=>f.rings[0]),bounds=close?L.latLngBounds(B().site).pad(.65):climate?L.latLngBounds([point(ctr,0,290),point(ctr,90,290),point(ctr,180,290),point(ctr,270,290)]):field&&recordPoints.length?L.latLngBounds(recordPoints).pad(.08):B().bounds;api.map.fitBounds(bounds,{paddingTopLeft:[22,35],paddingBottomRight:[22,45],maxZoom:close?19:field?17.75:17,animate:false});return true;}
  function distanceToRoad(at,ways){const k=111320,c=Math.cos(at[0]*Math.PI/180);let best=Infinity;const xy=p=>[(p[1]-at[1])*k*c,(p[0]-at[0])*k];for(const w of ways)for(const line of w.lines)for(let i=1;i<line.length;i++){const a=xy(line[i-1]),b=xy(line[i]),v=[b[0]-a[0],b[1]-a[1]],l=v[0]*v[0]+v[1]*v[1],t=l?Math.max(0,Math.min(1,-(a[0]*v[0]+a[1]*v[1])/l)):0;best=Math.min(best,Math.hypot(a[0]+t*v[0],a[1]+t*v[1]));}return best;}
@@ -71,8 +71,9 @@ window.BuildingMap=(function(){
  }
  function hydrate(entry,key){const id=entry.record.id,box=document.getElementById('bm-proof-'+id.replace(/[^\w-]/g,'-'));if(box){box.innerHTML='';proofs(entry,key).forEach(s=>{const figure=document.createElement('figure'),link=document.createElement('a'),img=document.createElement('img'),cap=document.createElement('figcaption');img.alt=s.caption||'Original linked survey screenshot';img.loading='eager';img.addEventListener('load',()=>{if(figure.isConnected)requestAnimationFrame(()=>api.fitPopup());});link.target='_blank';link.rel='noopener';link.appendChild(img);figure.appendChild(link);cap.textContent=s.auto?(s.caption||'Auto evidence')+' · '+(s.attribution||'')+' · imagery '+(s.imageryDate||'date not recorded'):'Original survey screenshot · preserved';figure.appendChild(cap);if(s.sourceUrl){const source=document.createElement('a');source.href=s.sourceUrl;source.target='_blank';source.rel='noopener';source.textContent=' · Source view';cap.appendChild(source);}box.appendChild(figure);const show=src=>{if(!figure.isConnected)return;const url=typeof src==='string'?src:src?URL.createObjectURL(src):s.file;if(url){img.src=url;link.href=url;}else cap.textContent+=' · unavailable on this device';};if(s.auto&&s.file)show(s.file);else api.getPhoto(s.id,show);});}document.querySelectorAll('[data-bm-auto]').forEach(b=>b.onclick=()=>{api.go('picturesauto');window.picturesAuto.open(b.dataset.bmAuto,true);});document.querySelectorAll('[data-bm-original]').forEach(b=>b.onclick=()=>window.editPlot(b.dataset.bmOriginal));}
  function popupNode(entry,key){const node=document.createElement('div');node.innerHTML=popup(entry,key);return node;}
- function wire(layer,entry,key){layer.options.bubblingMouseEvents=false;layer.bindPopup(popupNode(entry,key),{maxWidth:360});layer.on('popupopen',()=>{if(!api.capture(entry.record))hydrate(entry,key);});}
+ function wire(layer,entry,key){if(key!=='pictures'){layer.options.interactive=false;return;}layer.options.bubblingMouseEvents=false;layer.bindPopup(popupNode(entry,key),{maxWidth:360});layer.on('popupopen',()=>{if(!api.capture(entry.record))hydrate(entry,key);});}
  function render(key){
+  if(api)ArchitecturalMap.smoothZoom(api.map);
   current=key;document.body.classList.toggle('building-map-on',keys.includes(key));if(!keys.includes(key)||!api)return;
   const group=api.groups[key],renderer=legacyRenderer||(legacyRenderer=L.canvas({padding:.4})),m=base(group,renderer),isField=key.startsWith('survey')||key==='pictures',painted=[],mappedIds=new Set(),unknownIds=new Set(),autoIds=new Set(),minimumIds=new Set(),conflicts=[];
   const highways=(window.CONNECTIONS_DATA?.ways||[]).filter(w=>/^(motorway|trunk)/.test(w.tags.highway));
@@ -91,11 +92,21 @@ window.BuildingMap=(function(){
    });
   }
   const ctr=center([B().site]);
-  if(['streets','access','history','noise'].includes(key)){
+  const namedBuildings={surveyuse:['wmttorinikfw','wmttot59lzkm','wmttougywivz'],surveystoreys:['wmttqjojmmgt','wmtvtqgfe0x7','wmttorinikfw','wmttovkrn5zf'],surveyera:['wmttot59lzkm','wmttqjojmmgt','wmtvtqgfe0x7','wmttougywivz'],surveygreen:['wmttqjojmmgt','wmttot59lzkm']};
+  const buildingNames={wmttorinikfw:'Suzuki',wmttot59lzkm:'Chidiac · timber',wmttougywivz:'Harley / Bassoul',wmttqjojmmgt:'Credit Libanais',wmtvtqgfe0x7:'Maserati Tower',wmttovkrn5zf:'PLEMICOR'};
+  (namedBuildings[key]||[]).forEach(id=>{const f=m.features.find(f=>f.recordIds.includes(id));if(!f)return;const at=point(f.at,id==='wmttovkrn5zf'?270:90,id==='wmttovkrn5zf'?30:38);L.polyline([f.at,at],{color:'#60736b',weight:.65,interactive:false,renderer,bmRole:'named-building-leader',recordId:id}).addTo(group);ArchitecturalMap.label(at,buildingNames[id],{height:7,color:'#263f37',interactive:false,className:'bm-building-name'}).addTo(group);});
+  if(!['siteplot','edges','pictures'].includes(key)){
    note(group,[33.89739,35.54164],'STREET 80 · north approach','#267e78');
    note(group,[33.8948,35.54062],'STREET 52 · south approach','#267e78');
    note(group,[33.89543,35.5366],'ARMENIA · river bridge','#267e78');
    note(group,[33.8961,35.5408],'FOOTBRIDGE · mapped stairs','#a33867');
+   note(group,[33.89825,35.53965],'SEASIDE ROAD','#a35f45');
+   note(group,[33.8956,35.5449],'HIGHWAY','#a35f45');
+   note(group,[33.8956,35.53755],'BEIRUT RIVER','#387f89');
+  }
+  if(key!=='pictures'){
+   [275315121,306996681,715531021,701135687,701135688,270786366].forEach(id=>{const w=CONNECTIONS_DATA.ways.find(w=>w.id===id);if(w)L.polyline(w.lines,{color:id===275315121?'#267e78':id===306996681||id===715531021?'#438982':'#a33867',weight:6,interactive:false,renderer,bmRole:'named-reference-road',sourceWay:id}).addTo(group);});
+   if(['siteplot','edges'].includes(key)){note(group,[33.89667,35.5414],'STREET 80','#267e78');note(group,[33.89604,35.54104],'HIGHWAY + FOOTBRIDGE','#a33867');}
   }
   if(key==='pictures'&&!api.missingOnly()){
    const linked=new Set(api.records().flatMap(r=>api.shots(r.id).map(s=>s.id)));
@@ -122,6 +133,10 @@ window.BuildingMap=(function(){
   const msg=document.createElement('p');msg.className='bm-small';msg.textContent=isField?(key==='pictures'?'Original survey records and exact linked photographs.':'Dashed colour = Auto screenshot reading / VERIFY. Grey unfilled outline = reviewed but unknown; click for its photo. '+(key==='surveystoreys'?'≥ = minimum visible levels, NOT total floors; these stay unfilled. ≈ = estimate / approximate outline.':'Colour stays inside the same assigned building outline.')):key==='grain'?'Relative sizes of display outlines, not legal parcel areas. Approximate rectangles influence this comparison.':key==='noise'?'Geometric proximity only—not a sound, exposure or safety rating.':'Corrected building base · approximate display geometry. Roads and our site remain separate.';legend.appendChild(msg);
   const panel=document.getElementById('facts-panel');panel.querySelectorAll('.bm-coverage').forEach(n=>n.remove());const archive=panel.querySelector(':scope > details.jury-more');if(archive&&!archive.querySelector('.bm-archive-note')){const n=document.createElement('p');n.className='bm-small bm-archive-note';n.textContent='Earlier CAD/parcel study retained for reference. Its parcel counts and old geometric calculations do not describe the current building map.';archive.querySelector('summary').after(n);}
   if(isField){const pending=[...m.records.values()].filter(e=>hasField(key,e.record,e)&&!mappedIds.has(e.record.id));const d=document.createElement('details');d.className='bm-coverage';d.innerHTML='<summary>'+mappedIds.size+' mapped readings · '+autoIds.size+' from Auto'+(minimumIds.size?' ('+minimumIds.size+' minimum counts)':'')+' · '+unknownIds.size+' Auto unknown</summary><p>'+pending.length+' readings are not on a building outline. Includes unplaced records and open-space observations. No nearby building is assigned automatically. Original records and photos are preserved; Auto readings are historical visual interpretations.</p>';pending.forEach(e=>{const b=document.createElement('button');b.textContent=e.record.note||e.record.id;b.onclick=()=>{L.popup({maxWidth:360}).setLatLng(api.map.getCenter()).setContent(popupNode(e,key)).openOn(api.map);hydrate(e,key);};d.appendChild(b);});panel.appendChild(d);}
+  if(key!=='pictures'){
+   const freeze=layer=>{if(layer.eachLayer)layer.eachLayer(freeze);else{layer.unbindPopup?.();layer.options.interactive=false;const element=layer.getElement?.();if(element){element.classList.remove('leaflet-interactive');element.style.pointerEvents='none';layer.removeInteractiveTarget?.(element);}}};group.eachLayer(freeze);
+   legend.querySelectorAll('p,span').forEach(n=>{n.textContent=n.textContent.replace(/; click for its photo\./g,'; photographs remain in Pictures Auto.').replace(/ · click for both/g,' · combined reading');});
+  }
   ArchitecturalMap.scalePaths(api.map,group,18);
   window.BUILDING_MAP_AUDIT={key,features:m.features.length,painted,mappedIds:[...mappedIds],autoIds:[...autoIds],unknownIds:[...unknownIds],minimumIds:[...minimumIds],conflicts:conflicts.map(e=>e.record.id),unplaced:m.unplaced.map(e=>e.record.id),source:'Pictures Auto corrected display geometry + reviewed attributes'};
  }

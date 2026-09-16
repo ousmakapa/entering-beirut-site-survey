@@ -1,8 +1,16 @@
 /* Fixed world drawing; UI remains readable and scrollable outside it. */
+.leaflet-map-pane{will-change:transform}
 .architectural-drawing{pointer-events:none;overflow:hidden}
-.architectural-drawing .arch-ref{pointer-events:all}
+.architectural-drawing .arch-ref{pointer-events:none!important;cursor:default!important}
+.architectural-drawing .arch-ref:hover,.architectural-drawing .arch-ref:focus{text-decoration:none!important;font-weight:400!important}
+body.building-map-on:not([data-tab="pictures"]) .bm-tag{cursor:default}
 .arch-world-label{overflow:visible!important}
 .architectural-drawing text{user-select:none}
+.architectural-drawing .arch-ref{font-family:"Consolas","Courier New",monospace;font-weight:400}
+.arch-sheet-heading{display:block;font-size:13px;font-weight:600;letter-spacing:.015em;color:#334b43}
+.arch-sheet-heading i{font-style:normal;font-weight:400;padding:0 .6em;color:#8a9690}
+.arch-sheet-source{display:block;margin-top:4px;font-size:10px;color:#65736c}
+.arch-key-note{display:block!important;margin-top:8px;padding-top:8px;border-top:1px solid #d9ded7;font-size:10px;line-height:1.5;color:#596961}
 body.connections-on #connections-key,body.people-on #people-key,body.daily-on #daily-key,body.accessibility-on #accessibility-key,body.protection-on #protection-key{max-width:245px;background:rgba(255,255,250,.94)}
 body.connections-on #connections-caption,body.people-on #people-caption,body.daily-on #daily-caption,body.accessibility-on #accessibility-caption,body.protection-on #protection-caption{font-size:11px;letter-spacing:.02em}
 @media(max-width:700px){body.connections-on #connections-key,body.people-on #people-key,body.daily-on #daily-key,body.accessibility-on #accessibility-key,body.protection-on #protection-key{max-width:180px;font-size:10px}body.connections-on #connections-caption,body.people-on #people-caption,body.daily-on #daily-caption,body.accessibility-on #accessibility-caption,body.protection-on #protection-caption{font-size:9px}}

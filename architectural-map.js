@@ -33,9 +33,14 @@ window.ArchitecturalMap=(function(){
  function roads(svg,ids,col,width,dash){ids.forEach(id=>{const w=CONNECTIONS_DATA.ways.find(w=>w.id===id);if(w){const p=el('path',{d:geoPath(w.lines,false),fill:'none',stroke:col,'stroke-width':width,'stroke-linecap':'round','data-role':'named-source-street','data-source-way':id});if(dash)p.setAttribute('stroke-dasharray',dash);svg.appendChild(p);}});}
  function commonRoads(svg,unit,options={}){roads(svg,[200611932,237737315,692409629],options.highway||palette.road,unit*3);roads(svg,[26316545,692400343],palette.road,unit*2);roads(svg,[275315121],options.local||palette.local,unit*2.6,options.dash);roads(svg,[306996681,715531021],options.local||palette.local,unit*2.3,options.dash);roads(svg,[701135687,701135688,270786366,1069243892,1069243890,1069243891],palette.walk,unit*3.3);roads(svg,[452148075,452148076],palette.local,unit*2.2);}
  function site(svg,unit){const g=el('g',{'data-role':'project-site'});g.appendChild(el('path',{d:geoPath([PICTURES_NEW_DATA.site]),fill:'#efdc91',stroke:palette.ink,'stroke-width':unit*2,'fill-opacity':.88}));svg.appendChild(g);return g;}
- function refs(parent,ids,p,size,col,state){ids.forEach((id,i)=>{const t=state.tags.find(t=>t.id===id);if(!t)return;const n=text(parent,[p[0]+i*size*3.6,p[1]],id,size,col,{class:'arch-ref',role:'button',tabindex:'0','data-evidence':id,'aria-label':id+' · '+t.title});n.appendChild(el('title',{},t.title));const activate=e=>{e.stopPropagation();state.open(id);select(state.key,id);};n.addEventListener('click',activate);n.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();activate(e);}});});}
- function callout(state,ids,p,title,sub,symbol,col,options={}){const {svg,size,tags}=state,t=tags.find(t=>t.id===ids[0]);if(!t)return;const at=project(t.at),g=el('g',{'data-callout':ids.join(' ')});svg.appendChild(g);const anchor=[p[0]-size*1.25,p[1]-size*.2];line(g,[at,anchor],col,size*.065,'2 2',{'data-role':'fixed-leader'});g.appendChild(el('circle',{cx:at[0],cy:at[1],r:size*.16,fill:col}));glyph(g,symbol,anchor,size*.7,col);text(g,p,title,size,col,{'font-weight':750});
-  const captions=[];(Array.isArray(sub)?sub:[sub]).filter(Boolean).forEach(s=>{let row='';s.split(' ').forEach(word=>{if((row+' '+word).length>38&&row){captions.push(row);row=word;}else row+=(row?' ':'')+word;});if(row)captions.push(row);});captions.forEach((s,i)=>text(g,[p[0],p[1]+size*(1.35+i*1.2)],s,size*.78,palette.ink));refs(g,ids,[p[0],p[1]+size*(1.45+captions.length*1.2)],size*.68,col,state);return g;}
+ function refs(parent,ids,p,size,col,state){ids.forEach((id,i)=>{const t=state.tags.find(t=>t.id===id);if(!t)return;text(parent,[p[0]+i*size*3.6,p[1]],id,size,col,{class:'arch-ref','data-evidence':id,'aria-label':id+' · '+t.title});});}
+ // Editorial hierarchy is authored once in drawing units, never recomputed on zoom.
+ function heading(words){return words.toLowerCase().replace(/^./,c=>c.toUpperCase()).replace(/street (?=\d)/gi,'Street ').replace(/seaside road/gi,'Seaside Road').replace(/forum de beyrouth/gi,'Forum de Beyrouth').replace(/armenia bridge/gi,'Armenia Bridge');}
+ function callout(state,ids,p,title,sub,symbol,col,options={}){const {svg,size,tags}=state,t=tags.find(t=>t.id===ids[0]);if(!t)return;const at=project(t.at),primary=ids.includes('P'),mechanism=state.key==='protection'&&['W1','S1','N1','A1','R1'].includes(ids[0]),g=el('g',{'data-callout':ids.join(' '),'data-annotation-rank':primary?'primary':'supporting'});svg.appendChild(g);
+  const anchor=[p[0]-size*(mechanism?1.35:.65),p[1]-size*.32];line(g,[at,anchor],'#82918e',size*.045,null,{'data-role':'fixed-leader'});g.appendChild(el('circle',{cx:at[0],cy:at[1],r:size*.12,fill:col}));
+  if(mechanism)glyph(g,symbol,anchor,size*.62,col);else line(g,[anchor,[p[0]-size*.14,anchor[1]]],col,size*(primary?.13:.085));
+  text(g,p,heading(title),size*(primary?1.17:1.04),primary?palette.ink:col,{'font-weight':primary?700:600,'letter-spacing':-size*.012,style:'stroke-width:'+size*.23,'data-role':'annotation-heading'});
+  const captions=[];(Array.isArray(sub)?sub:[sub]).filter(Boolean).forEach(s=>{let row='';s.split(' ').forEach(word=>{if((row+' '+word).length>38&&row){captions.push(row);row=word;}else row+=(row?' ':'')+word;});if(row)captions.push(row);});captions.forEach((s,i)=>text(g,[p[0],p[1]+size*(1.45+i*1.24)],s,size*.8,'#43524e',{'data-role':'annotation-caption'}));refs(g,ids,[p[0],p[1]+size*(1.6+captions.length*1.24)],size*.67,col,state);return g;}
  function titleAt(svg,p,s,size,col){text(svg,p,s,size,col,{'font-weight':650,'letter-spacing':size*.035});}
  function north(svg,f,size){const x=f[0]+f[2]-size*2,y=f[1]+size*3;arrow(svg,[x,y+size*2.5],[x,y],palette.ink,size*.7,size*.16);text(svg,[x,y-size*.5],'N',size,palette.ink,{'text-anchor':'middle'});}
  function urban(state){const {svg,size,key}=state,u=2.2,m=base(svg,u);if(key==='connections')context(svg,m,CONNECTIONS_DATA.zones,[palette.north,palette.work,palette.home],u);else context(svg,m,(key==='people'?PEOPLE_DATA:DAILY_DATA).zones,[palette.home,palette.work,palette.north,palette.water],u);
@@ -106,12 +111,26 @@ window.ArchitecturalMap=(function(){
   callout(state,['T2','V1'],[-118,142],'BRIDGE LANDING + VIEWS','Clear passage / privacy in section','bridge',palette.walk);
   callout(state,['P','C1','E1'],[74,-159],'SELECTIVE SHELTER',['Shared space and upper rooms','Need different exposure tests'],'entry',palette.ink);
  }
- function render(key,api,open){const f=frames[key];if(!f)return false;const D=window[({connections:'CONNECTIONS',people:'PEOPLE',daily:'DAILY',accessibility:'ACCESSIBILITY',protection:'PROTECTION'})[key]+'_DATA'],svg=svgFrame(f,key),state={key,svg,tags:D.tags,open,size:key==='protection'?8:key==='accessibility'?19:22};
+ function render(key,api,open){smoothZoom(api.map);const f=frames[key];if(!f)return false;const D=window[({connections:'CONNECTIONS',people:'PEOPLE',daily:'DAILY',accessibility:'ACCESSIBILITY',protection:'PROTECTION'})[key]+'_DATA'],svg=svgFrame(f,key),state={key,svg,tags:D.tags,open,size:key==='protection'?8:key==='accessibility'?19:22};
   if(key==='protection')protection(state);else if(key==='accessibility')accessibility(state);else urban(state);north(svg,f,state.size);
-  const layer=L.svgOverlay(svg,bounds(f),{interactive:false,className:'architectural-drawing',bubblingMouseEvents:false});api.group.clearLayers();layer.addTo(api.group);state.layer=layer;states[key]=state;
-  const keybox=document.getElementById(key+'-key');if(keybox){keybox.innerHTML='<b>'+({connections:'EXISTING LINKS',people:'POTENTIAL USERS',daily:'ONE DAY, DIFFERENT NEEDS',accessibility:'THE WHOLE ARRIVAL',protection:'DIFFERENT PRESSURES'})[key]+'</b><span>Words name the feature. Symbols explain its role.</span><span>Small references open the evidence.</span><small>'+({connections:'Solid colour follows mapped streets and bridges. Building tint groups context, not individual use.',people:'Tint = study context, not population. User groups and reasons to visit are hypotheses.',daily:'Sequence = time questions, not counted activity or confirmed opening hours.',accessibility:'Stair strokes = mapped steps. Dashed roads = approaches to check, not certified accessible routes.',protection:'Waves = sound source · dots = emissions source<br>Rays = sun test · arrows = airflow cases<br>No measured exposure, plume or flood extent.'})[key]+'</small>';}
-  const caption=document.getElementById(key+'-caption');if(caption)caption.innerHTML='FIXED ARCHITECTURAL DRAWING · labels, symbols and hatches zoom with the buildings<br><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a> · corrected building base · interpretation, not measured performance';
+  roadNames(svg,f,key==='protection'?3.3:8);
+  if(key==='people'){
+   const m=BuildingMap.model();[['wmttorinikfw','Suzuki'],['wmttot59lzkm','Chidiac'],['wmttovkrn5zf','PLEMICOR']].forEach(([id,name])=>{const feature=m.features.find(f=>f.recordIds.includes(id));if(!feature)return;const at=project(feature.at);text(svg,[at[0],at[1]-8],name,7,palette.ink,{'text-anchor':'middle','data-named-building':id});});
+   const forum=CONNECTIONS_DATA.tags.find(t=>t.id==='D3');if(forum){const p=project(forum.at);text(svg,[p[0],p[1]-8],'Forum de Beyrouth',8,palette.north,{'text-anchor':'middle','data-named-place':'Forum de Beyrouth'});}
+  }
+  const layer=L.svgOverlay(svg,bounds(f),{interactive:false,className:'architectural-drawing',bubblingMouseEvents:false});api.group.clearLayers();layer.addTo(api.group);preparePreview(svg);state.layer=layer;states[key]=state;
+  const keybox=document.getElementById(key+'-key');if(keybox){keybox.innerHTML='<b>'+({connections:'Reading the connections',people:'Reading the neighbours',daily:'Reading the day',accessibility:'Reading the arrival',protection:'Reading the pressures'})[key]+'</b><small>'+({connections:'Colour follows mapped streets and bridges. Building tint groups context, not individual use.',people:'Building tint groups study areas, not population. Possible users and reasons to visit need testing.',daily:'The sequence describes questions, not measured activity or confirmed opening hours.',accessibility:'Stair strokes show mapped steps. Dashed roads are approaches to check, not certified accessible routes.',protection:'Waves: sound source · dots: emissions source<br>Rays: sun test · arrows: airflow cases<br>No measured exposure, plume or flood extent.'})[key]+'</small><span class="arch-key-note">Fine grey lines connect notes to locations; they are not routes. Small references open the evidence.</span>';}
+  const caption=document.getElementById(key+'-caption');if(caption)caption.innerHTML='<span class="arch-sheet-heading">Bourj Hammoud <i>/</i> '+({connections:'Connections across the highway',people:'Neighbours around our plot',daily:'The plot through the day',accessibility:'From the neighbourhood to our door',protection:'Shelter at the highway edge'})[key]+'</span><span class="arch-sheet-source"><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a> · corrected building base · interpretative study</span>';
+  if(keybox)keybox.querySelector('.arch-key-note').textContent='Fine grey lines connect notes to locations; they are not routes. Drawing labels are static. Supporting research remains in the right panel.';
   window.ARCHITECTURAL_MAP_AUDIT={key,tagIds:[...svg.querySelectorAll('[data-evidence]')].map(n=>n.getAttribute('data-evidence')),featureIds:[...svg.querySelectorAll('[data-bm-id]')].map(n=>n.getAttribute('data-bm-id')),frame:f.slice(),fixed:true};return true;
+ }
+ function roadNames(svg,f,size){
+  [[275315121,'Street 80',palette.local],[306996681,'Street 52',palette.local],[26316545,'Seaside Road',palette.road],[452148075,'Armenia Bridge',palette.local],[200611932,'Highway',palette.road]].forEach(([id,name,col])=>{
+   const way=CONNECTIONS_DATA.ways.find(w=>w.id===id);if(!way)return;const segments=[];
+   way.lines.forEach(r=>{for(let i=1;i<r.length;i++){const a=project(r[i-1]),b=project(r[i]),p=[(a[0]+b[0])/2,(a[1]+b[1])/2],length=Math.hypot(b[0]-a[0],b[1]-a[1]);if(p[0]>f[0]+35&&p[0]<f[0]+f[2]-35&&p[1]>f[1]+25&&p[1]<f[1]+f[3]-25)segments.push({a,b,p,length});}});
+   const s=segments.sort((a,b)=>b.length-a.length)[0];if(!s)return;let angle=Math.atan2(s.b[1]-s.a[1],s.b[0]-s.a[0])*180/Math.PI;if(angle>90)angle-=180;if(angle< -90)angle+=180;
+   const g=el('g',{transform:'translate('+s.p.join(' ')+') rotate('+angle+')','data-street-label':name,'data-source-way':id});svg.appendChild(g);text(g,[0,-size*.9],name,size,col,{'text-anchor':'middle','font-weight':650,style:'stroke-width:'+size*.45});
+  });
  }
  function select(key,id){const s=states[key],t=s?.tags.find(t=>t.id===id);if(!s)return;s.svg.querySelectorAll('[data-selected-evidence]').forEach(n=>n.remove());if(!t)return;const p=project(t.at),r=key==='protection'?3:10;s.svg.appendChild(el('circle',{cx:p[0],cy:p[1],r,fill:'none',stroke:palette.ink,'stroke-width':r/7,'data-selected-evidence':id}));}
  function fit(key,map,panel){if(!frames[key])return false;map.invalidateSize();map.fitBounds(bounds(frames[key]),{paddingTopLeft:[22,50],paddingBottomRight:innerWidth<700?[18,panel.offsetHeight+20]:[panel.offsetWidth+35,30],animate:false});return true;}
@@ -121,7 +140,37 @@ window.ArchitecturalMap=(function(){
   if(options.dataRecord)svg.setAttribute('data-record',options.dataRecord);if(options.dataManual)svg.setAttribute('data-manual',options.dataManual);
   const layer=L.svgOverlay(svg,bounds(f),{interactive:options.interactive!==false,bubblingMouseEvents:false,...options});layer.getLatLng=()=>L.latLng(at);return layer;
  }
+ // Cache only a temporary gesture preview. The settled drawing always remains vector.
+ function preparePreview(svg){const copy=svg.cloneNode(true),f=svg.viewBox.baseVal,w=2400,h=Math.round(w*f.height/f.width);copy.setAttribute('width',w);copy.setAttribute('height',h);copy.removeAttribute('style');const image=new Image();image.onload=()=>{const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(image,0,0,w,h);canvas.setAttribute('aria-hidden','true');svg._gesturePreview=canvas;};image.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(new XMLSerializer().serializeToString(copy));}
+ // Wheel gestures composite the whole drawing, then commit geographic geometry once.
+ // This avoids dropping wheel events during Leaflet's separate 250ms zoom animations.
+ function smoothZoom(map){
+  if(map._architecturalWheel)return;map._architecturalWheel=true;map.scrollWheelZoom.disable();map.options.zoomSnap=0;
+  const container=map.getContainer(),pane=map.getPane('mapPane');let gesture=null,frame=0,committing=false;
+  function restore(g){g.previews.forEach(([svg,canvas])=>{canvas.remove();svg.style.visibility='';});pane.style.transform=g.transform;pane.style.transformOrigin=g.origin;}
+  function finish(){if(!gesture)return;const g=gesture;gesture=null;cancelAnimationFrame(frame);restore(g);
+   const scale=Math.pow(2,g.shown-g.zoom),centre=map.getSize().divideBy(2),world=g.world.add(centre.subtract(g.anchor).divideBy(scale));
+   committing=true;map.setView(map.unproject(world,g.zoom),g.shown,{animate:false});committing=false;
+  }
+  function tick(now){const g=gesture;if(!g)return;const dt=Math.min(64,now-g.last);g.last=now;g.shown+=(g.target-g.shown)*(1-Math.exp(-dt/45));
+   pane.style.transform=g.transform+' scale('+Math.pow(2,g.shown-g.zoom)+')';
+   if(now-g.input>140&&Math.abs(g.target-g.shown)<.002){g.shown=g.target;finish();}else frame=requestAnimationFrame(tick);
+  }
+  container.addEventListener('wheel',e=>{
+   if(e.ctrlKey||e.target.closest('.leaflet-control,button,input,select,textarea'))return;
+   e.preventDefault();e.stopPropagation();if(map._animatingZoom)return;
+   const now=performance.now();if(!gesture){map.stop();const anchor=map.mouseEventToContainerPoint(e),layer=map.containerPointToLayerPoint(anchor),zoom=map.getZoom();
+    gesture={anchor,zoom,target:zoom,shown:zoom,world:map.project(map.containerPointToLatLng(anchor),zoom),transform:pane.style.transform,origin:pane.style.transformOrigin,last:now,input:now,previews:[]};
+    container.querySelectorAll('svg.architectural-drawing').forEach(svg=>{const canvas=svg._gesturePreview;if(!canvas)return;canvas.style.cssText=svg.style.cssText;canvas.style.position='absolute';canvas.style.pointerEvents='none';canvas.style.transformOrigin='0 0';svg.before(canvas);svg.style.visibility='hidden';gesture.previews.push([svg,canvas]);});
+    pane.style.transformOrigin=layer.x+'px '+layer.y+'px';frame=requestAnimationFrame(tick);
+   }
+   const delta=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?container.clientHeight:1);
+   gesture.target=Math.max(map.getMinZoom(),Math.min(map.getMaxZoom(),gesture.target-Math.max(-240,Math.min(240,delta))/400));gesture.input=now;
+  },{passive:false});
+  container.addEventListener('pointerdown',finish,true);
+  map.on('movestart',()=>{if(gesture&&!committing){const g=gesture;gesture=null;cancelAnimationFrame(frame);restore(g);}});
+ }
  // Freeze presentation stroke sizes to a reference zoom; coordinates never change.
  function scalePaths(map,group,reference=18){let applying=false;const update=()=>{if(applying||!map.hasLayer(group))return;applying=true;const scale=map.getZoomScale(map.getZoom(),reference);const visit=l=>{if(l.eachLayer)l.eachLayer(visit);else if(l instanceof L.Path){if(!l._architecturalStyle)l._architecturalStyle={weight:l.options.weight,dash:l.options.dashArray,radius:l instanceof L.CircleMarker&&!(l instanceof L.Circle)?l.getRadius():null};const o=l._architecturalStyle;if(Number.isFinite(o.weight))l.setStyle({weight:o.weight*scale,dashArray:o.dash?String(o.dash).split(/[ ,]+/).map(Number).map(v=>v*scale).join(' '):null});if(o.radius!==null)l.setRadius(o.radius*scale);}};visit(group);applying=false;};if(!group._architecturalScale){group._architecturalScale=update;map.on('zoomend',update);group.on('add',update);}update();}
- return{render,select,fit,label,scalePaths,project,unproject,frames};
+ return{render,select,fit,label,scalePaths,smoothZoom,project,unproject,frames};
 })();
