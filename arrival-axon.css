@@ -1,0 +1,6 @@
+.workspace.arrivalaxon-mode{grid-template-columns:1fr;grid-template-areas:"map";}
+.workspace.arrivalaxon-mode .facts-panel{display:none!important;}
+.workspace.arrivalaxon-mode .map-shell>:not(.arrivalaxon-view){visibility:hidden;pointer-events:none;}
+.arrivalaxon-view .sa-sheet header>span,.arrivalaxon-view .sa-kicker{color:#6b836d;}
+.arrivalaxon-view .sa-sheet footer i{width:15px;height:3px;}
+@media(max-width:900px){.arrivalaxon-on .tb-right{max-width:100%;overflow-x:auto;}}

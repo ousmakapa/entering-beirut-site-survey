@@ -17,16 +17,16 @@ window.SunAxon=(()=>{
  const path=(pts,closed=false)=>pts.map((p,i)=>(i?'L':'M')+p.map(v=>v.toFixed(3)).join(',')).join(' ')+(closed?' Z':'');
  const ring=r=>{const a=r.map(xy);if(a.length>1&&Math.hypot(a[0][0]-a.at(-1)[0],a[0][1]-a.at(-1)[1])<.001)a.pop();return a;};
  const positive=x=>Number.isFinite(Number(x))&&Number(x)>0?Number(x):null;
- function build(source=BuildingMap.model()){
+ function build(source=BuildingMap.model(),radius=RADIUS){
   const site=ring(source.site),cross=site.map((p,i)=>p[0]*site[(i+1)%site.length][1]-site[(i+1)%site.length][0]*p[1]),area2=cross.reduce((s,v)=>s+v,0);
   const center=[0,1].map(axis=>site.reduce((s,p,i)=>s+(p[axis]+site[(i+1)%site.length][axis])*cross[i],0)/(3*area2));center.push(0);
-  const buildings=source.features.filter(f=>Math.hypot(...xy(f.at).slice(0,2).map((v,i)=>v-center[i]))<=RADIUS).map(f=>{
+  const buildings=source.features.filter(f=>Math.hypot(...xy(f.at).slice(0,2).map((v,i)=>v-center[i]))<=radius).map(f=>{
    const records=f.recordIds.map(id=>source.records.get(id)?.record).filter(Boolean),r=records.length===1?records[0]:null;
    const total=r&&positive(r.storeys),minimum=r&&positive(r.autoStoreysMinimum),status=total?'recorded-total':minimum?'minimum-only':records.length>1?'conflicting-records':'unknown';
    return{id:f.id,recordIds:[...f.recordIds],name:r?.note||r?.autoEvidence?.title||'',rings:f.rings.map(ring),at:xy(f.at),approximateFootprint:f.approx,status,storeys:total,minimumStoreys:minimum,height:total?total*FLOOR:null,minimumHeight:!total&&minimum?minimum*FLOOR:null};
   });
   // Clip line segments to the study square, without moving their mapped centrelines.
-  const clip=(a,b)=>{let lo=0,hi=1;for(let i=0;i<2;i++){const d=b[i]-a[i],min=center[i]-RADIUS,max=center[i]+RADIUS;if(Math.abs(d)<1e-9){if(a[i]<min||a[i]>max)return null;}else{let t=(min-a[i])/d,u=(max-a[i])/d;if(t>u)[t,u]=[u,t];lo=Math.max(lo,t);hi=Math.min(hi,u);if(lo>hi)return null;}}return[lo,hi].map(t=>a.map((v,i)=>v+t*(b[i]-v)));};
+  const clip=(a,b)=>{let lo=0,hi=1;for(let i=0;i<2;i++){const d=b[i]-a[i],min=center[i]-radius,max=center[i]+radius;if(Math.abs(d)<1e-9){if(a[i]<min||a[i]>max)return null;}else{let t=(min-a[i])/d,u=(max-a[i])/d;if(t>u)[t,u]=[u,t];lo=Math.max(lo,t);hi=Math.min(hi,u);if(lo>hi)return null;}}return[lo,hi].map(t=>a.map((v,i)=>v+t*(b[i]-v)));};
   const roads=[];for(const w of window.CONNECTIONS_DATA?.ways||[])for(const line of w.lines)for(let i=1;i<line.length;i++){const segment=clip(xy(line[i-1]),xy(line[i]));if(segment)roads.push({id:w.id,name:w.name,type:w.tags.highway,bridge:w.tags.bridge,points:segment});}
   const solar=seasons.map(([key,name,color])=>{const dec={summer:23.44,equinox:0,winter:-23.44}[key],rad=Math.PI/180,h=Math.acos(-Math.tan(ORIGIN[0]*rad)*Math.tan(dec*rad))/rad/15,start=12-h,end=12+h;
    const sample=hour=>{const s=protectionSolar(key,hour),a=s.altitude*rad,b=s.azimuth*rad;return{hour,altitude:s.altitude,azimuth:s.azimuth,point:[center[0]+175*Math.cos(a)*Math.sin(b),center[1]+175*Math.cos(a)*Math.cos(b),Math.max(0,175*Math.sin(a))]};};

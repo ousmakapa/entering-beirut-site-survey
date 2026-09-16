@@ -929,9 +929,11 @@
   <script src="building-map.js?v=20260916-combined1"></script>
   <script src="architectural-map.js?v=20260916-combined1"></script>
   <link rel="stylesheet" href="sun-axon.css?v=20260916-1">
-  <script src="sun-axon.js?v=20260916-2"></script>
+  <script src="sun-axon.js?v=20260916-3"></script>
   <link rel="stylesheet" href="wind-diagram.css?v=20260916-1">
   <script src="wind-diagram.js?v=20260916-1"></script>
+  <link rel="stylesheet" href="arrival-axon.css?v=20260916-1">
+  <script src="arrival-axon.js?v=20260916-1"></script>
   <link rel="stylesheet" href="architectural-map.css?v=20260916-cad2">
 </head>
 <body>
@@ -1477,6 +1479,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     {key:'sun', label:'Sun & Shadow', short:'Sun', group:'ANALYSIS', color:'var(--layer-landuse)', blurb:'Solar geometry computed for this site\u2019s latitude (33.90\u00b0 N) and drawn against the plot\u2019s own surveyed bearings. Nothing here comes from another map \u2014 it is the sun and the plot.'},
     {key:'sunaxon', label:'Sun / Axonometric', short:'Sun · 3D', group:'ANALYSIS', color:'var(--layer-landuse)', blurb:'Seasonal sun paths over the same building footprints; estimated masses, not measured heights.'},
     {key:'winddiagram', label:'Wind / Site Diagram', short:'Wind · Diagram', group:'ANALYSIS', color:'#54808a', blurb:'Incoming direction cases on our actual building plan; not measured airflow.'},
+    {key:'arrivalaxon', label:'Arrival / Axonometric', short:'Arrival · 3D', group:'ANALYSIS', color:'#6b836d', blurb:'Street 80, Street 52 and the footbridge on our building model. Original accessibility map retained.'},
     {key:'wind', label:'Wind & Air', short:'Wind', group:'ANALYSIS', color:'var(--layer-movement)', blurb:'Prevailing wind by season, plotted against the plot\u2019s own surveyed axis to find the cross-ventilation line. The directions are station data for Beirut, not a site measurement \u2014 the geometry they are drawn against is the survey.'},
     {key:'story', label:'Nesting', short:'Story', group:'ANALYSIS', color:'var(--accent)', blurb:'The selected site-to-building concept, read as a narrative rather than another map.'}
   ];
@@ -4328,6 +4331,7 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   function fitFor(key){
     if(key==='sunaxon' && window.SunAxon){SunAxon.fit();return;}
     if(key==='winddiagram' && window.WindDiagram){WindDiagram.fit();return;}
+    if(key==='arrivalaxon' && window.ArrivalAxon){ArrivalAxon.fit();return;}
     if (window.BuildingMap && BuildingMap.fit(key)) return;
     map.invalidateSize({animate:false});
     if(key==='picturesnew' && window.picturesNew){window.picturesNew.fit();return;}
@@ -4392,7 +4396,8 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     storyView.hidden = !storyOn;
     if(window.SunAxon) SunAxon.show(key==='sunaxon');
     if(window.WindDiagram) WindDiagram.show(key==='winddiagram');
-    if(key==='sunaxon'||key==='winddiagram'){
+    if(window.ArrivalAxon) ArrivalAxon.show(key==='arrivalaxon');
+    if(key==='sunaxon'||key==='winddiagram'||key==='arrivalaxon'){
       lastTab=key;
       setPicturesMode(false);
       try { map.closePopup(); } catch(e) {}
