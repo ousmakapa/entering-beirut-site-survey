@@ -24,7 +24,7 @@ window.ArrivalAxon=(()=>{
    heightDatum:'Flat schematic ground Z=0. Bridge and road levels are unknown; coloured traces remain at Z=0 and are NOT a built section.',approaches,
    anchors:{north:xy([33.8970087,35.5415606]),south:xy([33.895269,35.5407867]),bridge:xy([33.89612,35.540951]),edge:xy([33.89657,35.541311]),seaside:xy([33.8979289,35.5419412]),highway:xy([33.89591,35.5421754])}};
  }
- function draw(m){
+ function draw(m,{contextOnly=false}={}){
   const s=el('svg',{xmlns:NS,viewBox:'-282 -209 564 418',role:'img','aria-label':'Arrival axonometric: Street 80, Street 52, the footbridge, mapped stairs and our plot','data-arrival-axon':'drawing'});
   s.appendChild(el('title',{},'Two approaches. One arrival to resolve.'));
   s.appendChild(el('desc',{},m.scope+' '+m.heightDatum));
@@ -59,6 +59,7 @@ window.ArrivalAxon=(()=>{
   for(const a of m.approaches)for(const r of a.segments){const p=r.points.map(project);line(routes,p,'#faf9f5',a.key==='bridge'?4.5:3.5);line(routes,p,a.color,a.key==='steps'?1.4:a.key==='bridge'?2.4:1.9,a.key==='bridge'?'3 1':null,{'data-way':r.id,'data-approach':a.key,'data-z':'0'});
    if(a.key==='steps'){const [u,v]=p,dx=v[0]-u[0],dy=v[1]-u[1],length=Math.hypot(dx,dy);if(length)for(let t=.15;t<1;t+=.25){const x=u[0]+t*dx,y=u[1]+t*dy;line(routes,[[x-2*dy/length,y+2*dx/length],[x+2*dy/length,y-2*dx/length]],a.color,.8);}}
   }
+  if(contextOnly)return s;
   function call(anchor,to,title,detail,color,icon){const q=project(anchor),turn=[to[0],q[1]];line(g,[q,turn,[to[0],to[1]+5]],color,.55,'1.4 1.6');g.appendChild(el('rect',{x:q[0]-1.8,y:q[1]-1.8,width:3.6,height:3.6,fill:'#faf9f5',stroke:color,'stroke-width':.8}));
    const cx=to[0],cy=to[1]-4;g.appendChild(el('circle',{cx,cy,r:8.5,fill:'#faf9f5',stroke:color,'stroke-width':.7}));
    if(icon==='walk'){g.appendChild(el('circle',{cx,cy:cy-3,r:1.1,fill:color}));line(g,[[cx,cy-1],[cx-1,cy+2],[cx-3,cy+5]],color,.8);line(g,[[cx-1,cy+2],[cx+2,cy+5]],color,.8);line(g,[[cx-3,cy+1],[cx,cy-1],[cx+3,cy+1]],color,.8);}
