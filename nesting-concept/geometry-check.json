@@ -1,0 +1,28 @@
+{
+  "citySourceSha256": "b93b8ea27ae186095d72d667e2802e6c2076be31c13ed322357f037ca1f935e1",
+  "plotMatchesInstructor": true,
+  "envelopeArea": 407.9999999999999,
+  "envelopeCoverage": 27.410152653629876,
+  "envelopeWithinInset": true,
+  "ribbonBounds": {
+    "x": [
+      -8,
+      8
+    ],
+    "y": [
+      -11.5,
+      11.5
+    ]
+  },
+  "envelopeBounds": {
+    "x": [
+      -8.5,
+      8.5
+    ],
+    "y": [
+      -12,
+      12
+    ]
+  },
+  "status": "concept ribbons, not new footprint or height model"
+}
