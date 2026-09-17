@@ -1,0 +1,175 @@
+{
+  "revision": "cafe-arrival7",
+  "options": [
+    {
+      "id": "a",
+      "name": "Linked pockets",
+      "subtitle": "A sequence with thicker thresholds",
+      "mode": "PRIMARY STUDY A",
+      "story": [
+        "The south arrival remains outside first.",
+        "A porch leads into a shared interior,",
+        "then small rooms nest along its edge."
+      ],
+      "risk": [
+        "Risk: a corridor with rooms attached.",
+        "Test each shared pocket as a place to stay,",
+        "not just a route through the building."
+      ],
+      "operation": "Cross the layers in sequence.",
+      "void": 0
+    },
+    {
+      "id": "b",
+      "name": "Pocket court",
+      "subtitle": "Outside reappears inside the nest",
+      "mode": "PRIMARY STUDY B",
+      "story": [
+        "Enter through the same south porch.",
+        "The shared interior surrounds a small",
+        "open court; rooms form its outer edge."
+      ],
+      "risk": [
+        "Risk: the court consumes scarce floor area.",
+        "The earlier large court is reduced to a",
+        "small test pocket, not two separate wings."
+      ],
+      "operation": "Nest an outdoor pocket inside shared space.",
+      "void": 60
+    },
+    {
+      "id": "c",
+      "name": "Vertical commons",
+      "subtitle": "The threshold continues upstairs",
+      "mode": "COMPARISON STUDY C",
+      "story": [
+        "The south porch leads to a compact hall.",
+        "Shared landings extend the arrival upward;",
+        "contained rooms sit beside these landings."
+      ],
+      "risk": [
+        "Risk: the public life moves upstairs.",
+        "Keep a useful shared ground floor and",
+        "reach every landing by lift as well as stair."
+      ],
+      "operation": "Repeat the layers on successive landings.",
+      "void": 40
+    }
+  ],
+  "geometry": {
+    "source": "02-project/drawings/_draw_data.json / site",
+    "plot": [
+      [
+        -21.519,
+        -20.293
+      ],
+      [
+        -0.656,
+        -27.49
+      ],
+      [
+        11.627,
+        -17.323
+      ],
+      [
+        20.448,
+        15.158
+      ],
+      [
+        20.188,
+        16.189
+      ],
+      [
+        19.522,
+        18.81
+      ],
+      [
+        -5.887,
+        29.687
+      ],
+      [
+        -21.519,
+        -20.293
+      ]
+    ],
+    "inset": [
+      [
+        -16.54154507611795,
+        -17.77873343093802
+      ],
+      [
+        -3.390975718589169,
+        24.26741910803898
+      ],
+      [
+        16.131726688918437,
+        15.910205755035701
+      ],
+      [
+        16.310311837739494,
+        15.207395432122798
+      ],
+      [
+        16.31330739785158,
+        15.195516884139872
+      ],
+      [
+        8.099273321104565,
+        -15.050491600932093
+      ],
+      [
+        -1.4756495722082965,
+        -22.975936610808496
+      ],
+      [
+        -16.54154507611795,
+        -17.77873343093802
+      ]
+    ],
+    "envelope": [
+      [
+        4.620129969012959,
+        -8.960816561699687
+      ],
+      [
+        11.637050882358642,
+        13.990497581413162
+      ],
+      [
+        -4.620129969012959,
+        18.960816561699687
+      ],
+      [
+        -11.637050882358642,
+        -3.9904975814131625
+      ],
+      [
+        4.620129969012959,
+        -8.960816561699687
+      ]
+    ],
+    "plotArea": 1488.499554,
+    "footprintLimit": 446.5498662,
+    "testFootprint": 407.9999999999999,
+    "outsideEnvelope": 1080.499554,
+    "coveragePercent": 27.410152653629876,
+    "minimumBoundaryClearance": 4.410935463056011,
+    "withinInset": true,
+    "width": 17,
+    "depth": 24,
+    "rotationDegrees": -17,
+    "centre": [
+      0,
+      5
+    ],
+    "setbackStudy": 4,
+    "notes": [
+      "Outer projected envelope includes entry porch and upper overlaps.",
+      "4 m inset on all boundaries is a study, not statutory approval.",
+      "Open ground includes routes and possible vehicle works; not all green or public.",
+      "Ramp is a requirement, not a fitted or graded design.",
+      "B1 extent, area counting and four-floor interpretation require confirmation."
+    ]
+  },
+  "notes": "Both pedestrian entrances lead to welcome/info; cafe has defined edges and a separate optional doorway. Main circulation bypasses seating. Same footprint; program/ramp fit unresolved."
+}

@@ -1,0 +1,7 @@
+.workspace.plotlayers-mode{grid-template-columns:1fr;grid-template-areas:"map"}
+.workspace.plotlayers-mode .facts-panel{display:none!important}
+.workspace.plotlayers-mode .map-shell>:not(.plotlayers-view){visibility:hidden;pointer-events:none}
+.plotlayers-view{position:absolute;inset:0;z-index:2100;background:#fcfbf6}
+.plotlayers-view[hidden]{display:none!important}
+.plotlayers-view iframe{display:block;width:100%;height:100%;border:0;background:#fcfbf6}
+@media(max-width:900px){body:has(.workspace.plotlayers-mode) .tb-right{max-width:100%;overflow-x:auto}.workspace.plotlayers-mode .map-shell{height:calc(100dvh - var(--chrome,180px));min-height:420px}}

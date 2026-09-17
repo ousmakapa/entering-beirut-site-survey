@@ -1,0 +1,132 @@
+{
+  "date": "2026-09-17",
+  "status": "proposed-for-review",
+  "concept": "Layers",
+  "operation": "Nesting",
+  "source": "../../02-project/survey-data/2026-09-16-arrival-axon/studio7-arrival-geometry.json",
+  "entrances": {
+    "south": "main pedestrian arrival after C1 stairs",
+    "east": "vehicle entrance and ramp to B1 underground parking; separate walk-in door",
+    "parking": "B1 connected by lift and stairs to the shared ground welcome; capacity, ramp and planning treatment VERIFY",
+    "service": "separate candidate route; location and manoeuvre VERIFY"
+  },
+  "options": [
+    {
+      "id": "a",
+      "num": "01",
+      "name": "Linked pockets",
+      "tag": "Nest spaces along a shared route",
+      "role": "PRIMARY STUDY A",
+      "story": [
+        "From the southern stairs, enter a welcome space.",
+        "The eastern arrival meets it before the route unfolds",
+        "through display, making and shared learning."
+      ],
+      "sectionStory": [
+        "The shared route continues through overlapping landings.",
+        "Smaller meeting rooms sit within the larger work layer;",
+        "the lift reaches the same shared spaces as the public stair."
+      ],
+      "operation": "Nesting through overlap",
+      "benefit": "Makes the sequence of arrivals and encounters clearest.",
+      "risk": "The spine could become a long corridor with rooms attached.",
+      "test": "Give each shared pocket a purpose: welcome, display, exchange.",
+      "floors": [
+        [
+          "G",
+          "Welcome + cafe / retail; introductory display; workshop access"
+        ],
+        [
+          "L1",
+          "Exhibition + event; learning around a shared landing"
+        ],
+        [
+          "L2",
+          "Co-working + meetings; a learning link"
+        ],
+        [
+          "L3",
+          "Quiet work + productive growing; controlled access"
+        ]
+      ]
+    },
+    {
+      "id": "b",
+      "num": "02",
+      "name": "Shared court",
+      "tag": "Nest rooms around a common outdoor space",
+      "role": "PRIMARY STUDY B",
+      "story": [
+        "Both entrances reach the same welcome space.",
+        "From here, a public loop opens onto a shared court;",
+        "display, learning and cafe spaces address this centre."
+      ],
+      "sectionStory": [
+        "Upper galleries overlook the open court.",
+        "Shared circulation surrounds it, with quieter rooms behind.",
+        "Growing occupies part of an upper edge, beside support."
+      ],
+      "operation": "Nesting through enclosure",
+      "benefit": "Makes a shared centre easy to recognise and inhabit.",
+      "risk": "A large court may squeeze the small permitted floor plates.",
+      "test": "Keep the southern entrance visible; test daylight and floor area.",
+      "floors": [
+        [
+          "G",
+          "Welcome + cafe / retail; display; court; workshop access"
+        ],
+        [
+          "L1",
+          "Exhibition + event; learning on the court edge"
+        ],
+        [
+          "L2",
+          "Co-working + meetings; gallery and controlled rooms"
+        ],
+        [
+          "L3",
+          "Quiet work + productive growing at the court edge"
+        ]
+      ]
+    },
+    {
+      "id": "c",
+      "num": "03",
+      "name": "Vertical commons",
+      "tag": "Nest shared places between the floors",
+      "role": "COMPARISON STUDY C",
+      "story": [
+        "The southern and eastern doors meet at a compact lobby.",
+        "Cafe, display and a demonstration space animate the ground.",
+        "A visible lift and stair lead toward shared upper places."
+      ],
+      "sectionStory": [
+        "A stepped sequence of voids links the floors visually.",
+        "Public galleries sit between learning and work layers.",
+        "A terrace connects to growing at the upper level."
+      ],
+      "operation": "Nesting through section",
+      "benefit": "Gives the strongest vertical exchange within a compact body.",
+      "risk": "Public life could retreat upstairs; voids consume floor area.",
+      "test": "Keep an active ground level and equal lift access to every landing.",
+      "floors": [
+        [
+          "G",
+          "Welcome + cafe / retail; display; demonstration"
+        ],
+        [
+          "L1",
+          "Exhibition + event; workshop / learning; shared landing"
+        ],
+        [
+          "L2",
+          "Co-working + meetings; collaboration overlooking below"
+        ],
+        [
+          "L3",
+          "Productive growing + quiet work; upper shared terrace"
+        ]
+      ]
+    }
+  ]
+}

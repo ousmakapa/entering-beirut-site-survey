@@ -242,12 +242,14 @@
     border-radius:3px; color:var(--brand-offwhite); font-family:var(--font-mono); font-size:.68rem;
     letter-spacing:.08em; text-transform:uppercase; text-decoration:none;}
   @media (max-width:700px){
+    body:has(.workspace.story-mode) .tb-right{flex-wrap:wrap; max-width:100%;}
     .story-view{padding:1.1rem .9rem 2rem;}
     .story-step{grid-template-columns:1fr; gap:.35rem;}
     .story-evidence{grid-template-columns:1fr;}
     .story-operation,.story-layers{grid-template-columns:1fr 1fr;}
     .story-sources ul{columns:1;}
   }
+  .story-block .story-deck-link{color:var(--accent);}
   @media (max-width:900px){.workspace{height:auto; grid-template-columns:1fr; grid-template-areas:"map" "facts";}
     .map-shell{min-height:72vh;}}
   .leaflet-container{font-family:var(--font-body); background:var(--surface-2);}
@@ -936,6 +938,16 @@
   <script src="arrival-axon.js?v=20260916-2"></script>
   <link rel="stylesheet" href="protection-diagrams.css?v=20260916-1">
   <script src="protection-diagrams.js?v=20260916-1"></script>
+  <link rel="stylesheet" href="north-south.css?v=20260916-1">
+  <script src="north-south.js?v=20260916-1"></script>
+  <link rel="stylesheet" href="city-layers.css?v=20260917-3">
+  <script src="city-layers.js?v=20260917-4"></script>
+  <script src="territory-layers-data.js?v=20260917-2"></script>
+  <script src="territory-layers.js?v=20260917-2"></script>
+  <link rel="stylesheet" href="plot-layers.css?v=20260917-1">
+  <script src="plot-layers.js?v=20260917-1"></script>
+  <link rel="stylesheet" href="nesting-concept.css?v=20260917-1">
+  <script src="nesting-concept.js?v=20260917-1"></script>
   <link rel="stylesheet" href="architectural-map.css?v=20260916-cad2">
 </head>
 <body>
@@ -1098,61 +1110,73 @@
     </div>
 
     <section class="story-view" id="story-view" aria-labelledby="story-title" hidden>
-      <div class="story-page">
-        <div class="story-kicker">Selected concept · 2026-09-11</div>
-        <h1 class="story-title" id="story-title">Nesting</h1>
-        <p class="story-lede"><b>The Sheltered Heart.</b> Because the plot has no naturally protected end, the building creates its own shelter: robust functions form the outer layers, public life occupies a changing inner heart, and the nest opens toward the eastern arrival before rising into an ecological upper layer.</p>
+      <div class="story-page" data-story-version="2026-09-17-layers-1">
+        <div class="story-kicker">Current direction locked · 2026-09-17 · wording and form to develop</div>
+        <h1 class="story-title" id="story-title">Layers</h1>
+        <p class="story-lede"><b>From separated layers to interrelated layers.</b> The city gives us different spatial conditions and interrupted local continuity. Our concept is layering. Nesting is how those layers can overlap, contain and connect spaces without erasing their differences. Protection and comfort remain requirements—not the main explanation of the concept.</p>
         <hr class="story-rule">
 
         <section class="story-block">
-          <div class="story-kicker">What the site tells us</div>
-          <h2>Pressure surrounds the clearing; release concentrates on the east</h2>
+          <div class="story-kicker">Reading the drawing · existing conditions</div>
+          <h2>One city, several changes in space</h2>
+          <p>The north and south are not completely disconnected: a bridge already links them. But the journey changes abruptly between small neighbourhood streets, major infrastructure and larger built surroundings. Our plot sits north of the highway, near the northern arrival of C1 and beside the Street 80 approach.</p>
+          <p>Our drawing identifies seven spatial conditions together. They are not seven separate districts: five broad context bands are crossed by C1, with our unbuilt plot highlighted inside the intermediate strip.</p>
+          <div class="story-timeline">
+            <article class="story-step" data-story-condition="1"><div class="story-date">01 · Southern fabric</div><div><h2>The neighbourhood-scale approach</h2><p>Small footprints and closely spaced streets form the southern context. Homes, shops and workshops overlap; this is not a purely residential zone. Street 52 brings the local approach toward the highway.</p></div></article>
+            <article class="story-step" data-story-condition="2"><div class="story-date">02 · Highway</div><div><h2>A regional connection, a local interruption</h2><p>The highway carries east–west movement across the wider city, while interrupting the north–south neighbourhood approach. It connects at one scale and makes crossing dependent on specific links at another.</p></div></article>
+            <article class="story-step" data-story-condition="3"><div class="story-date">03 · C1 crossing</div><div><h2>A link exists, but the journey changes</h2><p>The pedestrian bridge connects the two sides. Its mapped stairs mean the approach is not simply a continuation of a street-level walk. Landings, levels and a complete accessible journey still need checking. The bridge crosses the layers; it is not another district.</p></div></article>
+            <article class="story-step" data-story-condition="4"><div class="story-date">04 · Our plot</div><div><h2>An opening within the intermediate strip</h2><p>The unbuilt plot lies near the northern crossing arrival. It is not an established public plaza or a separate city layer. Its position gives us an opportunity: choosing to make it a transition is our architectural response, not something the existing site already proves.</p></div></article>
+            <article class="story-step" data-story-condition="5"><div class="story-date">05 · Built frontages</div><div><h2>Street 80 returns the approach to a local scale</h2><p>Street 80 continues beside existing buildings toward the north. The plot belongs to this intermediate built strip. Its street-side relationship differs from its highway-facing edge and neighbouring building edges; one uniform response would overlook those differences.</p></div></article>
+            <article class="story-step" data-story-condition="6"><div class="story-date">06 · Seaside Road</div><div><h2>Another seam in the sequence</h2><p>Street 80 meets an east–west road before the larger northern fabric. This is a further change in the local sequence, not the shoreline: the coast is farther north. The actual ease of pedestrian crossing remains to be checked.</p></div></article>
+            <article class="story-step" data-story-condition="7"><div class="story-date">07 · Northern fabric</div><div><h2>A different building grain</h2><p>Larger footprints contrast with the smaller southern fabric. This changes the scale of the built surroundings, but size alone does not establish industrial use, building height or activity. Our proposal must relate to this change without copying the largest footprints as an isolated object.</p></div></article>
+          </div>
+          <a class="story-deck-link" href="site-analysis-map.html?review=story-context#citylayers">Read the seven conditions in one drawing →</a>
+        </section>
+
+        <section class="story-block">
+          <div class="story-kicker">The interpretation · not another site fact</div>
+          <h2>The concept is layers; the change is in their relationship</h2>
+          <p>The important finding is not simply that the city has many layers. Here, the north–south local approach encounters east–west infrastructure and changing building scales near our plot. Connections exist, but the transitions remain abrupt.</p>
+          <p>I take layering from this analysis, but I do not reproduce the separation. In the project, layers should overlap and share spaces rather than sit beside one another as isolated pieces. They can keep their distinct character while becoming part of a connected whole.</p>
+          <div class="story-caution"><b>A local role, not a city-wide claim.</b> Our plot cannot remove the highway barrier or reconnect the entire district. Near C1 and Street 80, it can be designed to support a more continuous local transition. The exact entrance, surrounding access and landings remain to be verified.</div>
+        </section>
+
+        <section class="story-block">
+          <div class="story-kicker">Architectural translation</div>
+          <h2>Nesting brings the layers into a relationship</h2>
+          <p>Nesting is the spatial operation—not a decorative nest shape. One layer can contain part of another, overlap it or meet it around a shared space. Openings and thresholds allow movement between them, so enclosure does not automatically become isolation.</p>
+          <p>We will test these relationships in plan and section. The concept does not prescribe concentric rings, a fixed central courtyard, an east-only entrance or a programme stack. Seven site conditions do not require seven architectural shells.</p>
           <div class="story-evidence">
-            <article><span class="story-number">Pressure</span><p>The highway condition reaches almost the whole open plot; the northern industrial edge closes the opposite side, and neighbours provide little useful shade.</p></article>
-            <article><span class="story-number">Release</span><p>The east is the only side where confirmed walkable frontage, public arrival, the living fabric and the clearest open view converge.</p></article>
-            <article><span class="story-number">Need</span><p>Nearby canopy is private and walled. The project cannot borrow shelter or accessible green; it has to manufacture both.</p></article>
-          </div>
-          <div class="story-caution"><b>Important distinction.</b> The concept is not a courtyard copied from the neighbourhood. No local courtyard pattern was measured. Nesting is a site response developed through edge depth, program and section.</div>
-        </section>
-
-        <section class="story-block">
-          <div class="story-kicker">Analysis becomes architecture</div>
-          <h2>Four operations, in one direction</h2>
-          <div class="story-operation">
-            <article><svg viewBox="0 0 150 90"><polygon points="43,10 111,17 128,61 101,79 39,70 22,43" fill="#eee4db" stroke="#c94f18" stroke-width="2"/><path d="M12 84L38 69M55 88L63 73M110 86L103 76M142 71L126 61" stroke="#c94f18" stroke-width="3"/></svg><div><b>1 · Exposed</b><p>Read the whole clearing as a pressure field.</p></div></article>
-            <article><svg viewBox="0 0 150 90"><polygon points="43,10 111,17 128,61 101,79 39,70 22,43" fill="#4a5a46"/><polygon points="50,28 105,31 110,57 95,68 48,61 37,44" fill="#c8bcac"/></svg><div><b>2 · Thicken</b><p>Place robust uses on the hard edges.</p></div></article>
-            <article><svg viewBox="0 0 150 90"><polygon points="43,10 111,17 118,34 107,34 119,58 101,79 39,70 22,43" fill="#4a5a46"/><polygon points="50,28 106,32 119,58 96,68 48,61 37,44" fill="#c8bcac"/><path d="M106 44H145" stroke="#c94f18" stroke-width="4"/></svg><div><b>3 · Open east</b><p>Make the protected heart the public address.</p></div></article>
-            <article><svg viewBox="0 0 150 90"><polygon points="28,65 95,78 130,60 61,49" fill="#2f3830"/><polygon points="37,49 96,60 123,47 63,38" fill="#596a56"/><polygon points="48,35 96,43 116,33 67,26" fill="#84927e"/><polygon points="62,21 97,27 110,20 74,15" fill="#c8bcac"/><path d="M113 74C138 56 135 35 118 22" stroke="#c94f18" stroke-width="3" fill="none"/></svg><div><b>4 · Lift the heart</b><p>Entry becomes forum, overlook, terrace and garden.</p></div></article>
+            <article><span class="story-number">Layers</span><p>The concept: derive distinct spatial relationships from the urban analysis.</p></article>
+            <article><span class="story-number">Nesting</span><p>The operation: overlap, contain and connect those layers through shared spaces.</p></article>
+            <article><span class="story-number">Comfort</span><p>A requirement: test how the arrangement supports access, shelter and usable spaces.</p></article>
           </div>
         </section>
 
         <section class="story-block">
-          <div class="story-kicker">How the program nests</div>
-          <h2>The hard functions protect the soft ones</h2>
-          <div class="story-layers">
-            <div class="story-layer"><b>Robust ground</b><span>workshop · service · parking</span></div>
-            <div class="story-layer"><b>Public heart</b><span>entry · exhibition · café · community</span></div>
-            <div class="story-layer"><b>Quiet work</b><span>co-working · learning · meeting</span></div>
-            <div class="story-layer"><b>Ecological top</b><span>greenhouse · productive garden · terrace</span></div>
-          </div>
-          <p>The heart is not one full-height hole. It changes through the section—entrance cut, double-height forum, occupied overlook, terrace, then ecological room—so the shared space remains generous without consuming the complete floor plate.</p>
+          <div class="story-kicker">What stays in the project</div>
+          <h2>Protection is a test, not the concept's starting point</h2>
+          <p>The six investigations remain: noise; air, dust and odour; sun, glare and heat; wind and ventilation; rain, drainage and ground; and traffic and visual exposure. They help test the design. They do not determine six walls or prove that an enclosed space will be comfortable.</p>
+          <p>Protection may emerge from the arrangement, but it must be demonstrated. The concept should still make sense when described through urban relationships, before discussing temperature or environmental performance.</p>
         </section>
 
         <section class="story-conclusion">
-          <div class="story-kicker">Design direction</div>
-          <h2>Protect → open → gather → rise</h2>
-          <p>South buffers the corridor. North-west becomes the serviced back. West is deeply shaded and filtered. East opens through a public loggia. One compact structural frame holds the changing heart while lower large-span rooms divide into smaller spaces above.</p>
-          <a class="story-deck-link" href="presentation.html" target="_blank" rel="noopener">Open the 9-slide visual presentation ↗</a>
+          <div class="story-kicker">The jury story · current direction</div>
+          <h2>From separated layers to interrelated layers</h2>
+          <p>“Our analysis reveals different urban layers. The southern neighbourhood, highway, intermediate strip and larger northern fabric are connected at particular points, but the transitions between them remain abrupt.</p>
+          <p>Rather than introduce another isolated building, I want our project to bring these conditions into a relationship. I take layering from the city, but change how the layers work: instead of remaining separated, they overlap and connect through shared spaces.</p>
+          <p>Nesting is the spatial operation that brings the layers together without erasing their differences. Our plot cannot reconnect the whole district, but near the existing bridge and Street 80 it can support a more continuous local transition.”</p>
         </section>
 
         <section class="story-sources">
-          <h2>Evidence base</h2>
+          <h2>Evidence and next design test</h2>
           <ul>
-            <li>Professor's cadastral survey: exact plot, surrounding structures, boundaries and distances.</li>
-            <li>Site drawings: figure-ground, grain, four edges, access, environmental conditions and program relationships.</li>
-            <li>Field survey: 71 building-part records and 59 exact linked screen captures, current 2026-09-11.</li>
-            <li>Program and regulatory envelope remain design constraints; detailed massing, structure and environmental systems are the next tests.</li>
+            <li>Location and geometry: professor's plot boundary, corrected building model and mapped Street 52 / C1 / Street 80 components. Approximate footprints and unknown heights remain qualified.</li>
+            <li>District context: <a href="https://www.area-arch.it/en/bourj-hammoud-district/" target="_blank" rel="noopener">Harmandayan's district account (2014)</a> and <a href="https://associer.archi/fr/projets/bourj-hammoud-nord-beyrouth-liban-renouvellement-urbain" target="_blank" rel="noopener">Associer's strategic study</a>. These do not certify individual uses or an accessible route.</li>
+            <li>Student decision: Layers is the current concept; nesting is the operation. Wording, massing, programme relationships and environmental performance remain to develop.</li>
+            <li>Next: test whether overlapping layers create meaningful shared spaces and a legible local arrival, without obstructing access. No new building form is approved here.</li>
           </ul>
+          <p><a href="presentation.html" target="_blank" rel="noopener">Earlier presentation — archived concept, not this current direction ↗</a></p>
         </section>
       </div>
     </section>
@@ -1483,8 +1507,13 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     {key:'winddiagram', label:'Wind / Site Diagram', short:'Wind · Diagram', group:'ANALYSIS', color:'#54808a', blurb:'Incoming direction cases on our actual building plan; not measured airflow.'},
     {key:'arrivalaxon', label:'Arrival / Axonometric', short:'Arrival · 3D', group:'ANALYSIS', color:'#6b836d', blurb:'Street 80, Street 52 and the footbridge on our building model. Original accessibility map retained.'},
     {key:'protectiondiagrams', label:'Protection / Six Conditions', short:'Protection · 6', group:'ANALYSIS', color:'#8a7263', blurb:'Six matching site axonometrics, one per protection investigation. Original Protection map retained.'},
+    {key:'northsouth', label:'North–South / Site relationships', short:'North–South', group:'ANALYSIS', color:'#b98740', blurb:'Existing urban fabrics, highway and north–south crossing in one architectural sheet. No proposed massing.'},
+    {key:'citylayers', label:'City Layers / Section-perspectives', short:'City Layers', group:'ANALYSIS', color:'#a58c62', blurb:'The city sequence, crossing and plot edges in three source-based spatial strips. Site analysis, not proposed massing.'},
+    {key:'territorylayers', label:'River & Coast / Wider layers', short:'River & Coast', group:'ANALYSIS', color:'#39839a', blurb:'Wider river, coastal territory and local crossing relationships. Separate from the five-layer city sequence.'},
     {key:'wind', label:'Wind & Air', short:'Wind', group:'ANALYSIS', color:'var(--layer-movement)', blurb:'Prevailing wind by season, plotted against the plot\u2019s own surveyed axis to find the cross-ventilation line. The directions are station data for Beirut, not a site measurement \u2014 the geometry they are drawn against is the survey.'},
-    {key:'story', label:'Nesting', short:'Story', group:'ANALYSIS', color:'var(--accent)', blurb:'The selected site-to-building concept, read as a narrative rather than another map.'}
+    {key:'layers', label:'Layers / Plot studies', short:'Layers', group:'DESIGN STUDIES', color:'#99b9aa', blurb:'From city conditions to nested spatial settings. Three unselected plan and section studies, with research and area limits.'},
+    {key:'nestingconcept', label:'Nesting / First concept study', short:'Nesting · Concept', group:'DESIGN STUDIES', color:'#dfa98b', blurb:'Existing city layers, proposed thresholds and connected nested settings. Abstract relationships, not selected massing.'},
+    {key:'story', label:'Layers · Nesting', short:'Story', group:'ANALYSIS', color:'var(--accent)', blurb:'Layers is the concept; nesting is the spatial operation. The current site-to-project story, with protection retained as a design requirement.'}
   ];
   TABS.splice(TABS.findIndex(function(t){return t.key==='pictures';})+1,0,
     {key:'picturesnew',label:'Pictures New',short:'Pictures New',group:'FIELD DATA',color:'var(--accent)',
@@ -4332,10 +4361,14 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
   /* The fit, on its own, so a rotation or a window resize can re-run just this rather
      than rebuilding every layer on the map. */
   function fitFor(key){
+    if(key==='layers'||key==='nestingconcept') return;
     if(key==='sunaxon' && window.SunAxon){SunAxon.fit();return;}
     if(key==='winddiagram' && window.WindDiagram){WindDiagram.fit();return;}
     if(key==='arrivalaxon' && window.ArrivalAxon){ArrivalAxon.fit();return;}
     if(key==='protectiondiagrams' && window.ProtectionDiagrams){ProtectionDiagrams.fit();return;}
+    if(key==='northsouth' && window.NorthSouth){NorthSouth.fit();return;}
+    if(key==='citylayers' && window.CityLayers){CityLayers.fit();return;}
+    if(key==='territorylayers' && window.TerritoryLayers){TerritoryLayers.fit();return;}
     if (window.BuildingMap && BuildingMap.fit(key)) return;
     map.invalidateSize({animate:false});
     if(key==='picturesnew' && window.picturesNew){window.picturesNew.fit();return;}
@@ -4402,7 +4435,12 @@ var CAD_DATA = /*__CAD_FULL__*/ {"src":"BOURJ HAMMOUD.dwg \u2014 complete extrac
     if(window.WindDiagram) WindDiagram.show(key==='winddiagram');
     if(window.ArrivalAxon) ArrivalAxon.show(key==='arrivalaxon');
     if(window.ProtectionDiagrams) ProtectionDiagrams.show(key==='protectiondiagrams');
-    if(key==='sunaxon'||key==='winddiagram'||key==='arrivalaxon'||key==='protectiondiagrams'){
+    if(window.NorthSouth) NorthSouth.show(key==='northsouth');
+    if(window.CityLayers) CityLayers.show(key==='citylayers');
+    if(window.TerritoryLayers) TerritoryLayers.show(key==='territorylayers');
+    if(window.PlotLayers) PlotLayers.show(key==='layers');
+    if(window.NestingConcept) NestingConcept.show(key==='nestingconcept');
+    if(key==='nestingconcept'||key==='layers'||key==='sunaxon'||key==='winddiagram'||key==='arrivalaxon'||key==='protectiondiagrams'||key==='northsouth'||key==='citylayers'||key==='territorylayers'){
       lastTab=key;
       setPicturesMode(false);
       try { map.closePopup(); } catch(e) {}
